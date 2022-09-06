@@ -5,4 +5,4 @@
   remote_user: root
   tasks:
     - name: Tell us everything works
-      shell: echo "This worked"
+      command: echo "This worked"
