@@ -1,0 +1,4 @@
+# Snap
+sudo snap install --channel=3.2 maas
+# Deb
+

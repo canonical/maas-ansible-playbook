@@ -1,0 +1,20 @@
+---
+# Playbook to generate a MAAS region
+
+- hosts: localhost
+
+  vars_prompt:
+    - name: maas_installation_channel
+      prompt: Install MAAS from [deb] or [snap]?
+      default: "snap"
+      private: false
+
+    - name: maas_version
+      prompt: Version of MAAS to install
+      default: "latest"
+      private: false
+
+  tasks:
+    - name: Print a message
+      ansible.builtin.debug:
+        msg: 'Installing MAAS {{ maas_installation_channel }} v.{{ maas_version }}'

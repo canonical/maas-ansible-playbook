@@ -1,0 +1,4 @@
+# Global variable file for Ansible playbooks
+
+# The port MAAS uses to comunicate on
+maas_port: 5240
