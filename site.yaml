@@ -1,0 +1,7 @@
+---
+
+# This playbook should deploy everything
+
+- hosts: localhost
+  roles:
+  - role: common

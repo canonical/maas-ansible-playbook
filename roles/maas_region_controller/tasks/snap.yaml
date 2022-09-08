@@ -1,0 +1,6 @@
+---
+# Installs MAAS from snap
+
+- name: Print a message
+  ansible.builtin.debug:
+    msg: 'Installing MAAS {{ maas_installation_channel }} v.{{ maas_version }}'
