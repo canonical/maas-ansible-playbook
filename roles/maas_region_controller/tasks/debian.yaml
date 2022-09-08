@@ -1,0 +1,6 @@
+---
+# Installs MAAS from snap
+
+- name: Print a message
+  ansible.builtin.debug:
+    msg: 'Installation for MAAS Deb currently not supported'
