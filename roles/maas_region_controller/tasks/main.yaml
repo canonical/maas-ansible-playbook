@@ -1,7 +1,7 @@
 ---
 # Playbook to generate a MAAS region
 
-- hosts: any
+- hosts: localhost
 
   vars_prompt:
     - name: maas_installation_channel
@@ -15,6 +15,10 @@
       private: false
 
   tasks:
+    - name: Display choices
+      ansible.builtin.debug:
+        msg: 'Installing MAAS {{ maas_installation_channel }} V. {{ maas_version }}'
+
     - name: Install MAAS with Snap
       import_tasks: snap.yaml
       when: maas_installation_channel|lower == 'snap'
@@ -22,3 +26,6 @@
     - name: Install MAAS with Debian
       import_tasks: debian.yaml
       when: maas_installation_channel|lower == 'deb'
+
+    - name: Initialise MAAS region
+      ansible.builtin.command: maas init region --database-uri maas-test-db:///
