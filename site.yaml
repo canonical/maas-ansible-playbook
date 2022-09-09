@@ -2,6 +2,6 @@
 
 # This playbook should deploy everything
 
-- hosts: localhost
+- hosts: any
   roles:
   - role: common

@@ -1,7 +1,7 @@
 ---
 # Playbook to generate a MAAS region
 
-- hosts: localhost
+- hosts: any
 
   vars_prompt:
     - name: maas_installation_channel

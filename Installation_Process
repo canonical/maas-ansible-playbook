@@ -1,4 +1,40 @@
-# Snap
-sudo snap install --channel=3.2 maas
-# Deb
+[x] When running the playbook for a host with the maas_region_controller role,
+    the playbook installs the MAAS Region Controller
 
+[ ] A documented Ansible Variable provides the user with the ability to set
+    whether it’s a deb installation or a snap installation, and additional
+    variables for MAAS version, snap channel and ppa
+    [x] The default installation is a snap
+
+[ ] A successful run of the playbook should give the operator an accessible
+    and ready MAAS instance
+
+[ ] The installed region controller is used to set a maas_url variable when
+    there is not one already set for later Rack Controller configuration use.
+
+[ ] The operator can optionally enable TLS
+
+[ ] The playbook sets up the admin user
+
+[ ] The playbook adds any provided preseeds
+
+[ ] Uses an Ansible Variable to determine what version of MAAS to deploy with,
+    won’t execute (i.e “skipped” in the context of Ansible) if host_vars show
+    the Ubuntu version is incompatible with the version and install method
+
+[ ] The Region Controller tasks should be able to execute on multiple hosts in
+    a single execution if the target is an Ansible Group rather than a single host
+
+[ ] Only install the maas-region-api deb if using the deb installation
+
+[ ] Once the region controller is installed, run migrations using the configured
+    postgresql primary instance
+
+[ ] Running on an already configured machine but with a new version should
+    upgrade the instance
+
+[ ] The operator should be able to override the postgres DSN variable and not
+    set the maas_postgresql_primary or maas_postgresql_secondary on any machine
+    to be able to use an existing Postgresql instance not managed by this playbook
+
+[ ] Optionally install grafana agent
