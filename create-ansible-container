@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# create the container
+cat <<EOF | lxc launch ubuntu:jammy ansible-container
+description: Testing environment for MAAS ansible playbooks
+devices:
+    work:
+        type: disk
+        source: $(pwd)
+        path: /work
+EOF
+
+# install ansible in the container
+lxc exec ansible-container -- "sudo apt update; sudo apt install python3-pip -y; python3 -m pip install ansible"
+
+# login
+lxc shell ansible-container
+
+# remove the container once complete
+lxc delete ansible-container --force

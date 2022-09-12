@@ -1,12 +1,12 @@
 [x] When running the playbook for a host with the maas_region_controller role,
     the playbook installs the MAAS Region Controller
 
-[ ] A documented Ansible Variable provides the user with the ability to set
+[x] A documented Ansible Variable provides the user with the ability to set
     whether it’s a deb installation or a snap installation, and additional
     variables for MAAS version, snap channel and ppa
     [x] The default installation is a snap
 
-[ ] A successful run of the playbook should give the operator an accessible
+[x] A successful run of the playbook should give the operator an accessible
     and ready MAAS instance
 
 [ ] The installed region controller is used to set a maas_url variable when
@@ -14,7 +14,7 @@
 
 [ ] The operator can optionally enable TLS
 
-[ ] The playbook sets up the admin user
+[x] The playbook sets up the admin user
 
 [ ] The playbook adds any provided preseeds
 
