@@ -9,6 +9,8 @@
   when: maas_installation_channel|lower == 'snap'
 
 - name: Update MAAS deb
-  ansible.builtin.debug:
-    msg: 'This playbook currently does not support updating MAAS deb'
+  ansible.builting.command: add-apt-repository ppa:maas/{{ maas_version }}
+  with_items:
+  - apt update
+  - apt upgrade maas 
   when: maas_installation_channel|lower == 'deb'
