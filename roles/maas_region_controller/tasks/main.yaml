@@ -33,7 +33,7 @@
     - name: Add an administrator to MAAS
       ansible.builtin.command: maas createadmin
     
-    -name: Configure TLS
-      ansible.builtin.command: maas config-tls enable <key> <cert>
-      # TLS is available only in MAAS 3.2 or higher
-      when: enable_tls && maas_version is version("3.2", '>=')
+    # -name: Configure TLS
+    #   ansible.builtin.command: maas config-tls enable <key> <cert>
+    #   # TLS is available only in MAAS 3.2 or higher
+    #   when: enable_tls && maas_version is version("3.2", '>=')
