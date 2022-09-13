@@ -28,7 +28,12 @@
       when: maas_installation_channel|lower == 'deb'
 
     - name: Initialise MAAS region
+      ansible.builtin.command: maas init region --maas-url={{ maas_url }} --database-uri maas-test-db:///
+      when: maas_url != ""
+
+    - name: Initialise MAAS region
       ansible.builtin.command: maas init region --database-uri maas-test-db:///
+      when: maas_url == ""
 
     - name: Define MAAS URL
       shell: maas config | grep maas_url | cut -d "=" -f2

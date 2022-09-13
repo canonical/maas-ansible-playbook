@@ -9,7 +9,7 @@
 [x] A successful run of the playbook should give the operator an accessible
     and ready MAAS instance
 
-[ ] The installed region controller is used to set a maas_url variable when
+[x] The installed region controller is used to set a maas_url variable when
     there is not one already set for later Rack Controller configuration use.
 
 [~] The operator can optionally enable TLS
