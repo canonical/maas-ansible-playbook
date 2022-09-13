@@ -1,0 +1,5 @@
+---
+# Installs MAAS
+- name: Display choices
+  ansible.builtin.debug:
+    msg: 'Updating MAAS {{ maas_installation_channel }} to V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
