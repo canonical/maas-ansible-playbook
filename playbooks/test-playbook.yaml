@@ -1,0 +1,8 @@
+---
+# The playbook merely verifies that things work
+
+- hosts: $servername
+  remote_user: root
+  tasks:
+    - name: Tell us everything works
+      command: echo "This worked"
