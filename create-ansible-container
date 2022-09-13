@@ -11,7 +11,7 @@ devices:
 EOF
 
 # install ansible in the container
-lxc exec ansible-container -- "sudo apt update; sudo apt install python3-pip -y; python3 -m pip install ansible"
+lxc exec ansible-container -- "sudo apt update; sudo apt install python3-pip -y; python3 -m pip install ansible;"
 
 # login
 lxc shell ansible-container

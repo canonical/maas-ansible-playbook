@@ -1,6 +1,8 @@
 ---
-# Installs MAAS from snap
+# Installs MAAS from deb
 
-- name: Print a message
-  ansible.builtin.debug:
-    msg: 'Installation for MAAS Deb currently not supported'
+- name: Install "MAAS" from deb
+  ansible.builtin.command: maas config-tls enable
+
+-name: Install deb dependencies
+  ansible.builtin.command: apt get maas-region-deb

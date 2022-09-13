@@ -29,3 +29,11 @@
 
     - name: Initialise MAAS region
       ansible.builtin.command: maas init region --database-uri maas-test-db:///
+
+    - name: Add an administrator to MAAS
+      ansible.builtin.command: maas createadmin
+    
+    -name: Configure TLS
+      ansible.builtin.command: maas config-tls enable <key> <cert>
+      # TLS is available only in MAAS 3.2 or higher
+      when: enable_tls && maas_version >= "3.2"
