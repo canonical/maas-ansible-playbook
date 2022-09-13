@@ -3,3 +3,12 @@
 - name: Display choices
   ansible.builtin.debug:
     msg: 'Updating MAAS {{ maas_installation_channel }} to V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
+
+- name: Update MAAS snap
+  ansible.builtin.command: snap refresh --channel={{ maas_version }} maas
+  when: maas_installation_channel|lower == 'snap'
+
+- name: Update MAAS deb
+  ansible.builtin.debug:
+    msg: 'This playbook currently does not support updating MAAS deb'
+  when: maas_installation_channel|lower == 'deb'
