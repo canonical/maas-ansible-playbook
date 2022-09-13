@@ -12,7 +12,7 @@
 [ ] The installed region controller is used to set a maas_url variable when
     there is not one already set for later Rack Controller configuration use.
 
-[ ] The operator can optionally enable TLS
+[~] The operator can optionally enable TLS
 
 [x] The playbook sets up the admin user
 
@@ -25,9 +25,9 @@
 [ ] The Region Controller tasks should be able to execute on multiple hosts in
     a single execution if the target is an Ansible Group rather than a single host
 
-[ ] Only install the maas-region-api deb if using the deb installation
+[x] Only install the maas-region-api deb if using the deb installation
 
-[ ] Once the region controller is installed, run migrations using the configured
+[x] Once the region controller is installed, run migrations using the configured
     postgresql primary instance
 
 [ ] Running on an already configured machine but with a new version should

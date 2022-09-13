@@ -2,7 +2,10 @@
 # Installs MAAS from deb
 
 - name: Install "MAAS" from deb
-  ansible.builtin.command: maas config-tls enable
+  ansible.builtin.apt:
+    name: maas
+    state: '{{ maas_version }}'
 
--name: Install deb dependencies
-  ansible.builtin.command: apt get maas-region-deb
+- name: Install deb dependencies
+  ansible.builtin.apt:
+    name: maas-region-deb

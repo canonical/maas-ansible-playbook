@@ -2,3 +2,6 @@
 
 # The port MAAS uses to comunicate on
 maas_port: 5240
+
+# The maas url
+maas_url: ""

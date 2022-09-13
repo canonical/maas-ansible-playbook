@@ -17,7 +17,7 @@
   tasks:
     - name: Display choices
       ansible.builtin.debug:
-        msg: 'Installing MAAS {{ maas_installation_channel }} V. {{ maas_version }}'
+        msg: 'Installing MAAS {{ maas_installation_channel }} V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
 
     - name: Install MAAS with Snap
       import_tasks: snap.yaml
@@ -30,10 +30,18 @@
     - name: Initialise MAAS region
       ansible.builtin.command: maas init region --database-uri maas-test-db:///
 
+    - name: Define MAAS URL
+      shell: maas config | grep maas_url | cut -d "=" -f2
+      register: maas_url
+      when: maas_url == ""
+
     - name: Add an administrator to MAAS
       ansible.builtin.command: maas createadmin
-    
+
     # -name: Configure TLS
     #   ansible.builtin.command: maas config-tls enable <key> <cert>
     #   # TLS is available only in MAAS 3.2 or higher
     #   when: enable_tls && maas_version is version("3.2", '>=')
+
+    - name: Migrate MAAS database
+      ansible.builtin.command: maas migrate

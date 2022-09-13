@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# move to the correct location
+cd $(pwd)
+
 # create the container
 cat <<EOF | lxc launch ubuntu:jammy ansible-container
 description: Testing environment for MAAS ansible playbooks
