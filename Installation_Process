@@ -30,7 +30,7 @@
 [x] Once the region controller is installed, run migrations using the configured
     postgresql primary instance
 
-[ ] Running on an already configured machine but with a new version should
+[x] Running on an already configured machine but with a new version should
     upgrade the instance
 
 [ ] The operator should be able to override the postgres DSN variable and not
