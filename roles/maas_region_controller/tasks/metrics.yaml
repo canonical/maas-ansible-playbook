@@ -43,6 +43,3 @@
     timeout: 600
     type: "virtual-machine"
     wait_for_ipv4_address: true
-
-# - name: Create the Prometheus configuration
-#   delegate_to: o11y
