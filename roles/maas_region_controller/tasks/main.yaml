@@ -14,6 +14,11 @@
       default: "latest"
       private: false
 
+    - name: install_metrics
+      prompt: Install metrics? [Y/N]
+      default: "y"
+      private: false
+
   tasks:
     - name: Determine if MAAS is already installed
       ansible.builtin.command: dpkg -l | grep maas
@@ -26,3 +31,7 @@
     - name: Run MAAS Updates
       import_tasks: update_maas.yaml
       when: maas_installed | length > 0
+
+    - name: Install maas metrics
+      when: install_metrics | length > 0
+      import_tasks: metrics.yaml

@@ -37,4 +37,4 @@
     set the maas_postgresql_primary or maas_postgresql_secondary on any machine
     to be able to use an existing Postgresql instance not managed by this playbook
 
-[ ] Optionally install grafana agent
+[x] Optionally install grafana agent

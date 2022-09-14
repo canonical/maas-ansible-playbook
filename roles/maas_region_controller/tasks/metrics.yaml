@@ -1,0 +1,48 @@
+---
+# Install grafana agents for maas
+
+- name: Create an observation VM
+  community.general.lxd_container:
+    name: o11y
+    config:
+      user.user-data:
+        apt:
+          sources:
+            grafana:
+              source: 'deb {{ grafana_repo }} stable main'
+              key: $(wget -qO- {{ grafana_key }} | sed 's/^/                        /')
+        packages:
+          - unzip
+          - grafana
+          - make
+          - git
+          - python3-pip
+        runcmd:
+          - mkdir -p /opt/prometheus /opt/loki /opt/alertmanager
+          - wget -q {{ loki_pkg }} -O /tmp/loki-linux-amd64.zip
+          - unzip /tmp/loki-linux-amd64.zip -d /opt/loki
+          - chmod a+x /opt/loki/loki-linux-amd64
+          - wget -qO- {{ prom_pkg }} | tar xz --strip-components=1 -C /opt/prometheus
+          - wget -qO- {{ prom_alert_pkg }} | tar xz --strip-components=1 -C /opt/alertmanager
+          - cat /dev/zero | sudo -u ubuntu -- ssh-keygen -q -N ""
+        ssh_authorized_keys:
+          - $(cat ${HOME}/.ssh/id_rsa.pub | cut -d' ' -f1-2)
+    devices:
+      eth0:
+        type: nic
+        name: eth0
+        network: virbr0
+    profiles: ["default"]
+    source:
+      type: image
+      mode: pull
+      server: https://images.linuxcontainers.org
+      protocol: lxd
+      alias: ubuntu/jammy/amd64
+    state: started
+    timeout: 600
+    type: "virtual-machine"
+    wait_for_ipv4_address: true
+
+# - name: Create the Prometheus configuration
+#   delegate_to: o11y
