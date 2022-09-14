@@ -1,5 +1,1 @@
-grafana_repos: https://packages.grafana.com/oss/deb
-grafana_key: https://packages.grafana.com/gpg.key
-loki_pkg: https://github.com/grafana/loki/releases/download/v2.4.2/loki-linux-amd64.zip
-prom_pkg: https://github.com/prometheus/prometheus/releases/download/v2.31.1/prometheus-2.31.1.linux-amd64.tar.gz
-prom_alert_pkg: https://github.com/prometheus/alertmanager/releases/download/v0.23.0/alertmanager-0.23.0.linux-amd64.tar.gz
+grafana_agent_pkg: https://github.com/grafana/agent/releases/download/v0.22.0/agent-linux-amd64.zip

@@ -1,45 +1,33 @@
 ---
 # Install grafana agents for maas
 
-- name: Create an observation VM
-  community.general.lxd_container:
-    name: o11y
-    config:
-      user.user-data:
-        apt:
-          sources:
-            grafana:
-              source: 'deb {{ grafana_repo }} stable main'
-              key: $(wget -qO- {{ grafana_key }} | sed 's/^/                        /')
-        packages:
-          - unzip
-          - grafana
-          - make
-          - git
-          - python3-pip
-        runcmd:
-          - mkdir -p /opt/prometheus /opt/loki /opt/alertmanager
-          - wget -q {{ loki_pkg }} -O /tmp/loki-linux-amd64.zip
-          - unzip /tmp/loki-linux-amd64.zip -d /opt/loki
-          - chmod a+x /opt/loki/loki-linux-amd64
-          - wget -qO- {{ prom_pkg }} | tar xz --strip-components=1 -C /opt/prometheus
-          - wget -qO- {{ prom_alert_pkg }} | tar xz --strip-components=1 -C /opt/alertmanager
-          - cat /dev/zero | sudo -u ubuntu -- ssh-keygen -q -N ""
-        ssh_authorized_keys:
-          - $(cat ${HOME}/.ssh/id_rsa.pub | cut -d' ' -f1-2)
-    devices:
-      eth0:
-        type: nic
-        name: eth0
-        network: virbr0
-    profiles: ["default"]
-    source:
-      type: image
-      mode: pull
-      server: https://images.linuxcontainers.org
-      protocol: lxd
-      alias: ubuntu/jammy/amd64
-    state: started
-    timeout: 600
-    type: "virtual-machine"
-    wait_for_ipv4_address: true
+- name: Set the TCP port for grafana
+  ansible.builtin.command: maas $ADMIN maas set-config name=promtail_port value=5238
+
+- name: enable syslog forwarding
+  anisible.builtin.command: maas $ADMIN maas set-config name=promtail_enabled value=true
+
+- name: Download and unzip grafana agent
+  ansible.builtin.unarchive:
+      src: "{{ grafana_agent_pkg }}"
+      dest: /opt/agent
+      remote_src: true
+
+- name: Make agent executable
+  file: dest=/opt/agent/agent-linux-amd64 mode=a+x
+
+- name: Create agent directories
+  ansible.builtin.file:
+      path: "{{ item.src }}"
+      state: directory
+      mode: '0755'
+  loop:
+      - {src: "/var/lib/grafana-agent/positions"}
+      - {src: "/var/lib/grafana-agent/wal"}
+
+- name: Copy agent configuration from maas
+  ansible.builtin.copy:
+      src: /snap/maas/current/usr/share/maas/grafana_agent/agent.yaml.example
+      dest: /opt/agent/agent.yml
+
+# TODO: Start the agent: https://discourse.maas.io/t/how-to-set-up-maas-metrics/5204#heading--how-to-export-maas-controller-telemetry
