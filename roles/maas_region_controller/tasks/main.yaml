@@ -1,10 +1,10 @@
 ---
 # Playbook to generate a MAAS region
 
-- hosts: all
+- hosts: maas-region-controllers
 
   vars_prompt:
-    - name: maas_installation_channel
+    - name: maas_installation_type
       prompt: Install MAAS from [deb] or [snap]?
       default: "snap"
       private: false
@@ -12,6 +12,11 @@
     - name: maas_version
       prompt: Version of MAAS to install
       default: "latest"
+      private: false
+
+    - name: maas_snap_channel
+      prompt: Channel of MAAS to install
+      default: "stable"
       private: false
 
     - name: install_metrics

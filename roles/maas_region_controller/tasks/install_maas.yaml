@@ -2,29 +2,25 @@
 # Installs MAAS
 - name: Display choices
   ansible.builtin.debug:
-    msg: 'Installing MAAS {{ maas_installation_channel }} V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
+    msg: 'Installing MAAS {{ maas_installation_type }} V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
 
 - name: Install MAAS with Snap
   import_tasks: snap.yaml
-  when: maas_installation_channel|lower == 'snap'
+  when: maas_installation_type|lower == 'snap'
 
 - name: Install MAAS with Debian
   import_tasks: debian.yaml
-  when: maas_installation_channel|lower == 'deb'
+  when: maas_installation_type|lower == 'deb'
 
 - name: Initialise MAAS region
   ansible.builtin.command: maas init region --maas-url={{ maas_url }} --database-uri maas-test-db:///
-  when: maas_url | length > 0
-
-- name: Initialise MAAS region
-  ansible.builtin.command: maas init region --database-uri maas-test-db:///
-  when: maas_url | length == 0
 
 - name: Define MAAS URL
   ansible.builtin.command: maas config | grep maas_url | cut -d "=" -f2
   register: maas_url
   when: maas_url | length == 0
 
+# TODOD: Learn how to create a MAAS admin using flags
 - name: Add an administrator to MAAS
   ansible.builtin.command: maas createadmin
 

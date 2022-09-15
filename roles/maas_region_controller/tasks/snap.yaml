@@ -4,8 +4,4 @@
 - name: Install "MAAS" from snap
   community.general.snap:
     name: maas
-    channel: '{{ maas_version }}'
-
-- name: Install "MAAS-test-db" from snap
-  community.general.snap:
-    name: maas-test-db
+    channel: '{{ maas_version }}/{{ maas_snap_channel }}'
