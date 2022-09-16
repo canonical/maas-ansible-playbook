@@ -5,7 +5,7 @@
   ansible.builtin.apt:
     name: "maas={{ maas_version }}"
     state: 'present'
-  when: 'maas-rack-controller' in role_names
+  when: '"maas-rack-controller" in role_names'
 
 - name: Install deb dependencies
   ansible.builtin.apt:

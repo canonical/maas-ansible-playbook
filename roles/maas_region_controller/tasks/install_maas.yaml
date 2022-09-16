@@ -22,7 +22,9 @@
 
 # TODOD: Learn how to create a MAAS admin using flags
 - name: Add an administrator to MAAS
-  ansible.builtin.command: maas createadmin
+  ansible.builtin.command: maas createadmin \
+   --username={{ admin_username }} --password={{ admin_password }} \
+   --email={{ admin_email }} --ssh-import={{ admin_id }}
 
 # TODO: Ask for key/certificate location
 # -name: Configure TLS
