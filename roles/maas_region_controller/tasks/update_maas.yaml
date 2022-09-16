@@ -2,15 +2,15 @@
 # Installs MAAS
 - name: Display choices
   ansible.builtin.debug:
-    msg: 'Updating MAAS {{ maas_installation_channel }} to V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
+    msg: 'Updating MAAS {{ maas_installation_type }} to V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
 
 - name: Update MAAS snap
   ansible.builtin.command: snap refresh --channel={{ maas_version }} maas
-  when: maas_installation_channel|lower == 'snap'
+  when: maas_installation_type|lower == 'snap'
 
 - name: Update MAAS deb
   ansible.builtin.command: add-apt-repository ppa:maas/{{ maas_version }}
-  when: maas_installation_channel|lower == 'deb'
+  when: maas_installation_type|lower == 'deb'
   with_items:
     - apt update
     - apt upgrade maas

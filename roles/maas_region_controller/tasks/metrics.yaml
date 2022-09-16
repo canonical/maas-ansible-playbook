@@ -30,4 +30,18 @@
       src: /snap/maas/current/usr/share/maas/grafana_agent/agent.yaml.example
       dest: /opt/agent/agent.yml
 
-# TODO: Start the agent: https://discourse.maas.io/t/how-to-set-up-maas-metrics/5204#heading--how-to-export-maas-controller-telemetry
+- name: Start the grafana agent
+  ansible.builtin.service:
+      name: telemetry
+      args: -E HOSTNAME="$(hostname)" \
+            -E AGENT_WAL_DIR="/var/lib/grafana-agent/wal" \
+            -E AGENT_POS_DIR="/var/lib/grafana-agent/positions" \
+            -E MAAS_LOGS="/var/snap/maas/common/log/" \
+            -E MAAS_IS_REGION="true" \
+            -E MAAS_IS_RACK="false" \
+            -E MAAS_AZ="default" \
+            /opt/agent/agent-linux-amd64 \
+                -config.expand-env \
+                -config.file=/opt/agent/agent.yml
+      enabled: true
+      state: started
