@@ -1,0 +1,19 @@
+---
+# Playbook to generate a MAAS rack
+
+- hosts: maas-rack-controller
+
+  tasks:
+
+  - name: Chack MAAS Url supplied by user or region controller setup
+      ansible.builtin.fail:
+        - msg: "MAAS Url not found"
+      when: maas_url | length == 0
+
+  - name: Install maas rack controller
+      import_tasks: upgrade_maas.yaml
+      when: "'maas' not in ansible_facts.packages"
+
+  - name: Update maas rack controller
+      import_tasks: install_maas.yaml
+      when: "'maas' in ansible_facts.packages"
