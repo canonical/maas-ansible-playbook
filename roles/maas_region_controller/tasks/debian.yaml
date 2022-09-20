@@ -11,4 +11,4 @@
   ansible.builtin.apt:
     name: maas-region-api={{ maas_version }}
     state: "{{ maas_deb_state }}"
-  when: '"maas-rack-controll" not in role_names'
+  when: '"maas-rack-controller" not in role_names'
