@@ -1,0 +1,22 @@
+---
+# Playbook to generate a MAAS region
+
+- hosts: maas-region-controllers
+
+  tasks:
+
+    - name: "Check if MAAS is installed"
+      package_facts:
+        manager: "auto"
+
+    - name: "Install maas"
+      import_tasks: install_maas.yaml
+      when: "'maas' not in ansible_facts.packages"
+
+    - name: "Update maas"
+      import_tasks: update_maas.yaml
+      when: "'maas' in ansible_facts.packages"
+
+    - name: Install maas metrics
+      when: install_metrics | lower == "y"
+      import_tasks: metrics.yaml

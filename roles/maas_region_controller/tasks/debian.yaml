@@ -1,0 +1,14 @@
+---
+# Installs MAAS from deb
+
+- name: Install "MAAS" from deb
+  ansible.builtin.apt:
+    name: "maas={{ maas_version }}"
+    state: "{{ maas_deb_state }}"
+  when: '"maas-rack-controller" in role_names'
+
+- name: Install deb dependencies
+  ansible.builtin.apt:
+    name: maas-region-api={{ maas_version }}
+    state: "{{ maas_deb_state }}"
+  when: '"maas-rack-controller" not in role_names'

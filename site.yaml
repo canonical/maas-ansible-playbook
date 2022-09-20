@@ -2,6 +2,6 @@
 
 # This playbook should deploy everything
 
-- hosts: all
+- hosts: maas-region-controllers
   roles:
-  - role: common
+  - role: maas_region_controller
