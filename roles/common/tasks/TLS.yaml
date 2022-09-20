@@ -1,17 +1,29 @@
 ---
 # handle TLS setup, config, and enabling
 
-- name: Task name
+- name: Check if a certificate exists
   stat:
     path: "{{ tls_cert_path }}"
   register: tls_cert_stat
 
+- name: Check if a key exists
+  stat:
+    path: "{{ tls_key_path }}"
+  register: tls_key_stat
+
 - name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
   community.crypto.openssl_privatekey:
-    path: "{{ tls_cert_path }}"
-  when: generate_tls_cert && not tls_cert_stat.stat.exists
+    path: "{{ tls_key_path | default(/etc/ssl/private/maas_tls.pem) }}"
+  when: generate_tls_cred && not tls_key_stat.stat.exists
+
+- name: Generate a Self Signed OpenSSL certificate
+  community.crypto.x509_certificate:
+    path: "{{ tls_cert_path | default(/etc/ssl/crt/maas_tls.crt) }}"
+    privatekey_path: "{{ tls_key_path }}"
+    provider: selfsigned
+  when: generate_tls_cred && not tls_cert_stat.stat.exists
 
 - name: Configure TLS
-  ansible.builtin.command: maas config-tls enable {{ tls_key }} {{ tls_cert_path }}
+  ansible.builtin.command: maas config-tls enable {{ tls_key_path | default(/etc/ssl/private/maas_tls.pem) }} {{ tls_cert_path | default(/etc/ssl/crt/maas_tls.crt) }}
   # TLS is available only in MAAS 3.2 or higher
   when: maas_version is version("3.2", '>=')

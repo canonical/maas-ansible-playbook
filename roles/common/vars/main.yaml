@@ -1,4 +1,4 @@
 # TLS Settings
-tls_key: ""                # The key used for TLS
+tls_key_path: ""           # The key used for TLS. If a key is not found, this is where a new one will be generated
 tls_cert_path: ""          # Path to the TLS certificate. If a certificate is not found, this is where a new certificate will be stored
-generate_tls_cert: false   # generate a TLS certificate and store at tls_cert_path
+generate_tls_cred: false   # Generate TLS Credentials and store them at tls_key_path and tls_cert_path
