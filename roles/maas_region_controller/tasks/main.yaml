@@ -18,5 +18,5 @@
       when: "'maas' in ansible_facts.packages"
 
     - name: Install maas metrics
-      when: install_metrics | lower == "y"
+      when: install_metrics
       import_tasks: metrics.yaml
