@@ -2,3 +2,7 @@
 - name: Display choices
   ansible.builtin.debug:
     msg: 'Upgrading MAAS {{ maas_installation_type }} V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
+
+- name: Update MAAS snap
+  ansible.builtin.command: snap refresh --channel={{ maas_version }} maas
+  when: maas_installation_type|lower == 'snap'
