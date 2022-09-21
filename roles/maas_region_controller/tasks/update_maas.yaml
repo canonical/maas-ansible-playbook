@@ -8,9 +8,12 @@
   ansible.builtin.command: snap refresh --channel={{ maas_version }} maas
   when: maas_installation_type|lower == 'snap'
 
-- name: Update MAAS deb
-  ansible.builtin.command: add-apt-repository ppa:maas/{{ maas_version }}
-  when: maas_installation_type|lower == 'deb'
-  with_items:
-    - apt update
-    - apt upgrade maas
+- name: Install deb dependencies
+  ansible.builtin.apt:
+    pkg:
+    - maas={{ maas_version }}
+    - maas-region-api={{ maas_version }}
+    upgrade: true
+    state: present
+    update_cache: true
+  when: maas_installation_type|lower == 'deb' && '"maas-rack-controller" not in role_names'
