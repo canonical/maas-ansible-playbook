@@ -19,4 +19,8 @@
 - name: Initialise MAAS rack
   ansible.builtin.command: maas init rack --maas-url={{ maas_url }} --secret={{ maas_rack_secret }}
 
-#TODO: TLS
+- name: Conditional role
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: TLS
+  when: enable_tls
