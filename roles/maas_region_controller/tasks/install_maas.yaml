@@ -25,7 +25,7 @@
    --username={{ admin_username }} --password={{ admin_password }} \
    --email={{ admin_email }} --ssh-import={{ admin_id }}
 
-- name: Conditional role
+- name: Enable TLS
   ansible.builtin.include_role:
     name: common
     tasks_from: TLS
