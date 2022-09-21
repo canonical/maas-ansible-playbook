@@ -9,7 +9,9 @@
 
 - name: Install deb dependencies
   ansible.builtin.apt:
-    name: maas-rack-controller={{ maas_version }}
+    pkg:
+    - maas={{ maas_version }}
+    - maas-rack-controller={{ maas_version }}
     upgrade: true
     state: present
     update_cache: true
