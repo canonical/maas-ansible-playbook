@@ -5,9 +5,6 @@ maas_snap_channel: "stable"     # if using snap, then the channel. ie: stable, b
 maas_deb_state: "present"       # if using deb, the state for install
 install_metrics: true           # install metrics for the MAAS
 
-# grafana agent repo
-grafana_agent_pkg: https://github.com/grafana/agent/releases/download/v0.22.0/agent-linux-amd64.zip
-
 # administrator account details
 admin_username: "admin"
 admin_password: "admin"

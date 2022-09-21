@@ -17,6 +17,8 @@
       import_tasks: update_maas.yaml
       when: "'maas' in ansible_facts.packages"
 
-    - name: Install maas metrics
-      when: install_metrics | lower == "y"
-      import_tasks: metrics.yaml
+    - name: Install metrics
+      ansible.builtin.include_role:
+        name: common
+        tasks_from: metrics
+      when: install_metrics
