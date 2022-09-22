@@ -1,8 +1,31 @@
 ---
+- name: "Install pip for Configuration Dependencies"
+  ansible.builtin.apt:
+    name: python3-pip
+    update_cache: yes
+    state: present
+
+- name: "Install libpq-dev for Configuration"
+  ansible.builtin.apt:
+    name: libpq-dev
+    update_cache: yes # update cache still if pip was already installed
+    state: present
+
+- name: "Install psycopg2 For Configuration"
+  ansible.builtin.pip:
+    name: "psycopg2"
+    version: "2.9.3"
+    state: present
+
+- name: "Install acl to become postgres user"
+  ansible.builtin.apt:
+    name: acl
+    state: present
+
 - name: "Install Postgres Deb"
   ansible.builtin.apt:
     name: "{{ maas_postgres_deb_name }}"
-    update_cache: yes
+    update_cache: yes # update cache still if previous packages are already installed
     state: present
   when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'deb'
 
@@ -12,22 +35,10 @@
     channel: "{{ maas_postgres_snap_track }}/{{ maas_postgres_snap_channel"
   when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'snap'
 
-- name: "Create MAAS Postgres User"
-  community.postgresql.postgresql_user:
-    name: "maas"
-    password: "{{ maas_postgres_password }}"
-    state: present
-    
-- name: "Create MAAS Postgres Database"
-  community.postgresql.postgresql_db:
-    name: "maasdb"
-    owner: "maas"
-    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
-
-- name: "Write postgres_hba.conf"
+- name: "Write pg_hba.conf"
   ansible.builtin.template:
-    src: "postgres_hba.conf.j2"
-    dest: "{{ maas_postgres_config_dir }}postgres_hba.conf"
+    src: "pg_hba.conf.j2"
+    dest: "{{ maas_postgres_config_dir }}pg_hba.conf"
     mode: 0640
     owner: postgres
     group: postgres
@@ -39,3 +50,32 @@
     mode: 0644
     owner: postgres
     group: postgres
+
+- name: "Stop Postgres Service To Load New Configuration"
+  ansible.builtin.systemd:
+    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
+    state: stopped
+    no_block: no # wait for clean stop
+
+- name: "Start Postgres Service To Load New Configuration"
+  ansible.builtin.systemd:
+    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
+    enabled: true
+    state: started
+    no_block: no
+
+- name: "Create MAAS Postgres User"
+  community.postgresql.postgresql_user:
+    name: "maas"
+    password: "{{ maas_postgres_password }}"
+    state: present
+  become: yes
+  become_user: postgres
+    
+- name: "Create MAAS Postgres Database"
+  community.postgresql.postgresql_db:
+    name: "maasdb"
+    owner: "maas"
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
+  become: yes
+  become_user: postgres

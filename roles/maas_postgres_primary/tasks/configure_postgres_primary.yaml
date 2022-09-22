@@ -5,11 +5,14 @@
     password: "{{ maas_postgres_replication_password }}"
     role_attr_flags: replication
     state: present
+  become: yes
+  become_user: postgres
 
 - name: "Create Replication Slot"
   community.postgresql.postgresql_slot:
     name: "maas_replication"
     db: "maasdb"
-    owner: "{{ maas_postgres_replication_user }}"
     state: present
+  become: yes
+  become_user: postgres
 

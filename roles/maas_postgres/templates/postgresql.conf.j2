@@ -39,11 +39,11 @@
 # The default values of these variables are driven from the -D command-line
 # option or PGDATA environment variable, represented here as ConfigDir.
 
-data_directory = "{{ maas_postgres_data_dir| default(/var/lib/postgresql/{{ maas_postgres_version_number }})/main }}"          # use data in another directory
+data_directory = '{{ maas_postgres_data_dir }}'          # use data in another directory
                                         # (change requires restart)
 hba_file = '{{ maas_postgres_config_dir }}pg_hba.conf'        # host-based authentication file
                                         # (change requires restart)
-ident_file = '{{ maas_postgreS_config_dir }}pg_ident.conf'    # ident configuration file
+ident_file = '{{ maas_postgres_config_dir }}pg_ident.conf'    # ident configuration file
                                         # (change requires restart)
 
 # If external_pid_file is not explicitly set, no extra PID file is written.
@@ -56,8 +56,11 @@ external_pid_file = '/var/run/postgresql/{{ maas_postgres_version_number }}-main
 #------------------------------------------------------------------------------
 
 # - Connection Settings -
-
-listen_addresses = {{ "{{ maas_postgres_ipv4 }}, " if maas_postgres_ipv4 else '' }}{{ "{{ maas_postgres_ipv6 }}, " if maas_postgres_ipv6 else ''}}localhost         # what IP address(es) to listen on;
+{% if maas_postgres_primary_listen_all_ifaces|default(false) %}
+listen_addresses = '*'
+{% else %}
+listen_addresses = '{%- if maas_postgres_ipv4 is defined -%}{{ maas_postgres_ipv4 }}, {% endif -%}{%- if maas_postgres_ipv6 is defined -%}{{ maas_postgres_ipv6 }}, {% endif -%}localhost'         # what IP address(es) to listen on;
+{% endif %}
                                         # comma-separated list of addresses;
                                         # defaults to 'localhost'; use '*' for all
                                         # (change requires restart)
