@@ -1,0 +1,15 @@
+---
+- name: "Create Replication User"
+  community.postgresql.postgresql_user:
+    name: "{{ maas_postgres_replication_user }}"
+    password: "{{ maas_postgres_replication_password }}"
+    role_attr_flags: replication
+    state: present
+
+- name: "Create Replication Slot"
+  community.postgresql.postgresql_slot:
+    name: "maas_replication"
+    db: "maasdb"
+    owner: "{{ maas_postgres_replication_user }}"
+    state: present
+

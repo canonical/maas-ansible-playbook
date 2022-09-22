@@ -1,0 +1,41 @@
+---
+- name: "Install Postgres Deb"
+  ansible.builtin.apt:
+    name: "{{ maas_postgres_deb_name }}"
+    update_cache: yes
+    state: present
+  when: maas_postgres_installation_type|default "{{ maas_installation_type }}" |lower == 'deb'
+
+- name: "Install Postgres Snap"
+  community.general.snap:
+    name: "{{ maas_postgres_snap_name }}"
+    channel: "{{ maas_postgres_snap_track }}/{{ maas_postgres_snap_channel"
+  when: maas_postgres_installation_type|default "{{ maas_installation_type }}" |lower == 'snap'
+
+- name: "Create MAAS Postgres User"
+  community.postgresql.postgresql_user:
+    name: "maas"
+    password: "{{ maas_postgres_password }}"
+    state: present
+    
+- name: "Create MAAS Postgres Database"
+  community.postgresql.postgresql_db:
+    name: "maasdb"
+    owner: "maas"
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
+
+- name: "Write postgres_hba.conf"
+  ansible.builtin.template:
+    src: "postgres_hba.conf.j2"
+    dest: "{{ maas_postgres_config_dir }}postgres_hba.conf"
+    mode: 0640
+    owner: postgres
+    group: postgres
+
+- name: "Write postgresql.conf"
+  ansible.builtin.template:
+    src: "postgresql.conf.j2"
+    dest: "{{ maas_postgres_config_dir }}postgresql.conf"
+    mode: 0644
+    owner: postgres
+    group: postgres
