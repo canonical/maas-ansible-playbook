@@ -10,6 +10,16 @@
 local   all             postgres                                peer
 
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
-{% for hba_entry in maas_postgres_hba_entries %}
+{% for hba_entry in maas_postgres_hba_entries['local'] %}
   {{ hba_entry['type'] }}  {{ hba_entry['database'] }}        {{ hba_entry['user'] }}           {{ hba_entry['address'] }}                {{ hba_entry['method'] }} 
 {% endfor %}
+{% if ansible_facts.all_ipv4_address|len > 0 and maas_postgres_hba_entries['ipv4']|len > 0 %}
+  {% for hba_entry in maas_postgres_hba_entries['ipv4'] %}
+  {{ hba_entry['type'] }}  {{ hba_entry['database'] }}        {{ hba_entry['user'] }}           {{ hba_entry['address'] }}                {{ hba_entry['method'] }} 
+  {% endfor %}
+{% endif %}
+{% if ansible_facts.all_ipv6_address|len > 0 and maas_postgres_hba_entries['ipv6']|len > 0 %}
+  {% for hba_entry in maas_postgres_hba_entries['ipv6'] %}
+  {{ hba_entry['type'] }}  {{ hba_entry['database'] }}        {{ hba_entry['user'] }}           {{ hba_entry['address'] }}                {{ hba_entry['method'] }} 
+  {% endfor %}
+{% endif %}
