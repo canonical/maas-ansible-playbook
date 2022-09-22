@@ -2,7 +2,12 @@
 
 # This playbook should deploy everything
 
-- hosts: all
+- hosts: maas_region_controller
   roles:
-  - role: maas_region_controller
-  - role: maas_postgres_primary
+    - role: maas_region_controller
+  become: yes
+
+- hosts: maas_postgres_primary
+  roles:
+    - role: maas_postgres_primary
+  become: yes

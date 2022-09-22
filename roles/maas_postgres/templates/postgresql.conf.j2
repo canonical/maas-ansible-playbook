@@ -39,7 +39,7 @@
 # The default values of these variables are driven from the -D command-line
 # option or PGDATA environment variable, represented here as ConfigDir.
 
-data_directory = "{{ maas_postgres_data_dir| default /var/lib/postgresql/{{ maas_postgres_version_number }}/main }}"          # use data in another directory
+data_directory = "{{ maas_postgres_data_dir| default(/var/lib/postgresql/{{ maas_postgres_version_number }})/main }}"          # use data in another directory
                                         # (change requires restart)
 hba_file = '{{ maas_postgres_config_dir }}pg_hba.conf'        # host-based authentication file
                                         # (change requires restart)

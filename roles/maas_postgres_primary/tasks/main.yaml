@@ -1,14 +1,11 @@
 ---
 # Playbook to install a R/W Postgres
+- name: "Install Postgres"
+  ansible.builtin.include_role:
+    name: maas_postgres
+    tasks_from: install_postgres
 
-- hosts: maas-postgres-primary
-  tasks:
-    - name: "Install Postgres"
-      ansible.builtin.include_role:
-        name: maas_postgres
-        tasks_from: install_postgres
-
-    - name: "Configure Postgres Primary"
-      import_tasks:
-        configure_postgres_primary.yaml
+- name: "Configure Postgres Primary"
+  import_tasks:
+    configure_postgres_primary.yaml
 

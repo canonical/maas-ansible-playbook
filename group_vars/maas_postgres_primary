@@ -1,39 +1,38 @@
 ---
 maas_postgres_hba_entries:
-  - type: 'local'
-    database: 'all'
-    user: 'all'
-    address: ''
-    method: 'peer
-  - type: 'host'
-    database: 'all'
-    user: 'all'
-    address: '127.0.0.1/32'
-    method: 'md5'
-  - type: 'host'
-    database: 'all'
-    user: 'all'
-    address: '::1/128'
-    method: 'md5'
-{% if ansible_facts.all_ipv4_addresses|len > 0 %}
-  - type: 'host'
-    database: 'all'
-    user: 'all'
-    address: "{{ maas_postgres_ipv4|default ansible_facts.default_ipv4_address }}"
-    method: 'md5'
-  - type: 'host'
-    database: 'replication'
-    user: "{{ maas_postgres_replication_user }}"
-    address: "{{ maas_postgres_replication_v4_address|default maas_postgres_ipv4|default ansible_facts.default_ipv4_address }}"
-{% endif %}
-{% if ansible_facts.all_ipv6_addresses|len > 0 %}
-  - type: 'host'
-    database: 'all'
-    user: 'all'
-    address: "{{ maas_postgres_ipv6 }}|default ansible_facts.default_ipv6_address }}"
-    method: 'md5'
-  - type: 'host'
-    database: 'replication'
-    user: "{{ maas_postgres_replication_user }}"
-    address: "{{ maas_postgres_replication_v6_address|default maas_postgres_ipv6|default ansible_facts.default_ipv6_address }}"
-{% endif %}
+  local:
+    - type: 'local'
+      database: 'all'
+      user: 'all'
+      address: ''
+      method: 'peer'
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: '127.0.0.1/32'
+      method: 'md5'
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: '::1/128'
+      method: 'md5'
+  ipv4:
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: "{{ maas_postgres_ipv4|default ansible_facts.default_ipv4_address }}"
+      method: 'md5'
+    - type: 'host'
+      database: 'replication'
+      user: "{{ maas_postgres_replication_user }}"
+      address: "{{ maas_postgres_replication_v4_address|default maas_postgres_ipv4|default ansible_facts.default_ipv4_address }}"
+  ipv6:
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: "{{ maas_postgres_ipv6 }}|default ansible_facts.default_ipv6_address }}"
+      method: 'md5'
+    - type: 'host'
+      database: 'replication'
+      user: "{{ maas_postgres_replication_user }}"
+      address: "{{ maas_postgres_replication_v6_address|default maas_postgres_ipv6|default ansible_facts.default_ipv6_address }}"

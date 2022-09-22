@@ -4,13 +4,13 @@
     name: "{{ maas_postgres_deb_name }}"
     update_cache: yes
     state: present
-  when: maas_postgres_installation_type|default "{{ maas_installation_type }}" |lower == 'deb'
+  when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'deb'
 
 - name: "Install Postgres Snap"
   community.general.snap:
     name: "{{ maas_postgres_snap_name }}"
     channel: "{{ maas_postgres_snap_track }}/{{ maas_postgres_snap_channel"
-  when: maas_postgres_installation_type|default "{{ maas_installation_type }}" |lower == 'snap'
+  when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'snap'
 
 - name: "Create MAAS Postgres User"
   community.postgresql.postgresql_user:
