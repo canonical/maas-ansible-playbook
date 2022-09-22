@@ -10,7 +10,7 @@
 
 - name: "Create Replication Slot"
   community.postgresql.postgresql_slot:
-    name: "maas_replication"
+    name: "{{ maas_postgres_replication_slot }}"
     db: "maasdb"
     state: present
   become: yes
