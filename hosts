@@ -1,10 +1,8 @@
 # Define hosts for MAAS here
 
 [maas_postgres_primary]
-test03.maas ansible_user=ubuntu
 
 [maas_postgres_secondary]
-test04.maas ansible_user=ubuntu
 
 [maas_postgres:children]
 maas_postgres_primary
