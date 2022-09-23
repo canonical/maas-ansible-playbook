@@ -9,3 +9,5 @@ test04.maas ansible_user=ubuntu
 [maas_postgres:children]
 maas_postgres_primary
 maas_postgres_secondary
+
+[maas_proxy]

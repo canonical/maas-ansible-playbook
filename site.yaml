@@ -19,3 +19,9 @@
     - role: maas_region_controller
   become: yes
   gather_facts: true
+
+- hosts: maas_proxy
+  roles:
+    - role: maas_proxy
+  become: yes
+  gather_facts: true
