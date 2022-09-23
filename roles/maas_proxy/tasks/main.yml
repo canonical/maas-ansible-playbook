@@ -1,0 +1,19 @@
+---
+- name: "Install HAProxy"
+  ansible.builtin.apt:
+    name: haproxy
+    state: present
+
+- name: "Write HAProxy Config"
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    mode: '0644'
+    owner: haproxy
+    group: haproxy
+
+- name: "Restart HAProxy"
+  ansible.builtin.systemd:
+    name: "haproxy.service"
+    state: restarted
+    enabled: true

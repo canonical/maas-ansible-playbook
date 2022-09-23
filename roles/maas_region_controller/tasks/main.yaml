@@ -1,6 +1,5 @@
 ---
 # Playbook to generate a MAAS region
-
 - name: "Check if MAAS is installed"
   package_facts:
     manager: "auto"
@@ -12,7 +11,6 @@
 - name: "Update maas"
   import_tasks: update_maas.yaml
   when: "'maas' in ansible_facts.packages"
-
 
 - name: Install maas metrics
   when: install_metrics
