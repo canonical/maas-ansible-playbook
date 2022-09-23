@@ -8,4 +8,6 @@
 maas_postgres_primary
 maas_postgres_secondary
 
+[maas_region_controller]
+
 [maas_proxy]
