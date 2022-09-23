@@ -18,3 +18,5 @@ maas_postgres_primary_address: ""
 maas_postgres_replication_user: "replicator"
 
 maas_postgres_data_dir: "/var/lib/postgresql/{{ maas_postgres_version_number }}/main/"
+
+maas_postgres_replication_slot: "maas_replication"

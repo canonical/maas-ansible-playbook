@@ -312,7 +312,9 @@ min_wal_size = 80MB
 
 # These settings are ignored on a standby server.
 
-#synchronous_standby_names = '' # standby servers that provide sync rep
+{% if 'maas_postgres_primary' in role_names %}
+synchronous_standby_names = '*'
+{% endif %}
                                 # method to choose sync standbys, number of sync standbys,
                                 # and comma-separated list of application_name
                                 # from standby(s); '*' = all
@@ -322,10 +324,14 @@ min_wal_size = 80MB
 
 # These settings are ignored on a primary server.
 
-#primary_conninfo = ''                  # connection string to sending server
-#primary_slot_name = ''                 # replication slot on sending server
-#promote_trigger_file = ''              # file name whose presence ends recovery
-#hot_standby = on                       # "off" disallows queries during recovery
+{% if 'maas_postgres_secondary' in role_names %}
+primary_conninfo = 'postgresql://{{ maas_postgres_replication_user }}:{{ maas_postgres_replication_password }}@{{ maas_postgres_primary_address }}:5432'                  # connection string to sending server
+primary_slot_name = '{{ maas_postgres_replication_slot }}'                 # replication slot on sending server
+promote_trigger_file = '{{ maas_postgres_trigger_file }}'              # file name whose presence ends recovery
+hot_standby = 'on'                       # "off" disallows queries during recovery
+{% else %}
+hot_standby = 'off'                       # "off" disallows queries during recovery
+{% endif %}
                                         # (change requires restart)
 #max_standby_archive_delay = 30s        # max delay before canceling queries
                                         # when reading WAL from archive;

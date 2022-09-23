@@ -15,16 +15,16 @@ local all postgres peer
 
 {% endfor %}
 
-{% if ('ansible_all_ipv4_addresses' in ansible_facts) and
-    (ansible_facts['ansible_all_ipv4_addresses']|length > 0) and
+{% if (ansible_all_ipv4_addresses|length > 0) and
+    ('address' in ansible_default_ipv4) and
         (maas_postgres_hba_entries['ipv4']|length > 0) %}
   {% for hba_entry in maas_postgres_hba_entries['ipv4'] %}
 {{ hba_entry['type'] }} {{ hba_entry['database'] }} {{ hba_entry['user'] }} {{ hba_entry['address'] }} {{ hba_entry['method'] }} 
   
   {% endfor %}
 {% endif %}
-{% if ('ansible_all_ipv6_addresses' in ansible_facts) and
-    (ansible_facts['ansible_all_ipv6_addresses']|length > 0) and
+{% if (ansible_all_ipv6_addresses|length > 0) and
+    ('address' in ansible_default_ipv6) and
         (maas_postgres_hba_entries['ipv6']|length > 0) %}
   {% for hba_entry in maas_postgres_hba_entries['ipv6'] %}
 {{ hba_entry['type'] }} {{ hba_entry['database'] }} {{ hba_entry['user'] }} {{ hba_entry['address'] }} {{ hba_entry['method'] }} 
