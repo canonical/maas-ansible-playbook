@@ -1,0 +1,26 @@
+---
+
+- name: Display choices
+  ansible.builtin.debug:
+    msg: 'Installing MAAS {{ maas_installation_type }} V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
+
+- name: Install "MAAS" from snap
+  community.general.snap:
+    name: maas
+    channel: '{{ maas_version }}/{{ maas_snap_channel }}'
+  when: maas_installation_type|lower == 'snap'
+
+- name: Install deb dependencies
+  ansible.builtin.apt:
+    name: maas-rack-controller={{ maas_version }}
+    state: "{{ maas_deb_state }}"
+  when: maas_installation_type|lower == 'deb' && '"maas-rack-controller" in role_names' && "maas-region-controller" not in role_names
+
+- name: Initialise MAAS rack
+  ansible.builtin.command: maas init rack --maas-url={{ maas_url }} --secret={{ maas_rack_secret }}
+
+- name: Conditional role
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: TLS
+  when: enable_tls

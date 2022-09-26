@@ -1,0 +1,18 @@
+---
+- name: Display choices
+  ansible.builtin.debug:
+    msg: 'Upgrading MAAS {{ maas_installation_type }} V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
+
+- name: Update MAAS snap
+  ansible.builtin.command: snap refresh --channel={{ maas_version }} maas
+  when: maas_installation_type|lower == 'snap'
+
+- name: Install deb dependencies
+  ansible.builtin.apt:
+    pkg:
+    - maas={{ maas_version }}
+    - maas-rack-controller={{ maas_version }}
+    upgrade: true
+    state: present
+    update_cache: true
+  when: maas_installation_type|lower == 'deb' && '"maas-rack-controller" in role_names'  && "maas-region-controller" not in role_names
