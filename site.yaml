@@ -2,6 +2,26 @@
 
 # This playbook should deploy everything
 
-- hosts: maas-region-controllers
+- hosts: maas_postgres_primary
   roles:
-  - role: maas_region_controller
+    - role: maas_postgres_primary
+  become: yes
+  gather_facts: true
+
+- hosts: maas_postgres_secondary
+  roles:
+    - role: maas_postgres_secondary
+  become: yes
+  gather_facts: true
+
+- hosts: maas_region_controller
+  roles:
+    - role: maas_region_controller
+  become: yes
+  gather_facts: true
+
+- hosts: maas_proxy
+  roles:
+    - role: maas_proxy
+  become: yes
+  gather_facts: true

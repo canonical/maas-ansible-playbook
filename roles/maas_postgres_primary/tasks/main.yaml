@@ -1,0 +1,10 @@
+---
+# Role to install a R/W Postgres
+- name: "Install Postgres"
+  ansible.builtin.include_role:
+    name: maas_postgres
+    tasks_from: install_postgres
+
+- name: "Configure Postgres Primary"
+  import_tasks:
+    configure_postgres_primary.yaml
