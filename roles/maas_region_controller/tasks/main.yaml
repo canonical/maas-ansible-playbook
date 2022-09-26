@@ -12,6 +12,26 @@
   import_tasks: update_maas.yaml
   when: "'maas' in ansible_facts.packages"
 
+<<<<<<< HEAD
 - name: Install maas metrics
   when: install_metrics
   import_tasks: metrics.yaml
+=======
+    - name: "Check if MAAS is installed"
+      package_facts:
+        manager: "auto"
+
+    - name: "Install maas"
+      import_tasks: install_maas.yaml
+      when: "'maas' not in ansible_facts.packages"
+
+    - name: "Update maas"
+      import_tasks: update_maas.yaml
+      when: "'maas' in ansible_facts.packages"
+
+    - name: Install metrics
+      ansible.builtin.include_role:
+        name: common
+        tasks_from: metrics
+      when: install_metrics
+>>>>>>> origin/clean-up-code
