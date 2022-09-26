@@ -1,0 +1,48 @@
+---
+maas_postgres_ipv4: "{{ ansible_default_ipv4['address'] if 'address' in ansible_default_ipv4 else '127.0.0.1' }}"
+maas_postgres_ipv6: "{{ ansible_default_ipv6['address'] if 'address' in ansible_default_ipv6 else '::1' }}"
+maas_postgres_ipv4_netmask: "{{ ansible_default_ipv4['netmask'] if 'netmask' in ansible_default_ipv4 else '255.255.255.255' }}"
+maas_postgres_ipv6_prefixlen: "{{ ansible_default_ipv6['prefixlen'] if 'prefixlen' in ansible_default_ipv6 else '128' }}"
+maas_postgres_replication_v4_cidr: "{{ maas_postgres_ipv4 }}/{{ maas_postgres_ipv4_netmask }}"
+maas_postgres_replication_v6_cidr: "{{ maas_postgres_ipv6 }}/{{ maas_postgres_ipv6_prefixlen }}"
+maas_postgres_replication_v4_subnet: "{{ maas_postgres_ipv4 }}/{{ maas_postgres_replication_v4_cidr | ipaddr('prefix') }}"
+maas_postgres_replication_v6_subnet: "{{ maas_postgres_replication_v6_cidr | ipaddr('prefix') }}"
+maas_postgres_hba_entries:
+  local:
+    - type: 'local'
+      database: 'all'
+      user: 'all'
+      address: ''
+      method: 'peer'
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: '127.0.0.1/32'
+      method: 'md5'
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: '::1/128'
+      method: 'md5'
+  ipv4:
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: "{{ maas_postgres_ipv4 }}/32" 
+      method: 'md5'
+    - type: 'host'
+      database: 'replication'
+      user: "{{ maas_postgres_replication_user }}"
+      address: "{{ maas_postgres_replication_v4_subnet }}"
+      method: 'md5'
+  ipv6:
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: "{{ maas_postgres_ipv6 }}/128"
+      method: 'md5'
+    - type: 'host'
+      database: 'replication'
+      user: "{{ maas_postgres_replication_user }}"
+      address: "{{ maas_postgres_replication_v6_subnet }}"
+      method: 'md5'

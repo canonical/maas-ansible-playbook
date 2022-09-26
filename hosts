@@ -1,3 +1,13 @@
 # Define hosts for MAAS here
 
-localhost
+[maas_postgres_primary]
+
+[maas_postgres_secondary]
+
+[maas_postgres:children]
+maas_postgres_primary
+maas_postgres_secondary
+
+[maas_region_controller]
+
+[maas_proxy]

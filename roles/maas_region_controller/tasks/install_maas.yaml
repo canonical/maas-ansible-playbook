@@ -30,7 +30,6 @@
   register: maas_url
   when: maas_url | length == 0
 
-# TODOD: Learn how to create a MAAS admin using flags
 - name: Add an administrator to MAAS
   ansible.builtin.command: maas createadmin \
    --username={{ admin_username }} --password={{ admin_password }} \
