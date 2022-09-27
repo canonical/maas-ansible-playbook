@@ -26,6 +26,13 @@
   become: true
   gather_facts: true
 
+- hosts: maas_region_rack_controller
+  roles:
+    - role: maas_region_controller
+    - role: maas_rack_controller
+  become: true
+  gather_facts: true
+
 - hosts: maas_proxy
   roles:
     - role: maas_proxy

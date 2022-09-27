@@ -8,6 +8,8 @@
 maas_postgres_primary
 maas_postgres_secondary
 
+[maas_region_rack_controller]
+
 [maas_region_controller]
 10.242.21.222 ansible_user=ubuntu
 
