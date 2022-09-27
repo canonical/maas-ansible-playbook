@@ -6,9 +6,6 @@ maas_deb_state: "present"       # if using deb, the state for install
 enable_tls: false               # If an operator wishes to enable TLS
 install_metrics: true           # install metrics for the MAAS
 
-# grafana agent repo
-grafana_agent_pkg: https://github.com/grafana/agent/releases/download/v0.22.0/agent-linux-amd64.zip
-
 # administrator account details
 admin_username: "admin"
 admin_password: "admin"
