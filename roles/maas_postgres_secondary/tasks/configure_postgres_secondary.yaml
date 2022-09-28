@@ -25,7 +25,7 @@
     responses:
       '(?i)password': "{{ maas_postgres_replication_password }}"
   when: maas_postgres_action == "install"
-  become: yes
+  become: true
   become_user: postgres
 
 - name: "Write recovery.conf"
