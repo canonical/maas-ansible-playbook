@@ -21,6 +21,17 @@
     state: absent
   when: maas_installation_type|lower == 'deb'
 
+- name: Uninstall deb dependencies
+  ansible.builtin.apt:
+    name: "maas-rack-controller"
+    state: absent
+  when: maas_installation_type|lower == 'deb'
+
+- name: "Uninstall HAProxy"
+  ansible.builtin.apt:
+    name: haproxy
+    state: absent
+
 - name: Remove useless packages from the cache
   ansible.builtin.apt:
     autoclean: true

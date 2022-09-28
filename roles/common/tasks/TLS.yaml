@@ -19,14 +19,14 @@
 - name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
   community.crypto.openssl_privatekey:
     path: "{{ tls_key_path }}"
-  when: generate_tls_cred && not tls_key_stat.stat.exists
+  when: generate_tls_cred and not tls_key_stat.stat.exists
 
 - name: Generate a Self Signed OpenSSL certificate
   community.crypto.x509_certificate:
     path: "{{ tls_cert_path }}"
     privatekey_path: "{{ tls_key_path }}"
     provider: selfsigned
-  when: generate_tls_cred && not tls_cert_stat.stat.exists
+  when: generate_tls_cred and not tls_cert_stat.stat.exists
 
 - name: Configure TLS
   ansible.builtin.command: maas config-tls enable {{ tls_key_path }} {{ tls_cert_path }}
