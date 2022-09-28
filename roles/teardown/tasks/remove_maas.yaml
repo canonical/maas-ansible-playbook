@@ -1,0 +1,34 @@
+---
+# Remove everything MAAS related
+
+- name: Uninstall MAAS snap
+  community.general.snap:
+    name: maas
+    channel: '{{ maas_version }}/{{ maas_snap_channel }}'
+    state: absent
+  when: maas_installation_type|lower == 'snap'
+
+- name: Uninstall MAAS test db snap
+  community.general.snap:
+    name: "maas-test-db"
+    channel: '{{ maas_version }}/{{ maas_snap_channel }}'
+    state: absent
+  when: maas_installation_type|lower == 'snap'
+
+- name: Uninstall MAAS from deb
+  ansible.builtin.apt:
+    name: maas
+    state: absent
+  when: maas_installation_type|lower == 'deb'
+
+- name: Uninstall deb dependencies
+  ansible.builtin.apt:
+    name: "maas-region-api"
+    state: absent
+  when: maas_installation_type|lower == 'deb'
+
+- name: Uninstall deb dependencies
+  ansible.builtin.apt:
+    name: "maas-rack-controller"
+    state: absent
+  when: maas_installation_type|lower == 'deb'

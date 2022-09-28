@@ -1,0 +1,13 @@
+---
+# Remove everything for the postgres secondary
+
+- name: "Stop Postgres"
+  ansible.builtin.systemd:
+    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
+    state: stopped
+    no_block: no
+
+- name: "Remove Previous Data Directory"
+  ansible.builtin.file:
+    path: "{{ maas_postgres_data_dir }}"
+    state: absent
