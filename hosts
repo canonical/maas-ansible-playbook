@@ -11,6 +11,3 @@ maas_postgres_secondary
 [maas_region_controller]
 
 [maas_proxy]
-
-[maas_teardown]
-10.10.0.20 ansible_user=ubuntu

@@ -4,13 +4,13 @@
   ansible.builtin.debug:
     msg: 'Installing MAAS {{ maas_installation_type }} V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
 
-- name: Install MAAS from snap
+- name: Install "MAAS" from snap
   community.general.snap:
     name: maas
     channel: '{{ maas_version }}/{{ maas_snap_channel }}'
   when: maas_installation_type|lower == 'snap'
 
-- name: Install MAAS from deb
+- name: Install "MAAS" from deb
   ansible.builtin.apt:
     name: "maas={{ maas_version }}"
     state: "{{ maas_deb_state }}"
