@@ -14,16 +14,16 @@
   ansible.builtin.apt:
     name: "maas={{ maas_version }}"
     state: "{{ maas_deb_state }}"
-  when: maas_installation_type|lower == 'deb' && '"maas-rack-controller" in role_names'
+  when: (maas_installation_type|lower == 'deb') and ('maas-rack-controller' in role_names)
 
 - name: Install deb dependencies
   ansible.builtin.apt:
     name: maas-region-api={{ maas_version }}
     state: "{{ maas_deb_state }}"
-  when: maas_installation_type|lower == 'deb' && '"maas-rack-controller" not in role_names'
+  when: (maas_installation_type|lower == 'deb') and ('maas-rack-controller' not in role_names)
 
 - name: Initialise MAAS region
-  ansible.builtin.command: maas init region --maas-url={{ maas_url }} --database-uri maas-test-db:///
+  ansible.builtin.command: maas init region --maas-url={{ maas_url }} --database-uri {{ maas_postgres_uri }}
 
 - name: Define MAAS URL
   ansible.builtin.command: maas config | grep maas_url | cut -d "=" -f2
