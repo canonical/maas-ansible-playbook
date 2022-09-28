@@ -25,3 +25,9 @@
     - role: maas_proxy
   become: yes
   gather_facts: true
+
+- hosts: maas_teardown
+  roles:
+    - role: teardown
+  become: true
+  gather_facts: true

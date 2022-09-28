@@ -1,0 +1,26 @@
+---
+# will reset the system state to that prior to maas install
+
+- name: Uninstall MAAS snap
+  ansible.builtin.command: snap remove maas --purge
+  when: maas_installation_type|lower == 'snap'
+
+- name: Uninstall MAAS test db snap
+  ansible.builtin.command: snap remove maas-test-db --purge
+  when: maas_installation_type|lower == 'snap'
+
+- name: Uninstall MAAS from deb
+  ansible.builtin.apt:
+    name: maas
+    state: absent
+  when: maas_installation_type|lower == 'deb'
+
+- name: Uninstall deb dependencies
+  ansible.builtin.apt:
+    name: "maas-region-api"
+    state: absent
+  when: maas_installation_type|lower == 'deb'
+
+- name: Remove useless packages from the cache
+  ansible.builtin.apt:
+    autoclean: true
