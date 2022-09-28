@@ -16,4 +16,4 @@
     upgrade: true
     state: present
     update_cache: true
-  when: maas_installation_type|lower == 'deb' && '"maas-rack-controller" not in role_names'
+  when: maas_installation_type|lower == 'deb' and '"maas-rack-controller" not in role_names'

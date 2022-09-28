@@ -11,7 +11,7 @@ maas_postgres_secondary
 [maas_region_rack_controller]
 
 [maas_region_controller]
-10.242.21.222 ansible_user=ubuntu
+10.10.0.20 ansible_user=ubuntu
 
 [maas_rack_controller]
 

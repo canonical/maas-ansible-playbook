@@ -2,7 +2,7 @@
 # Installs MAAS
 - name: Display choices
   ansible.builtin.debug:
-    msg: 'Installing MAAS {{ maas_installation_type }} V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
+    msg: 'Installing MAAS {{ maas_installation_type }} V. {{ maas_version }} on {{ host_ip }}'
 
 - name: Install "MAAS" from snap
   community.general.snap:
@@ -14,21 +14,21 @@
   ansible.builtin.apt:
     name: "maas={{ maas_version }}"
     state: "{{ maas_deb_state }}"
-  when: maas_installation_type|lower == 'deb' && '"maas-rack-controller" in role_names'
+  when: maas_installation_type|lower == 'deb' and '"maas-rack-controller" in role_names'
 
 - name: Install deb dependencies
   ansible.builtin.apt:
     name: maas-region-api={{ maas_version }}
     state: "{{ maas_deb_state }}"
-  when: maas_installation_type|lower == 'deb' && '"maas-rack-controller" not in role_names'
+  when: maas_installation_type|lower == 'deb' and '"maas-rack-controller" not in role_names'
+
+- name: Install maas-test-db
+  community.general.snap:
+    name: maas-test-db
+  when: maas_test_db
 
 - name: Initialise MAAS region
-  ansible.builtin.command: maas init region --maas-url={{ maas_url }} --database-uri maas-test-db:///
-
-- name: Define MAAS URL
-  ansible.builtin.command: maas config | grep maas_url | cut -d "=" -f2
-  register: maas_url
-  when: maas_url | length == 0
+  ansible.builtin.command: maas init region --maas-url={{ maas_url | default(host_ip) }} --database-uri maas-test-db:///
 
 - name: Add an administrator to MAAS
   ansible.builtin.command: maas createadmin \
