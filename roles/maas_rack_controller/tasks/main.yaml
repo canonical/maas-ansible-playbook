@@ -1,7 +1,6 @@
 ---
 # Playbook to generate a MAAS rack
 
-
 - name: "Chack MAAS Url supplied by user or region controller setup"
   ansible.builtin.fail:
     msg: "MAAS Url not found"
