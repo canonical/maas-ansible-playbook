@@ -17,5 +17,4 @@
 - name: Remove the grafana agent
   ansible.builtin.service:
     name: telemetry
-    enabled: false
     state: stopped

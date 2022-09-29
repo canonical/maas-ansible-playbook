@@ -11,7 +11,7 @@
   community.general.snap:
     name: "maas-test-db"
     state: absent
-  when: maas_installation_type|lower == 'snap'
+  when: "'maas-test-db' in ansible_facts.packages"
 
 - name: Uninstall MAAS from deb
   ansible.builtin.apt:
@@ -23,10 +23,10 @@
   ansible.builtin.apt:
     name: "maas-region-api"
     state: absent
-  when: maas_installation_type|lower == 'deb'
+  when: "'maas-region-api' in ansible_facts.packages"
 
 - name: Uninstall deb dependencies
   ansible.builtin.apt:
     name: "maas-rack-controller"
     state: absent
-  when: maas_installation_type|lower == 'deb'
+  when: "'maas-rack-controller' in ansible_facts.packages"
