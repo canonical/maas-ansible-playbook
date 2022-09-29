@@ -1,6 +1,2 @@
 # MAAS installation setup
-maas_version: "latest"          # ie: 3.2, 2.8
-maas_installation_type: "snap"  # snap or deb
-maas_snap_channel: "stable"     # if using snap, then the channel. ie: stable, beta, edge
-maas_deb_state: "present"       # if using deb, the state for install
-enable_tls: true                # whether to enable tls for this instance
+enable_tls: false                # whether to enable tls for this instance
