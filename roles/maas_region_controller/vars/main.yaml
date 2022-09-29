@@ -5,8 +5,7 @@ maas_snap_channel: "stable"     # if using snap, then the channel. ie: stable, b
 maas_deb_state: "present"       # if using deb, the state for install
 enable_tls: false               # If an operator wishes to enable TLS
 install_metrics: false           # install metrics for the MAAS
-maas_url:                       # The url to use for the MAAS DB
-host_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+maas_url:                       # The url of the db
 
 # administrator account details
 admin_username: "admin"
