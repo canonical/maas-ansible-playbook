@@ -6,6 +6,13 @@
     mode: 0644
     owner: postgres
     group: postgres
+  when: maas_postgres_action != 'absent'
+
+- name: "Delete postgresql.conf"
+  file:
+    state: 'absent'
+    path: "{{ maas_postgres_config_dir }}postgresql.conf"
+  when: maas_postgres_action == 'absent'
 
 - name: "Stop Postgres Service To Load New Configuration"
   ansible.builtin.systemd:
@@ -19,4 +26,5 @@
     enabled: true
     state: started
     no_block: no
+  when: maas_postgres_action != 'absent'
 
