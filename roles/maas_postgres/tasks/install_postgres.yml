@@ -32,7 +32,7 @@
 - name: "Install Postgres Snap"
   community.general.snap:
     name: "{{ maas_postgres_snap_name }}"
-    channel: "{{ maas_postgres_snap_track }}/{{ maas_postgres_snap_channel"
+    channel: "{{ maas_postgres_snap_track }}/{{ maas_postgres_snap_channel }}"
   when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'snap'
 
 - name: "Write pg_hba.conf"
