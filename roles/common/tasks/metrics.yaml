@@ -2,10 +2,10 @@
 # Install grafana agents for maas
 
 - name: Set the TCP port for grafana
-  ansible.builtin.command: maas $ADMIN maas set-config name=promtail_port value=5238
+  ansible.builtin.command: maas {{ admin_username }} maas set-config name=promtail_port value=5238
 
 - name: enable syslog forwarding
-  anisible.builtin.command: maas $ADMIN maas set-config name=promtail_enabled value=true
+  anisible.builtin.command: maas {{ admin_username }} maas set-config name=promtail_enabled value=true
 
 - name: Download and unzip grafana agent
   ansible.builtin.unarchive:

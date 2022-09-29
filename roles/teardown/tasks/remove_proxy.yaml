@@ -1,0 +1,21 @@
+---
+
+- name: "Stop HAProxy"
+  ansible.builtin.systemd:
+    name: "haproxy.service"
+    state: stopped
+    enabled: false
+  ansible.builtin.file:
+    path: "{{ maas_postgres_data_dir }}"
+    state: absent
+
+- name: "Remove HAProxy"
+  ansible.builtin.apt:
+    name: haproxy
+    state: absent
+
+- name: "Remove HAProxy Config"
+  ansible.builtin.file:
+    path: /etc/haproxy/haproxy.cfg
+    state: absent
+  become: haproxy

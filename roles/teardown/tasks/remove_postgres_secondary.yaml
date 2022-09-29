@@ -4,7 +4,7 @@
 - name: "Stop Postgres"
   ansible.builtin.systemd:
     name: "postgresql@{{ maas_postgres_version_number }}-main.service"
-    state: stopped
+    state: absent
     no_block: no
 
 - name: "Remove Previous Data Directory"
