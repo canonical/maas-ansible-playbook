@@ -5,5 +5,10 @@ maas_port: 5240             # The port MAAS uses to comunicate on
 maas_https_port: 5443       # The https port MAAS uses to comunicate on
 maas_url: ""                # The URL maas uses
 
+# Installation variables
+maas_version: 3.2             # maas version to install
+maas_snap_channel: stable     # snap channel to use if maas_installation_type == snap
+maas_installation_type: snap  # Snap or deb
+
 # grafana agent repo
 grafana_agent_pkg: https://github.com/grafana/agent/releases/download/v0.22.0/agent-linux-amd64.zip

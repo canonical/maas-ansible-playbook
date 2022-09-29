@@ -11,11 +11,11 @@
     path: "{{ item.src }}"
     state: absent
   loop:
-      - {src: "/var/lib/grafana-agent/positions"}
-      - {src: "/var/lib/grafana-agent/wal"}
+    - {src: "/var/lib/grafana-agent/positions"}
+    - {src: "/var/lib/grafana-agent/wal"}
 
 - name: Remove the grafana agent
   ansible.builtin.service:
-      name: telemetry
-      enabled: false
-      state: absent
+    name: telemetry
+    enabled: false
+    state: stopped

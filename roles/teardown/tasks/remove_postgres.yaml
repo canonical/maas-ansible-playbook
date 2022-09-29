@@ -48,9 +48,9 @@
 - name: "Stop Postgres Service"
   ansible.builtin.systemd:
     name: "postgresql@{{ maas_postgres_version_number }}-main.service"
-    state: absent
-    no_block: no # wait for clean stop
-    
+    state: stopped
+    no_block: false # wait for clean stop
+
 - name: "Delete MAAS Postgres Database"
   community.postgresql.postgresql_db:
     name: "maasdb"

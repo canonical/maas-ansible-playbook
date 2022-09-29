@@ -15,4 +15,3 @@
     state: present
   become: true
   become_user: postgres
-

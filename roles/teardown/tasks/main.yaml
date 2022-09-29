@@ -1,28 +1,37 @@
 ---
 # will reset the system state to that prior to maas install
+
+- name: Collect facts about installed packages
+  package_facts:
+    manager: "auto"
+
+- name: Collect facts about system services
+  service_facts:
+  register: services_state
+
 - name: "Uninstall MAAS"
   import_tasks: remove_maas.yaml
-  when: "'maas' in ansible_facts.packages"
+  # when: "'maas' in ansible_facts.packages"
 
 - name: "Remove metrics"
   import_tasks: remove_metrics.yaml
-  when: "'telemetry' in services"
+  # when: "'telemetry' in services"
 
 - name: "Uninstall postgres primary"
   import_tasks: remove_postgres_primary.yaml
-  when: "'postgres' in ansible_facts.packages"
+  # when: "'postgres' in ansible_facts.packages"
 
 - name: "Uninstall postgres secondary"
   import_tasks: remove_postgres_secondary.yaml
-  when: "'postgres' in ansible_facts.packages"
+  # when: "'postgres' in ansible_facts.packages"
 
 - name: "Uninstall postgres"
   import_tasks: remove_postgres.yaml
-  when: "'postgres' in ansible_facts.packages"
+  # when: "'postgres' in ansible_facts.packages"
 
 - name: "Uninstall HAProxy"
   import_tasks: remove_proxy.yaml
-  when: "'haproxy' in ansible_facts.packages"
+  # when: "'haproxy' in ansible_facts.packages"
 
 - name: Remove ununsed packages from the cache
   ansible.builtin.apt:

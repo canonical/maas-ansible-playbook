@@ -11,8 +11,8 @@
 - name: Update deb dependencies
   ansible.builtin.apt:
     pkg:
-    - maas={{ maas_version }}
-    - maas-region-api={{ maas_version }}
+      - maas={{ maas_version }}
+      - maas-region-api={{ maas_version }}
     upgrade: true
     state: present
     update_cache: true

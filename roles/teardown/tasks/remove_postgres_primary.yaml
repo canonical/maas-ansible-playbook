@@ -3,7 +3,7 @@
 
 - name: "Delete Replication User"
   community.postgresql.postgresql_user:
-    name: "{{ maas_postgres_replication_user }}"
+    name: "{{ maas_postgres_replication_user | default('replicator') }}"
     password: "{{ maas_postgres_replication_password }}"
     role_attr_flags: replication
     state: absent
@@ -12,9 +12,8 @@
 
 - name: "Delete Replication Slot"
   community.postgresql.postgresql_slot:
-    name: "{{ maas_postgres_replication_slot }}"
+    name: "{{ maas_postgres_replication_slot | default('maas_replication') }}"
     db: "maasdb"
     state: absent
   become: true
   become_user: postgres
-
