@@ -25,10 +25,10 @@
 - name: Install maas-test-db
   community.general.snap:
     name: maas-test-db
-  when: maas_test_db
+  when: maas_postgres_uri == "maas-test-db:///"
 
 - name: Initialise MAAS region
-  ansible.builtin.command: maas init region --maas-url={{ maas_url | default(host_ip) }} --database-uri maas-test-db:///
+  ansible.builtin.command: maas init region --maas-url={{ maas_url | default(host_ip) }} --database-uri {{ maas_postgres_uri }}
 
 - name: Add an administrator to MAAS
   ansible.builtin.command: maas createadmin \
