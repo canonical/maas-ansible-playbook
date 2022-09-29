@@ -312,7 +312,7 @@ min_wal_size = 80MB
 
 # These settings are ignored on a standby server.
 
-{% if 'maas_postgres_primary' in role_names %}
+{% if 'maas_postgres_primary' in role_names and maas_postgres_enable_sync is defined %}
 synchronous_standby_names = '*'
 {% endif %}
                                 # method to choose sync standbys, number of sync standbys,

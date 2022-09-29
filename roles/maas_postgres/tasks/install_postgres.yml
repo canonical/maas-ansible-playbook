@@ -32,7 +32,7 @@
 - name: "Install Postgres Snap"
   community.general.snap:
     name: "{{ maas_postgres_snap_name }}"
-    channel: "{{ maas_postgres_snap_track }}/{{ maas_postgres_snap_channel"
+    channel: "{{ maas_postgres_snap_track }}/{{ maas_postgres_snap_channel }}"
     state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
   when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'snap'
 
@@ -52,38 +52,14 @@
   when: maas_postgres_action|lower == 'absent'
 
 - name: "Write postgresql.conf"
-  ansible.builtin.template:
-    src: "postgresql.conf.j2"
-    dest: "{{ maas_postgres_config_dir }}postgresql.conf"
-    mode: 0644
-    owner: postgres
-    group: postgres
-  when: maas_postgres_action|lower != 'absent'
-
-- name: "Delete postgresql.conf"
-  file:
-    state: 'absent'
-    path: "{{ maas_postgres_config_dir }}postgresql.conf"
-  when: maas_postgres_action|lower == 'absent'
-
-- name: "Stop Postgres Service To Load New Configuration"
-  ansible.builtin.systemd:
-    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
-    state: stopped
-    no_block: false # wait for clean stop
-
-- name: "Start Postgres Service To Load New Configuration"
-  ansible.builtin.systemd:
-    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
-    enabled: true
-    state: started
-    no_block: false
-  when: maas_postgres_action|lower != 'absent'
+  ansible.builtin.include_tasks:
+    file: write_postgres_config.yaml
 
 - name: "Create MAAS Postgres User"
   community.postgresql.postgresql_user:
-    name: "maas"
+    name: "{{ maas_postgres_user }}"
     password: "{{ maas_postgres_password }}"
+    login_user: "postgres"
     state: present
   become: true
   become_user: postgres
@@ -91,8 +67,8 @@
 
 - name: "Create MAAS Postgres Database"
   community.postgresql.postgresql_db:
-    name: "maasdb"
-    owner: "maas"
+    name: "{{ maas_postgres_database }}"
     state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
-  become: true
+    owner: "{{ maas_postgres_user }}"
+  become: yes
   become_user: postgres
