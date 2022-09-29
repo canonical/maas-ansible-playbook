@@ -2,14 +2,13 @@
 # will reset the system state to that prior to maas install
 
 - hosts: all
-  roles:
-    - role: maas_region_controller
-    - role: maas_rack_controller
-    - role: maas_postgres_primary
-    - role: maas_postgres_secondary
-    - role: maas_proxy
-
   become: true
+  vars:
+    maas_deb_state: absent
+    maas_installation_type: "{% if 'maas' in ansible_facts.packages %}deb{% else %}snap{% endif %}"
+    maas_postgres_action: absent
+    maas_proxy_state: absent
+    maas_state: absent
   tasks:
 
   - name: "Collect facts about installed packages"
@@ -24,14 +23,9 @@
     shell: sudo maas config #| grep 'Mode' | cut -d':'' -f2 | xargs
     register: maas_mode
 
-  - name: Set variables for uninstall
+  - name: determine the maas mode
     set_fact:
-      maas_deb_state: absent
-      maas_installation_type: "{% if 'maas' in ansible_facts.packages %}deb{% else %}snap{% endif %}"
       maas_mode: "{{ maas_mode.stdout_lines | first | split(':') | last | trim }}"
-      maas_postgres_action: absent
-      maas_proxy_state: absent
-      maas_state: absent
 
   - name: "Uninstall MAAS region"
     ansible.builtin.include_role:

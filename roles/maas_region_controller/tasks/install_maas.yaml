@@ -1,6 +1,8 @@
 ---
 # Installs MAAS
 
+- debug: "msg={{ maas_state }}"
+
 - name: Install "MAAS" from snap
   community.general.snap:
     name: maas
