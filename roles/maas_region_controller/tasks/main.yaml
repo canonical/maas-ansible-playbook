@@ -13,5 +13,7 @@
   when: "'maas' in ansible_facts.packages"
 
 - name: Install maas metrics
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: metrics
   when: install_metrics
-  import_tasks: metrics.yaml
