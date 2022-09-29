@@ -8,8 +8,7 @@
 - name: "Remove Previous Data Directory"
   ansible.builtin.file:
     path: "{{ maas_postgres_data_dir }}"
-    state: absent
-  when: maas_postgres_action == "install"
+    state: 'absent'
 
 - name: "Create a New Data Directory"
   ansible.builtin.file:
@@ -18,6 +17,7 @@
     owner: postgres
     group: postgres
     mode: '0700'
+  when: maas_postgres_action|lower == 'install'
 
 - name: "Create Base Backup"
   ansible.builtin.expect:
@@ -34,9 +34,11 @@
     dest: "{{ maas_postgres_config_dir }}recovery.conf"
     owner: postgres
     group: postgres
+  when: maas_postgres_action|lower == 'install'
 
 - name: "Start Postgres in Hot Standby"
   ansible.builtin.systemd:
     name: "postgresql@{{ maas_postgres_version_number }}-main.service"
     state: started
     no_block: false
+  when: maas_postgres_action|lower != 'absent'

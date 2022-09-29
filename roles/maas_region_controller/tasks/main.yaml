@@ -6,11 +6,11 @@
 
 - name: "Install maas"
   import_tasks: install_maas.yaml
-  when: "'maas' not in ansible_facts.packages"
+  when: maas_state|lower == 'install'
 
 - name: "Update maas"
   import_tasks: update_maas.yaml
-  when: "'maas' in ansible_facts.packages"
+  when: maas_state|lower != 'install'
 
 - name: Install maas metrics
   ansible.builtin.include_role:

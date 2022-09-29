@@ -3,36 +3,37 @@
   ansible.builtin.apt:
     name: python3-pip
     update_cache: true
-    state: present
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
 
 - name: "Install libpq-dev for Configuration"
   ansible.builtin.apt:
     name: libpq-dev
     update_cache: true # update cache still if pip was already installed
-    state: present
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
 
 - name: "Install psycopg2 For Configuration"
   ansible.builtin.pip:
     name: "psycopg2"
     version: "2.9.3"
-    state: present
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
 
 - name: "Install acl to become postgres user"
   ansible.builtin.apt:
     name: acl
-    state: present
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
 
 - name: "Install Postgres Deb"
   ansible.builtin.apt:
     name: "{{ maas_postgres_deb_name }}"
     update_cache: true # update cache still if previous packages are already installed
-    state: present
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
   when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'deb'
 
 - name: "Install Postgres Snap"
   community.general.snap:
     name: "{{ maas_postgres_snap_name }}"
     channel: "{{ maas_postgres_snap_track }}/{{ maas_postgres_snap_channel"
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
   when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'snap'
 
 - name: "Write pg_hba.conf"
@@ -42,6 +43,13 @@
     mode: 0640
     owner: postgres
     group: postgres
+  when: maas_postgres_action|lower != 'absent'
+
+- name: Delete pg_hba.conf"
+  file:
+    state: 'absent'
+    path: "{{ maas_postgres_config_dir }}pg_hba.conf"
+  when: maas_postgres_action|lower == 'absent'
 
 - name: "Write postgresql.conf"
   ansible.builtin.template:
@@ -50,6 +58,13 @@
     mode: 0644
     owner: postgres
     group: postgres
+  when: maas_postgres_action|lower != 'absent'
+
+- name: "Delete postgresql.conf"
+  file:
+    state: 'absent'
+    path: "{{ maas_postgres_config_dir }}postgresql.conf"
+  when: maas_postgres_action|lower == 'absent'
 
 - name: "Stop Postgres Service To Load New Configuration"
   ansible.builtin.systemd:
@@ -63,6 +78,7 @@
     enabled: true
     state: started
     no_block: false
+  when: maas_postgres_action|lower != 'absent'
 
 - name: "Create MAAS Postgres User"
   community.postgresql.postgresql_user:
@@ -71,6 +87,7 @@
     state: present
   become: true
   become_user: postgres
+  when: maas_postgres_action|lower != 'absent'
 
 - name: "Create MAAS Postgres Database"
   community.postgresql.postgresql_db:

@@ -4,7 +4,7 @@
     name: "{{ maas_postgres_replication_user }}"
     password: "{{ maas_postgres_replication_password }}"
     role_attr_flags: replication
-    state: present
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
   become: true
   become_user: postgres
 
@@ -12,6 +12,6 @@
   community.postgresql.postgresql_slot:
     name: "{{ maas_postgres_replication_slot }}"
     db: "maasdb"
-    state: present
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
   become: true
   become_user: postgres

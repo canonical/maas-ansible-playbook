@@ -3,23 +3,33 @@
 
 - name: Set the TCP port for grafana
   ansible.builtin.command: maas {{ admin_username }} maas set-config name=promtail_port value=5238
+  when: maas_state|lower != 'absent'
 
 - name: enable syslog forwarding
   anisible.builtin.command: maas {{ admin_username }} maas set-config name=promtail_enabled value=true
+  when: maas_state|lower != 'absent'
 
 - name: Download and unzip grafana agent
   ansible.builtin.unarchive:
       src: "{{ grafana_agent_pkg }}"
       dest: /opt/agent
       remote_src: true
+  when: maas_state|lower != 'absent'
+
+- name: Remove grafana agent pkg
+  ansible.builtin.file:
+    path: /opt/agent
+    state: 'absent'
+  when: maas_state|lower == 'absent'
 
 - name: Make agent executable
   file: dest=/opt/agent/agent-linux-amd64 mode=a+x
+  when: maas_state|lower != 'absent'
 
 - name: Create agent directories
   ansible.builtin.file:
       path: "{{ item.src }}"
-      state: directory
+      state: "{{ 'directory' if maas_state|lower != 'absent' else maas_state }}"
       mode: '0755'
   loop:
       - {src: "/var/lib/grafana-agent/positions"}
@@ -29,6 +39,7 @@
   ansible.builtin.copy:
       src: /snap/maas/current/usr/share/maas/grafana_agent/agent.yaml.example
       dest: /opt/agent/agent.yml
+  when: maas_state|lower != 'absent'
 
 - name: Start the grafana agent
   ansible.builtin.service:
@@ -44,4 +55,4 @@
                 -config.expand-env \
                 -config.file=/opt/agent/agent.yml
       enabled: true
-      state: started
+      state: "{{ 'started' if maas_state|lower != 'absent' else 'stopped' }}"

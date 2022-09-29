@@ -1,45 +1,46 @@
 ---
 # Installs MAAS
-- name: Display choices
-  ansible.builtin.debug:
-    msg: 'Installing MAAS {{ maas_installation_type }} V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
 
 - name: Install "MAAS" from snap
   community.general.snap:
     name: maas
     channel: '{{ maas_version }}/{{ maas_snap_channel }}'
+    state: "{{ 'present' if maas_state|lower == 'install' else maas_state }}"
   when: maas_installation_type|lower == 'snap'
 
 - name: Install "MAAS" from deb
   ansible.builtin.apt:
     name: "maas={{ maas_version }}"
-    state: "{{ maas_deb_state }}"
+    state: "{{ 'present' if maas_deb_state|lower == 'install' else maas_deb_state }}"
   when: maas_installation_type|lower == 'deb' and '"maas-rack-controller" in role_names'
 
 - name: Install deb dependencies
   ansible.builtin.apt:
     name: maas-region-api={{ maas_version }}
-    state: "{{ maas_deb_state }}"
+    state: "{{ 'present' if maas_deb_state|lower == 'install' else maas_deb_state }}"
   when: maas_installation_type|lower == 'deb' and '"maas-rack-controller" not in role_names'
 
 - name: Initialise MAAS region
   ansible.builtin.command: maas init region --maas-url={{ maas_url }} --database-uri maas-test-db:///
+  when: maas_state|lower != 'absent'
 
 - name: Define MAAS URL
   ansible.builtin.command: maas config | grep maas_url | cut -d "=" -f2
   register: maas_url
-  when: maas_url | length == 0
+  when: maas_url | length == 0 and maas_state|lower != 'absent'
 
 - name: Add an administrator to MAAS
   ansible.builtin.command: maas createadmin \
    --username={{ admin_username }} --password={{ admin_password }} \
    --email={{ admin_email }} --ssh-import={{ admin_id }}
+  when: maas_state|lower != 'absent'
 
 - name: Enable TLS
   ansible.builtin.include_role:
     name: common
     tasks_from: TLS
-  when: enable_tls
+  when: enable_tls and maas_state|lower != 'absent'
 
 - name: Migrate MAAS database
   ansible.builtin.command: maas migrate
+  when: maas_state|lower != 'absent'

@@ -20,14 +20,14 @@
   become: true
   gather_facts: true
 
-- hosts: maas_proxy
+- hosts: maas_rack_controller
   roles:
-    - role: maas_proxy
+    - role: maas_rack_controller
   become: true
   gather_facts: true
 
-- hosts: maas_teardown
+- hosts: maas_proxy
   roles:
-    - role: teardown
+    - role: maas_proxy
   become: true
   gather_facts: true
