@@ -44,38 +44,22 @@
     group: postgres
 
 - name: "Write postgresql.conf"
-  ansible.builtin.template:
-    src: "postgresql.conf.j2"
-    dest: "{{ maas_postgres_config_dir }}postgresql.conf"
-    mode: 0644
-    owner: postgres
-    group: postgres
-
-- name: "Stop Postgres Service To Load New Configuration"
-  ansible.builtin.systemd:
-    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
-    state: stopped
-    no_block: no # wait for clean stop
-
-- name: "Start Postgres Service To Load New Configuration"
-  ansible.builtin.systemd:
-    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
-    enabled: true
-    state: started
-    no_block: no
+  ansible.builtin.include_tasks:
+    file: write_postgres_config.yaml
 
 - name: "Create MAAS Postgres User"
   community.postgresql.postgresql_user:
-    name: "maas"
+    name: "{{ maas_postgres_user }}"
     password: "{{ maas_postgres_password }}"
+    login_user: "postgres"
     state: present
   become: yes
   become_user: postgres
-    
+
 - name: "Create MAAS Postgres Database"
   community.postgresql.postgresql_db:
-    name: "maasdb"
-    owner: "maas"
+    name: "{{ maas_postgres_database }}"
     state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
+    owner: "{{ maas_postgres_user }}"
   become: yes
   become_user: postgres
