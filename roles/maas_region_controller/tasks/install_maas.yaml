@@ -20,7 +20,7 @@
   ansible.builtin.apt:
     name: maas-region-api={{ maas_version }}
     state: "{{ maas_deb_state }}"
-  when: maas_installation_type|lower == 'deb' and '"maas-rack-controller" not in role_names'
+  when: maas_installation_type|lower == 'deb' and '"maas_rack_controller" not in role_names'
 
 - name: Install maas-test-db
   community.general.snap:
@@ -28,7 +28,7 @@
   when: maas_postgres_uri == "maas-test-db:///"
 
 - name: Initialise MAAS region
-  ansible.builtin.command: maas init {%- if "maas-rack-controller" in role_names -%}region+rack{%- else -%}region{%- endif -%} --maas-url={{ maas_url | default(host_ip) }} --database-uri {{ maas_postgres_uri }}
+  ansible.builtin.command: maas init {% if "maas_rack_controller" in role_names %}region+rack{% else %}region{% endif %} --maas-url={{ maas_url | default(host_ip) }} --database-uri {{ maas_postgres_uri }}
 
 - name: Add an administrator to MAAS
   ansible.builtin.command: maas createadmin \
