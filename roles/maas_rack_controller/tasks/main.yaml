@@ -8,14 +8,14 @@
 
 - name: "Install maas rack controller"
   import_tasks: install_maas.yaml
-  when: "'maas' not in ansible_facts.packages"
+  when: "('maas' not in ansible_facts.packages) and ('maas-region-controller' not in role_names)"
 
 - name: "Update maas rack controller"
   import_tasks: upgrade_maas.yaml
-  when: "'maas' in ansible_facts.packages"
+  when: "('maas' in ansible_facts.packages) and ('maas-region-controller' not in role_names)"
 
 - name: Install metrics
   ansible.builtin.include_role:
     name: common
     tasks_from: metrics
-  when: install_metrics
+  when: install_metrics and ('maas-region-controller' not in role_names)
