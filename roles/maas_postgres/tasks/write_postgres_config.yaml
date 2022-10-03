@@ -1,0 +1,22 @@
+---
+- name: "Write postgresql.conf"
+  ansible.builtin.template:
+    src: "postgresql.conf.j2"
+    dest: "{{ maas_postgres_config_dir }}postgresql.conf"
+    mode: 0644
+    owner: postgres
+    group: postgres
+
+- name: "Stop Postgres Service To Load New Configuration"
+  ansible.builtin.systemd:
+    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
+    state: stopped
+    no_block: no # wait for clean stop
+
+- name: "Start Postgres Service To Load New Configuration"
+  ansible.builtin.systemd:
+    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
+    enabled: true
+    state: started
+    no_block: no
+

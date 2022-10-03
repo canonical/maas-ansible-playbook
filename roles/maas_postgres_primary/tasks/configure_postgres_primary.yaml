@@ -15,4 +15,9 @@
     state: present
   become: yes
   become_user: postgres
+  register: maas_postgres_enable_sync
 
+- name: "Update Postgres Config for Replication"
+  ansible.builtin.include_role:
+    name: maas_postgres
+    tasks_from: write_postgres_config
