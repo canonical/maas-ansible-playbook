@@ -9,11 +9,11 @@ maas_postgres_primary
 maas_postgres_secondary
 
 [maas_region_rack_controller]
-10.10.0.20 ansible_user=ubuntu
 
 [maas_region_controller]
 
 [maas_rack_controller]
+10.10.0.16 ansible_user=ubuntu maas_url=10.10.0.19 maas_rack_secret="" enable_TLS=false install_metrics=false
 
 [maas_proxy]
 

@@ -1,6 +1,10 @@
 ---
 # Playbook to generate a MAAS rack
 
+- name: "Check if MAAS is installed"
+  package_facts:
+    manager: "auto"
+
 - name: "Chack MAAS Url supplied by user or region controller setup"
   ansible.builtin.fail:
     msg: "MAAS Url not found"
