@@ -113,10 +113,10 @@ unix_socket_directories = '/var/snap/maas-test-db/common/postgres/sockets'
 {% if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' %}
 ssl = {{ 'on' if maas_postgres_ssl_enabled else 'off' }}
 #ssl_ca_file = ''
-ssl_cert_file = {{ maas_postgres_cert if maas_postgres_cert is defined else '/etc/ssl/certs/ssl-cert-snakeoil.pem' }}
+ssl_cert_file = '{{ maas_postgres_cert if maas_postgres_cert is defined else "/etc/ssl/certs/ssl-cert-snakeoil.pem" }}'
 #ssl_crl_file = ''
 #ssl_crl_dir = ''
-ssl_key_file = '/etc/ssl/private/ssl-cert-snakeoil.key'
+ssl_key_file = '{{ maas_postgres_key if maas_postgres_key is defined else "/etc/ssl/private/ssl-cert-snakeoil.key" }}'
 #ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL' # allowed SSL ciphers
 #ssl_prefer_server_ciphers = on
 #ssl_ecdh_curve = 'prime256v1'
