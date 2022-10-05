@@ -8,3 +8,4 @@
 - name: "Configure Postgres Primary"
   import_tasks:
     configure_postgres_primary.yaml
+  when: maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb'

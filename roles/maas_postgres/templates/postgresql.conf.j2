@@ -39,6 +39,8 @@
 # The default values of these variables are driven from the -D command-line
 # option or PGDATA environment variable, represented here as ConfigDir.
 
+{# use default locations for snap, but explicitly set for deb #}
+{% if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' %}
 data_directory = '{{ maas_postgres_data_dir }}'          # use data in another directory
                                         # (change requires restart)
 hba_file = '{{ maas_postgres_config_dir }}pg_hba.conf'        # host-based authentication file
@@ -49,7 +51,7 @@ ident_file = '{{ maas_postgres_config_dir }}pg_ident.conf'    # ident configurat
 # If external_pid_file is not explicitly set, no extra PID file is written.
 external_pid_file = '/var/run/postgresql/{{ maas_postgres_version_number }}-main.pid'                   # write an extra PID file
                                         # (change requires restart)
-
+{% endif %}
 
 #------------------------------------------------------------------------------
 # CONNECTIONS AND AUTHENTICATION
@@ -67,8 +69,11 @@ listen_addresses = '{%- if maas_postgres_ipv4 is defined -%}{{ maas_postgres_ipv
 port = 5432                             # (change requires restart)
 max_connections = 100                   # (change requires restart)
 #superuser_reserved_connections = 3     # (change requires restart)
+{% if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' %}
 unix_socket_directories = '/var/run/postgresql' # comma-separated list of directories
-                                        # (change requires restart)
+{% else %}
+unix_socket_directories = '/var/snap/maas-test-db/common/postgres/sockets'
+{% endif %}
 #unix_socket_group = ''                 # (change requires restart)
 #unix_socket_permissions = 0777         # begin with 0 to use octal notation
                                         # (change requires restart)
@@ -105,12 +110,13 @@ unix_socket_directories = '/var/run/postgresql' # comma-separated list of direct
 
 # - SSL -
 
-ssl = on
+{% if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' %}
+ssl = {{ 'on' if maas_postgres_ssl_enabled else 'off' }}
 #ssl_ca_file = ''
-ssl_cert_file = '/etc/ssl/certs/ssl-cert-snakeoil.pem'
+ssl_cert_file = '{{ maas_postgres_cert if maas_postgres_cert is defined else "/etc/ssl/certs/ssl-cert-snakeoil.pem" }}'
 #ssl_crl_file = ''
 #ssl_crl_dir = ''
-ssl_key_file = '/etc/ssl/private/ssl-cert-snakeoil.key'
+ssl_key_file = '{{ maas_postgres_key if maas_postgres_key is defined else "/etc/ssl/private/ssl-cert-snakeoil.key" }}'
 #ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL' # allowed SSL ciphers
 #ssl_prefer_server_ciphers = on
 #ssl_ecdh_curve = 'prime256v1'
@@ -119,6 +125,9 @@ ssl_key_file = '/etc/ssl/private/ssl-cert-snakeoil.key'
 #ssl_dh_params_file = ''
 #ssl_passphrase_command = ''
 #ssl_passphrase_command_supports_reload = off
+{% else %}
+ssl = off
+{% endif %}
 
 
 #------------------------------------------------------------------------------
