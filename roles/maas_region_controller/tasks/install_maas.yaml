@@ -10,20 +10,57 @@
     channel: '{{ maas_version }}/{{ maas_snap_channel }}'
   when: maas_installation_type|lower == 'snap'
 
+- name: Add MAAS apt Respository
+  ansible.builtin.apt_repository:
+    repo: "ppa:maas/{{ maas_version }}"
+  when: maas_installation_type|lower == 'deb'
+
 - name: Install "MAAS" from deb
   ansible.builtin.apt:
-    name: "maas={{ maas_version }}"
+    name: "maas"
     state: "{{ maas_deb_state }}"
-  when: (maas_installation_type|lower == 'deb') and ('maas-rack-controller' in role_names)
+    update_cache: true
+  when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in role_names)
 
-- name: Install deb dependencies
+- name: Install "MAAS" Region Controller from deb
   ansible.builtin.apt:
-    name: maas-region-api={{ maas_version }}
+    name: "{{ 'maas-region-controller' if 'maas_postgres_primary' in role_names else 'maas-region-api'}}"
     state: "{{ maas_deb_state }}"
-  when: (maas_installation_type|lower == 'deb') and ('maas-rack-controller' not in role_names)
+    update_cache: true
+  when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' not in role_names)
 
-- name: Initialise MAAS region
-  ansible.builtin.command: maas init region --maas-url={{ maas_url }} --database-uri {{ maas_postgres_uri }}
+- name: Update regiond.conf
+  ansible.builtin.template:
+    src: regiond.conf.j2
+    dest: /etc/maas/regiond.conf
+    mode: 0644
+    owner: maas
+    group: maas
+  when: maas_installation_type|lower == 'deb'
+
+- name: Migrate MAAS database
+  ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
+  when: ('maas_postgres_primary' not in role_names) # if database is local to this host, we install a package that will already have run migrations
+
+- name: Initialise MAAS Controller - Snap
+  ansible.builtin.command: maas init {{ 'region+rack' if 'maas_rack_controller' in role_names else 'region' }} --maas-url={{ maas_url }} --database-uri {{ maas_postgres_uri }}
+  when: maas_installation_type|lower == 'snap'
+
+# MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
+- name: Initialise MAAS Controller - Deb
+  ansible.builtin.expect:
+    command: maas init
+    responses:
+      'URL for the Canonical RBAC service (leave blank if not using the service)': "{{ maas_rbac_url|default('') }}"
+      'Path of the Candid authentication agent file (leave blank if not using the service)': "{{ maas_candid_auth_file|default('') }}"
+  when: maas_installation_type|lower == 'deb' and ((maas_rbac_url is defined) or (maas_candid_auth_file is defined))
+
+- name: Starting MAAS region service
+  ansible.builtin.systemd:
+    name: maas-regiond.service
+    state: started
+    no_block: no
+  when: maas_installation_type|lower == 'deb'
 
 - name: Define MAAS URL
   ansible.builtin.command: maas config | grep maas_url | cut -d "=" -f2
@@ -41,5 +78,3 @@
     tasks_from: TLS
   when: enable_tls
 
-- name: Migrate MAAS database
-  ansible.builtin.command: maas migrate
