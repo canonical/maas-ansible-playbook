@@ -2,7 +2,7 @@
 
 - name: Display choices
   ansible.builtin.debug:
-    msg: 'Installing MAAS {{ maas_installation_type }} V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
+    msg: "Installing MAAS {{ maas_installation_type }} V. {{ maas_version }} on {{ ansible_facts['distribution'] }}"
 
 - name: Install "MAAS" from snap
   community.general.snap:

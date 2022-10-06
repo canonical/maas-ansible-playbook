@@ -1,0 +1,1 @@
+maas_package_name: "{{ 'maas' if ('maas_rack_controller' in ansible_facts.packages) or (maas_installation_type|lower == 'snap') else 'maas-region-api' }}"
