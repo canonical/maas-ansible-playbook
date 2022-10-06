@@ -8,6 +8,7 @@
   community.general.snap:
     name: maas
     channel: '{{ maas_version }}/{{ maas_snap_channel }}'
+  register: maas_region_new_installation
   when: maas_installation_type|lower == 'snap'
 
 - name: Add MAAS apt Respository
@@ -20,6 +21,7 @@
     name: "maas"
     state: "{{ maas_deb_state }}"
     update_cache: true
+  register: maas_region_new_installation
   when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in role_names)
 
 - name: Install "MAAS" Region Controller from deb
@@ -27,6 +29,7 @@
     name: "{{ 'maas-region-controller' if 'maas_postgres_primary' in role_names else 'maas-region-api'}}"
     state: "{{ maas_deb_state }}"
     update_cache: true
+  register: maas_region_new_installation
   when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' not in role_names)
 
 - name: Update regiond.conf
@@ -71,6 +74,7 @@
   ansible.builtin.command: maas createadmin \
    --username={{ admin_username }} --password={{ admin_password }} \
    --email={{ admin_email }} --ssh-import={{ admin_id }}
+  when: not maas_region_new_installation
 
 - name: Enable TLS
   ansible.builtin.include_role:
