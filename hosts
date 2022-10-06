@@ -1,7 +1,7 @@
 # Define hosts for MAAS here
 
 [maas_postgres_primary]
-10.10.0.23
+
 [maas_postgres_secondary]
 
 # DO NOT MODIFY this group
