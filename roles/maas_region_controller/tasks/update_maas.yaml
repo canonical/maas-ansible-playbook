@@ -26,4 +26,13 @@
 
 - name: Read MAAS Secret For Rack Controllers
   ansible.builtin.command: cat /var/lib/maas/secret
-  register: maas_rack_secret
+  register: maas_rack_secret_tmp
+
+- name: Save MAAS Secret
+  set_fact:
+    maas_rack_secret: "{{ maas_rack_secret_tmp.stdout }}"
+    cacheable: yes
+  run_once: true
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  with_items: "{{ groups['maas_rack_controller'] }}"

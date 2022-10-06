@@ -9,10 +9,7 @@
 
 - name: Install deb dependencies
   ansible.builtin.apt:
-    pkg:
-    - maas={{ maas_version }}
-    - maas-rack-controller={{ maas_version }}
-    upgrade: true
-    state: present
-    update_cache: true
-  when: maas_installation_type|lower == 'deb' && '"maas-rack-controller" in role_names'  && "maas-region-controller" not in role_names
+    name: "maas-rack-controller"
+    state: latest
+    update_cache: yes
+  when: maas_installation_type|lower == 'deb' and ('maas_region_controller' not in role_names)

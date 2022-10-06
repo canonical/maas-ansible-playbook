@@ -8,18 +8,19 @@
   community.general.snap:
     name: maas
     channel: '{{ maas_version }}/{{ maas_snap_channel }}'
-  when: maas_installation_type|lower == 'snap'
+  when: maas_installation_type|lower == 'snap' and ('maas_region_controller' not in role_names)
 
 - name: Install deb dependencies
   ansible.builtin.apt:
-    name: maas-rack-controller={{ maas_version }}
-    state: "{{ maas_deb_state }}"
-  when: maas_installation_type|lower == 'deb' && '"maas-rack-controller" in role_names' && "maas-region-controller" not in role_names
+    name: maas-rack-controller
+    state: "{{ maas_deb_state|default('present') }}"
+  when: (maas_installation_type|lower == 'deb') and ('maas_region_controller' not in role_names)
 
-- name: Initialise MAAS rack
-  ansible.builtin.command: maas init rack --maas-url={{ maas_url }} --secret={{ maas_rack_secret }}
+- name: Initialise MAAS Rack Controller
+  ansible.builtin.command: maas init --mode=rack --maas-url={{ maas_url }} --secret={{ maas_rack_secret }}
+  when: ('maas_region_controller' not in role_names)
 
-- name: Conditional role
+- name: Enable TLS
   ansible.builtin.include_role:
     name: common
     tasks_from: TLS
