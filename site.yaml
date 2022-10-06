@@ -20,14 +20,16 @@
   become: yes
   gather_facts: true
 
-- hosts: maas_rack_controller
-  roles:
-    - role: maas_rack_controller
-  become: yes
-  gather_facts: true
-
+# proxies are provisioned prior to rack controllers so the rack controller
+# will request to register to region controllers through the proxy
 - hosts: maas_proxy
   roles:
     - role: maas_proxy
+  become: yes
+  gather_facts: true
+
+- hosts: maas_rack_controller
+  roles:
+    - role: maas_rack_controller
   become: yes
   gather_facts: true
