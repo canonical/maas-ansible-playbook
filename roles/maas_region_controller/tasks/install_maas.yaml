@@ -22,7 +22,7 @@
     state: "{{ maas_deb_state }}"
     update_cache: true
   register: maas_region_new_installation
-  when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in role_names)
+  when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in group_names)
 
 - name: Install "MAAS" Region Controller from deb
   ansible.builtin.apt:
@@ -30,7 +30,7 @@
     state: "{{ maas_deb_state }}"
     update_cache: true
   register: maas_region_new_installation
-  when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' not in role_names)
+  when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' not in group_names)
 
 - name: Update regiond.conf
   ansible.builtin.template:
@@ -43,20 +43,22 @@
 
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
-  when: ('maas_postgres_primary' not in role_names) # if database is local to this host, we install a package that will already have run migrations
+  when: ('maas_postgres_primary' not in group_names) or (maas_installation_type|lower == 'snap') # if database is local to this host, we install a package that will already have run migrations
 
 - name: Initialise MAAS Controller - Snap
   ansible.builtin.command: maas init {{ 'region+rack' if 'maas_rack_controller' in role_names else 'region' }} --maas-url={{ maas_url }} --database-uri {{ maas_postgres_uri }}
-  when: maas_installation_type|lower == 'snap'
+  when: maas_installation_type|lower == 'snap' and maas_region_new_installation is defined
 
 # MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
 - name: Initialise MAAS Controller - Deb
   ansible.builtin.expect:
-    command: maas init
+    command: "maas init --rbac-url={{ maas_rbac_url|default('') }} --candid-agent-file={{ maas_candid_auth_file|default('') }} --admin-ssh-import={{ admin_id }}"
     responses:
-      'URL for the Canonical RBAC service (leave blank if not using the service)': "{{ maas_rbac_url|default('') }}"
-      'Path of the Candid authentication agent file (leave blank if not using the service)': "{{ maas_candid_auth_file|default('') }}"
-  when: maas_installation_type|lower == 'deb' and ((maas_rbac_url is defined) or (maas_candid_auth_file is defined))
+      "(?i)Username: ": "{{admin_username}}"
+      "(?i)Password: ": "{{admin_password}}"
+      "(?i)Again: ": "{{admin_password}}"
+      "(?i)Email: ": "{{admin_email}}"
+  when: maas_installation_type|lower == 'deb' and maas_region_new_installation is defined
 
 - name: Starting MAAS region service
   ansible.builtin.systemd:
@@ -81,6 +83,11 @@
     name: common
     tasks_from: TLS
   when: enable_tls
+
+- name: Wait For MAAS To Create Secret File
+  ansible.builtin.wait_for:
+    path: /var/lib/maas/secret
+    state: present
 
 - name: Read MAAS Secret For Rack Controllers
   ansible.builtin.command: cat /var/lib/maas/secret

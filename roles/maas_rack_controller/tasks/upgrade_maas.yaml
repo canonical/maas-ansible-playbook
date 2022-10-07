@@ -12,4 +12,4 @@
     name: "maas-rack-controller"
     state: latest
     update_cache: yes
-  when: maas_installation_type|lower == 'deb' and ('maas_region_controller' not in role_names)
+  when: maas_installation_type|lower == 'deb' and ('maas_region_controller' not in group_names)
