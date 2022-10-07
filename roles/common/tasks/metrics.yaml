@@ -17,8 +17,8 @@
 
 - name: Remove grafana agent pkg
   ansible.builtin.file:
-    path: /opt/agent
-    state: 'absent'
+      path: /opt/agent
+      state: 'absent'
   when: maas_state|lower == 'absent'
 
 - name: Make agent executable

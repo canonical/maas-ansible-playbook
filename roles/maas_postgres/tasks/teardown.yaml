@@ -38,7 +38,7 @@
 
 - name: "Uninstall Postgres Snap"
   community.general.snap:
-    name: "{{ maas_postgres_snap_name | default('maas-test-db')}}"
+    name: "{{ maas_postgres_snap_name | default('maas-test-db') }}"
     state: absent
   when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'snap'
 
