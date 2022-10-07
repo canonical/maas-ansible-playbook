@@ -4,14 +4,15 @@
     src: "postgresql.conf.j2"
     dest: "{{ maas_postgres_config_dir }}postgresql.conf"
     mode: 0644
-    owner: postgres
-    group: postgres
+    owner: "{{ 'postgres' if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' else 'snap_daemon' }}"
+    group: "{{ 'postgres' if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' else 'snap_daemon' }}"
 
 - name: "Stop Postgres Service To Load New Configuration"
   ansible.builtin.systemd:
     name: "postgresql@{{ maas_postgres_version_number }}-main.service"
     state: stopped
     no_block: no # wait for clean stop
+  when: maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb'
 
 - name: "Start Postgres Service To Load New Configuration"
   ansible.builtin.systemd:
@@ -19,4 +20,8 @@
     enabled: true
     state: started
     no_block: no
+  when: maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb'
 
+- name: "Restart Postgres Snap To Load New Configuration"
+  ansible.builtin.command: snap restart maas-test-db
+  when: maas_postgres_installation_type|default(maas_installation_type)|lower == 'snap'

@@ -4,6 +4,7 @@
 
 [maas_postgres_secondary]
 
+# DO NOT MODIFY this group
 [maas_postgres:children]
 maas_postgres_primary
 maas_postgres_secondary
@@ -15,5 +16,3 @@ maas_postgres_secondary
 [maas_rack_controller]
 
 [maas_proxy]
-
-[maas_teardown]
