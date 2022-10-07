@@ -3,7 +3,6 @@
   ansible.builtin.apt:
     name: python3-pip
     update_cache: true
-    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
 
 - name: "Install libpq-dev for Configuration"
   ansible.builtin.apt:
@@ -53,12 +52,6 @@
     owner: snap_daemon
     group: snap_daemon
   when: (maas_postgres_installation_type|default(maas_installation_type)|lower == 'snap') and (maas_postgres_action|lower == 'absent')
-
-- name: Delete pg_hba.conf"
-  file:
-    state: 'absent'
-    path: "{{ maas_postgres_config_dir }}pg_hba.conf"
-  when: maas_postgres_action|lower == 'absent'
 
 - name: "Write postgresql.conf"
   ansible.builtin.include_tasks:

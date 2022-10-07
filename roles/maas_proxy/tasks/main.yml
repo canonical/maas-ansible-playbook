@@ -15,11 +15,5 @@
 - name: "Restart HAProxy"
   ansible.builtin.systemd:
     name: "haproxy.service"
-    state: "{{ 'restarted' if maas_proxy_state|lower != 'absent' else 'stopped' }}"
+    state: 'restarted'
     enabled: true
-
-- name: "Remove HAProxy Config"
-  ansible.builtin.file:
-    path: /etc/haproxy/haproxy.cfg
-    state: 'absent'
-  when: maas_proxy_state|lower == 'absent'

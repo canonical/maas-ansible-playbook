@@ -11,8 +11,8 @@
   ansible.builtin.apt:
     pkg:
       - maas={{ maas_version }}
-      - maas-rack-controller={{ maas_version }}
+      - maas_rack_controller={{ maas_version }}
     upgrade: true
     state: present
     update_cache: true
-  when: maas_installation_type|lower == 'deb' and '"maas-rack-controller" in role_names'  and "maas-region-controller" not in role_names
+  when: maas_installation_type|lower == 'deb' and '"maas_rack_controller" in group_names'  and "maas_region_controller" not in group_names

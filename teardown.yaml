@@ -3,12 +3,7 @@
 
 - hosts: all
   become: true
-  vars:
-    maas_deb_state: absent
-    maas_installation_type: "{% if 'maas' in ansible_facts.packages %}deb{% else %}snap{% endif %}"
-    maas_postgres_action: absent
-    maas_proxy_state: absent
-    maas_state: absent
+  gather_facts: true
   tasks:
 
   - name: "Collect facts about installed packages"
@@ -19,25 +14,15 @@
   - name: "Collect facts about system services"
     service_facts:
 
-  - name: Fetch maas install mode
-    shell: sudo maas config #| grep 'Mode' | cut -d':'' -f2 | xargs
-    register: maas_mode
-
-  - name: determine the maas mode
-    set_fact:
-      maas_mode: "{{ maas_mode.stdout_lines | first | split(':') | last | trim }}"
-
   - name: "Uninstall MAAS region"
     ansible.builtin.include_role:
       name: "maas_region_controller"
-      tasks_from: install_maas
-    when: maas_mode == "region"
+      tasks_from: teardown
 
   - name: "Uninstall MAAS rack"
     ansible.builtin.include_role:
       name: maas_rack_controller
-      tasks_from: install_maas
-    when: maas_mode == "rack"
+      tasks_from: teardown
 
   - name: "Remove metrics"
     ansible.builtin.include_role:
@@ -48,20 +33,32 @@
   - name: "Uninstall postgres primary"
     ansible.builtin.include_role:
       name: maas_postgres_primary
-      tasks_from: main
-    when: "'postgres' in ansible_facts.packages"
+      tasks_from: teardown
+    # when: "'postgres' in ansible_facts.packages"
 
   - name: "Uninstall postgres secondary"
     ansible.builtin.include_role:
       name: maas_postgres_secondary
-      tasks_from: main
-    when: "'postgres' in ansible_facts.packages"
+      tasks_from: teardown
+    # when: "'postgres' in ansible_facts.packages"
+
+  - name: "Uninstall postgres"
+    ansible.builtin.include_role:
+      name: maas_postgres
+      tasks_from: teardown
+    # when: "'postgres' in ansible_facts.packages"
 
   - name: "Uninstall HAProxy"
     ansible.builtin.include_role:
       name: maas_proxy
-      tasks_from: main
-    when: "'haproxy' in ansible_facts.packages"
+      tasks_from: teardown
+    # when: "'haproxy' in ansible_facts.packages"
+  
+  - name: "Install pip for Configuration Dependencies"
+    ansible.builtin.apt:
+      name: python3-pip
+      state: absent
+    when: uninstall_pip
 
   - name: Remove ununsed packages from the cache
     ansible.builtin.apt:

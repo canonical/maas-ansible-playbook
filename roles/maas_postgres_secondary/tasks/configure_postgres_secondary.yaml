@@ -41,4 +41,3 @@
     name: "postgresql@{{ maas_postgres_version_number }}-main.service"
     state: started
     no_block: false
-  when: maas_postgres_action|lower != 'absent'

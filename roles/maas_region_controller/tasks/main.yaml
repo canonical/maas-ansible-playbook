@@ -1,5 +1,6 @@
 ---
 # Playbook to generate a MAAS region
+- debug: "msg={{ install_metrics }}"
 - name: "Check if MAAS is installed"
   package_facts:
     manager: "auto"

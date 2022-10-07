@@ -1,6 +1,6 @@
 # Define hosts for MAAS here
 
-10.10.0.20 ansible_user=ubuntu
+10.10.0.19 ansible_user=ubuntu
 
 [maas_postgres_primary]
 
