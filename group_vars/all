@@ -4,6 +4,7 @@
 maas_port: 5240             # The port MAAS uses to comunicate on
 maas_https_port: 5443       # The https port MAAS uses to comunicate on
 maas_url: ""                # The URL maas uses
+enable_tls: false
 
 # Installation variables
 maas_version: "latest"          # ie: 3.2, 2.8

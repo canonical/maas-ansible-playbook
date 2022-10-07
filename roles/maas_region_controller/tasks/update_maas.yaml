@@ -1,19 +1,33 @@
 ---
-# Installs MAAS
-- name: Display choices
-  ansible.builtin.debug:
-    msg: 'Updating MAAS {{ maas_installation_type }} to V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
-
-- name: Update MAAS snap
+- name: Update MAAS - Snap
   ansible.builtin.command: snap refresh --channel={{ maas_version }} maas
   when: maas_installation_type|lower == 'snap'
 
-- name: Update deb dependencies
+- name: Add MAAS apt Respository
+  ansible.builtin.apt_repository:
+    repo: "ppa:maas/{{ maas_version }}"
+  when: maas_installation_type|lower == 'deb'
+
+- name: Update MAAS - Deb
   ansible.builtin.apt:
-    pkg:
-      - maas={{ maas_version }}
-      - maas_region_api={{ maas_version }}
-    upgrade: true
-    state: present
+    name: "{{ 'maas-region-controller' if 'maas_postgres_primary' in role_names else 'maas-region-api' }}"
+    state: latest
     update_cache: true
   when: maas_installation_type|lower == 'deb' and '"maas_rack_controller" not in group_names'
+
+- name: Migrate MAAS database
+  ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
+  when: ('maas_postgres_primary' not in role_names) # if database is local to this host, we install a package that will already have run migrations
+
+- name: Read MAAS Secret For Rack Controllers
+  ansible.builtin.command: cat /var/lib/maas/secret
+  register: maas_rack_secret_tmp
+
+- name: Save MAAS Secret
+  set_fact:
+    maas_rack_secret: "{{ maas_rack_secret_tmp.stdout }}"
+    cacheable: yes
+  run_once: true
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  with_items: "{{ groups['maas_rack_controller'] }}"

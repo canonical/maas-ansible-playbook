@@ -35,7 +35,7 @@ backend maas_region_controllers
     server {{ upstream['hostname'] }} {{ upstream['ip'] }}:{{ upstream['port'] }}
     {% endfor %}
 {% else %}
-    {% for upstream in groups['maas_region_controllers'] %}
+    {% for upstream in groups['maas_region_controller'] %}
         {% if ('ansible_default_ipv4' in upstream) and ('address' in upstream['ansible_default_ipv4']) %}
     server {{ upstream['hostname'] }} {{ upstream['ansible_default_ipv4']['address'] }}:5240
         {% endif %}

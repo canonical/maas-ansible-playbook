@@ -1,9 +1,0 @@
-# MAAS installation setup
-enable_tls: false               # If an operator wishes to enable TLS
-install_metrics: false          # install metrics for the MAAS
-
-# administrator account details
-admin_username: "admin"
-admin_password: "admin"
-admin_email: "admin@email.com"
-admin_id: "admin"

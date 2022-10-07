@@ -1,27 +1,69 @@
 ---
 # Installs MAAS
 
-- name: Install "MAAS" from snap
+- name: Install MAAS - Snap
   community.general.snap:
     name: maas
     channel: '{{ maas_version }}/{{ maas_snap_channel }}'
     state: "{{ 'present' if maas_state|lower == 'install' else maas_state }}"
+  register: maas_region_new_installation
   when: maas_installation_type|lower == 'snap'
 
-- name: Install "MAAS" from deb
+- name: Add MAAS apt Respository
+  ansible.builtin.apt_repository:
+    repo: "ppa:maas/{{ maas_version }}"
+  when: maas_installation_type|lower == 'deb'
+
+- name: Install MAAS - Deb
   ansible.builtin.apt:
-    name: "maas={{ maas_version }}"
-    state: "{{ 'present' if maas_deb_state|lower == 'install' else maas_deb_state }}"
+    name: "maas"
+    state: "{{ maas_deb_state }}"
+    update_cache: true
+  register: maas_region_new_installation
   when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in group_names)
 
-- name: Install deb dependencies
+- name: Install MAAS Region Controller - Deb
   ansible.builtin.apt:
-    name: maas_region_api={{ maas_version }}
-    state: "{{ 'present' if maas_deb_state|lower == 'install' else maas_deb_state }}"
+    name: "{{ 'maas-region-controller' if 'maas_postgres_primary' in role_names else 'maas-region-api'}}"
+    state: "{{ maas_deb_state }}"
+    update_cache: true
+  register: maas_region_new_installation
   when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' not in group_names)
 
-- name: Initialise MAAS region
-  ansible.builtin.command: maas init region --maas-url={{ maas_url }} --database-uri {{ maas_postgres_uri }}
+- name: Update regiond.conf
+  ansible.builtin.template:
+    src: regiond.conf.j2
+    dest: /etc/maas/regiond.conf
+    mode: 0644
+    owner: maas
+    group: maas
+  when: maas_installation_type|lower == 'deb'
+
+- name: Migrate MAAS database
+  ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
+  when: ('maas_postgres_primary' not in group_names) or (maas_installation_type|lower == 'snap') # if database is local to this host, we install a package that will already have run migrations
+
+- name: Initialise MAAS Controller - Snap
+  ansible.builtin.command: maas init {{ 'region+rack' if 'maas_rack_controller' in role_names else 'region' }} --maas-url={{ maas_url }} --database-uri {{ maas_postgres_uri }}
+  when: maas_installation_type|lower == 'snap' and maas_region_new_installation is defined
+
+# MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
+- name: Initialise MAAS Controller - Deb
+  ansible.builtin.expect:
+    command: "maas init --rbac-url={{ maas_rbac_url|default('') }} --candid-agent-file={{ maas_candid_auth_file|default('') }} --admin-ssh-import={{ admin_id }}"
+    responses:
+      "(?i)Username: ": "{{admin_username}}"
+      "(?i)Password: ": "{{admin_password}}"
+      "(?i)Again: ": "{{admin_password}}"
+      "(?i)Email: ": "{{admin_email}}"
+  when: maas_installation_type|lower == 'deb' and maas_region_new_installation is defined
+
+- name: Starting MAAS region service
+  ansible.builtin.systemd:
+    name: maas-regiond.service
+    state: started
+    no_block: no
+  when: maas_installation_type|lower == 'deb'
 
 - name: Define MAAS URL
   ansible.builtin.command: maas config | grep maas_url | cut -d "=" -f2
@@ -32,6 +74,7 @@
   ansible.builtin.command: maas createadmin \
    --username={{ admin_username }} --password={{ admin_password }} \
    --email={{ admin_email }} --ssh-import={{ admin_id }}
+  when: not maas_region_new_installation
 
 - name: Enable TLS
   ansible.builtin.include_role:
@@ -39,5 +82,20 @@
     tasks_from: TLS
   when: enable_tls
 
-- name: Migrate MAAS database
-  ansible.builtin.command: maas migrate
+- name: Wait For MAAS To Create Secret File
+  ansible.builtin.wait_for:
+    path: /var/lib/maas/secret
+    state: present
+
+- name: Read MAAS Secret For Rack Controllers
+  ansible.builtin.command: cat /var/lib/maas/secret
+  register: maas_rack_secret_tmp
+
+- name: Save MAAS Secret
+  set_fact:
+    maas_rack_secret: "{{ maas_rack_secret_tmp.stdout }}"
+    cacheable: yes
+  run_once: true
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  loop: "{{ groups['maas_rack_controller'] }}"
