@@ -4,6 +4,7 @@
 maas_port: 5240             # The port MAAS uses to comunicate on
 maas_https_port: 5443       # The https port MAAS uses to comunicate on
 maas_url: ""                # The URL maas uses
+enable_tls: false
 
 # grafana agent repo
 grafana_agent_pkg: https://github.com/grafana/agent/releases/download/v0.22.0/agent-linux-amd64.zip

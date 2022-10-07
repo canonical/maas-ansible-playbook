@@ -28,7 +28,7 @@ maas_postgres_hba_entries:
     - type: 'host'
       database: 'all'
       user: 'all'
-      address: "{{ maas_postgres_ipv4 }}/32" 
+      address: "{{ maas_postgres_ipv4 }}/24" 
       method: 'md5'
     - type: 'host'
       database: 'replication'
