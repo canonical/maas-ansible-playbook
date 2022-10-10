@@ -44,6 +44,7 @@
     chain: INPUT
     protocol: tcp
     destination_ports:
+      - "{{ dns }}"
       - "{{ maas_port }}"
       - "{{ rsyslog }}"
       - "{{ maas_https_port }}"
@@ -57,6 +58,8 @@
     chain: INPUT
     protocol: udp
     destination_ports:
+      - "{{ dns }}"
+      - "{{ ntp }}"
       - "{{ maas_port }}"
       - "{{ rsyslog }}"
     jump: ACCEPT
@@ -67,6 +70,7 @@
     chain: INPUT
     protocol: tcp
     destination_ports:
+      - "{{ dns }}"
       - "{{ rsyslog }}"
       - "{{ rack_http_port }}"
     jump: ACCEPT
@@ -77,6 +81,7 @@
     chain: INPUT
     protocol: udp
     destination_ports:
+      - "{{ dns }}"
       - "{{ tftp_dhcp }}"
       - "{{ ntp }}"
       - "{{ rsyslog }}"

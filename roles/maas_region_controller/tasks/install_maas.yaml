@@ -99,8 +99,3 @@
   delegate_to: "{{ item }}"
   delegate_facts: true
   loop: "{{ groups['maas_rack_controller'] }}"
-
-- name: "Setup firewall"
-ansible.builtin.include_role:
-  name: maas_firewall
-  tasks_from: setup_firewall_rules
