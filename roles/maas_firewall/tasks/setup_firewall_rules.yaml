@@ -50,7 +50,7 @@
       - "{{ rpc_ports }}"
       - "{{ postgres }}"
     jump: ACCEPT
-  when: ('maas_region_controller' in role_names)
+  when: ('maas_region_controller' in group_names)
 
 - name: Specific to region controller (udp)
   ansible.builtin.iptables:
@@ -60,7 +60,7 @@
       - "{{ maas_port }}"
       - "{{ rsyslog }}"
     jump: ACCEPT
-  when: ('maas_region_controller' in role_names)
+  when: ('maas_region_controller' in group_names)
 
 - name: Specific to rack controller (tcp)
   ansible.builtin.iptables:
@@ -70,7 +70,7 @@
       - "{{ rsyslog }}"
       - "{{ rack_http_port }}"
     jump: ACCEPT
-  when: ('maas_rack_controller' in role_names)
+  when: ('maas_rack_controller' in group_names)
 
 - name: Specific to rack controller (udp)
   ansible.builtin.iptables:
@@ -82,7 +82,7 @@
       - "{{ rsyslog }}"
       - "{{ rack_http_port }}"
     jump: ACCEPT
-  when: ('maas_rack_controller' in role_names)
+  when: ('maas_rack_controller' in group_names)
 
 - name: Specific to postgres (tcp)
   ansible.builtin.iptables:
@@ -91,7 +91,7 @@
     destination_ports:
       - "{{ postgres }}"
     jump: ACCEPT
-  when: ('maas_postgres_primary' in role_names or 'maas_postgres_secondary' in role_names)
+  when: ('maas_postgres_primary' in group_names or 'maas_postgres_secondary' in group_names)
 
 - name: Proxy and region controller on same host
   ansible.builtin.iptables:
@@ -100,7 +100,7 @@
     destination_ports:
       - "{{ proxy_sharewregion }}"
     jump: ACCEPT
-  when: ('maas_proxy' in role_names and 'maas_region_controller' in role_names)
+  when: ('maas_proxy' in group_names and 'maas_region_controller' in group_names)
 
 - name: Proxy and postgres on same host
   ansible.builtin.iptables:
@@ -109,4 +109,4 @@
     destination_ports:
       - "{{ proxy_sharewpostgres }}"
     jump: ACCEPT
-  when: ('maas_proxy' in role_names and ('maas_postgres_primary' in role_names or 'maas_postgres_secondary' in role_names))
+  when: ('maas_proxy' in group_names and ('maas_postgres_primary' in group_names or 'maas_postgres_secondary' in group_names))
