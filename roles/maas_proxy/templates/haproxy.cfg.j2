@@ -36,11 +36,11 @@ backend maas_region_controllers
     {% endfor %}
 {% else %}
     {% for upstream in groups['maas_region_controller'] %}
-        {% if ('ansible_default_ipv4' in upstream) and ('address' in upstream['ansible_default_ipv4']) %}
-    server {{ upstream['hostname'] }} {{ upstream['ansible_default_ipv4']['address'] }}:5240
+        {% if ('ansible_default_ipv4' in hostvars[upstream]) and ('address' in hostvars[upstream]['ansible_default_ipv4']) %}
+    server {{ hostvars[upstream]['ansible_hostname'] }} {{ hostvars[upstream]['ansible_default_ipv4']['address'] }}:5240
         {% endif %}
-        {% if ('ansible_default_ipv6' in upstream) and ('address' in upstream['ansible_default_ipv6']) %}
-    server {{ upstream['hostname'] }} {{ upstream['ansible_default_ipv6']['address'] }}:5240
+        {% if ('ansible_default_ipv6' in hostvars[upstream]) and ('address' in hostvars[upstream]['ansible_default_ipv6']) %}
+    server {{ hostvars[upstream]['ansible_hostname'] }} {{ hostvars[upstream]['ansible_default_ipv6']['address'] }}:5240
         {% endif %}
     {% endfor %}
 {% endif %}
@@ -71,11 +71,11 @@ backend maas-postgres
         {% endfor %}
     {% else %}
         {% for pg in groups['maas_postgres'] %}
-            {% if ('ansible_default_ipv4' in pg) and ('address' in pg['ansible_default_ipv4']) %}
-    server {{ pg['hostname'] }} {{ pg['ansible_default_ipv4']['address'] }}:5432
+            {% if ('ansible_default_ipv4' in hostvars[pg]) and ('address' in hostvars[pg]['ansible_default_ipv4']) %}
+    server {{ hostvars[pg]['ansible_hostname'] }} {{ hostvars[pg]['ansible_default_ipv4']['address'] }}:5432
             {% endif %}
-            {% if ('ansible_default_ipv6' in pg) and ('address' in pg['ansible_default_ipv6']) %}
-    server {{ pg['hostname'] }} {{ pg['ansible_default_ipv6']['address'] }}:5432
+            {% if ('ansible_default_ipv6' in hostvars[pg]) and ('address' in hostvars[pg]['ansible_default_ipv6']) %}
+    server {{ hostvars[pg]['ansible_hostname'] }} {{ hostvars[pg]['ansible_default_ipv6']['address'] }}:5432
             {% endif %}
         {% endfor %}
     {% endif %}

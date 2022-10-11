@@ -1,7 +1,7 @@
 ---
 # Installs MAAS
 
-- name: Uninstall MAAS - Snapp
+- name: Uninstall MAAS - Snap
   community.general.snap:
     name: maas
     state: absent
