@@ -75,3 +75,4 @@
   become: yes
   become_user: postgres
   when: maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb'
+  

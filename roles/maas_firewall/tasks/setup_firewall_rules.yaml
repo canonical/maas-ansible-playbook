@@ -23,95 +23,25 @@
     chain: FORWARD
     policy: DROP
 
-# - name: Open tcp ports - all roles
+# - name: Open tcp ports 
 #   ansible.builtin.iptables:
 #     chain: INPUT
 #     protocol: tcp
-#     destination_ports:
-#       - "{{ }}"
+#     destination_ports: "{{ maas_open_tcp_ports }}"
 #     jump: ACCEPT
 
-# - name: Open udp ports - all roles
-#   ansible.builtin.iptables:
-#     chain: INPUT
-#     protocol: udp
-#     destination_ports:
-#       - "{{  }}"
-#     jump: ACCEPT
-
-- name: Specific to region controller (tcp)
+- name: Open tcp ports 
   ansible.builtin.iptables:
     chain: INPUT
     protocol: tcp
-    destination_ports:
-      - "{{ dns }}"
-      - "{{ maas_port }}"
-      - "{{ rsyslog }}"
-      - "{{ maas_https_port }}"
-      - "{{ rpc_ports }}"
-      - "{{ postgres }}"
+    destination_port: "{{ item }}"
     jump: ACCEPT
-  when: ('maas_region_controller' in group_names)
+  with_items: "{{ maas_open_tcp_ports }}"
 
-- name: Specific to region controller (udp)
+- name: Open udp ports 
   ansible.builtin.iptables:
     chain: INPUT
     protocol: udp
-    destination_ports:
-      - "{{ dns }}"
-      - "{{ ntp }}"
-      - "{{ maas_port }}"
-      - "{{ rsyslog }}"
+    destination_port: "{{ item }}"
     jump: ACCEPT
-  when: ('maas_region_controller' in group_names)
-
-- name: Specific to rack controller (tcp)
-  ansible.builtin.iptables:
-    chain: INPUT
-    protocol: tcp
-    destination_ports:
-      - "{{ dns }}"
-      - "{{ rsyslog }}"
-      - "{{ rack_http_port }}"
-    jump: ACCEPT
-  when: ('maas_rack_controller' in group_names)
-
-- name: Specific to rack controller (udp)
-  ansible.builtin.iptables:
-    chain: INPUT
-    protocol: udp
-    destination_ports:
-      - "{{ dns }}"
-      - "{{ tftp_dhcp }}"
-      - "{{ ntp }}"
-      - "{{ rsyslog }}"
-      - "{{ rack_http_port }}"
-    jump: ACCEPT
-  when: ('maas_rack_controller' in group_names)
-
-- name: Specific to postgres (tcp)
-  ansible.builtin.iptables:
-    chain: INPUT
-    protocol: tcp
-    destination_ports:
-      - "{{ postgres }}"
-    jump: ACCEPT
-  when: ('maas_postgres_primary' in group_names or 'maas_postgres_secondary' in group_names)
-
-- name: Proxy and region controller on same host
-  ansible.builtin.iptables:
-    chain: INPUT
-    protocol: tcp 
-    destination_ports:
-      - "{{ proxy_sharewregion }}"
-    jump: ACCEPT
-  when: ('maas_proxy' in group_names and 'maas_region_controller' in group_names)
-
-- name: Proxy and postgres on same host
-  ansible.builtin.iptables:
-    chain: INPUT
-    protocol: tcp 
-    destination_ports:
-      - "{{ proxy_sharewpostgres }}"
-    jump: ACCEPT
-  when: ('maas_proxy' in group_names and ('maas_postgres_primary' in group_names or 'maas_postgres_secondary' in group_names))
+  with_items: "{{ maas_open_udp_ports }}"
