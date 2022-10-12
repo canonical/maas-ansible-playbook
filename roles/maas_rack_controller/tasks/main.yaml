@@ -10,11 +10,11 @@
 
 - name: "Install maas rack controller"
   import_tasks: install_maas.yaml
-  when: ('maas_rack_controller' not in ansible_facts.packages)
+  when: ('maas-rack-controller' not in ansible_facts.packages)
 
 - name: "Update maas rack controller"
   import_tasks: upgrade_maas.yaml
-  when: ('maas_rack_controller' in ansible_facts.packages)
+  when: ('maas-rack-controller' in ansible_facts.packages)
 
 - name: Install metrics
   ansible.builtin.include_role:

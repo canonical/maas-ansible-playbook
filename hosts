@@ -1,18 +1,20 @@
 # Define hosts for MAAS here
 
 [maas_postgres_primary]
+10.10.0.19 ansible_user="ubuntu" maas_postgres_installation_type="snap"
 
 [maas_postgres_secondary]
+
+[maas_region_controller]
+10.10.0.19 ansible_user="ubuntu" admin_email="jack.lloyd-walters@canonical.com" admin_id="lloydwaltersj" maas_url="10.10.0.19:5240/MAAS" maas_postgres_password="maas"
+
+[maas_rack_controller]
+# 10.10.0.19
+
+[maas_proxy]
+
 
 # DO NOT MODIFY this group
 [maas_postgres:children]
 maas_postgres_primary
 maas_postgres_secondary
-
-[maas_region_rack_controller]
-
-[maas_region_controller]
-
-[maas_rack_controller]
-
-[maas_proxy]

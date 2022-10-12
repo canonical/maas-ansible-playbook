@@ -1,9 +1,5 @@
 ---
 # Installs MAAS
-- name: Display choices
-  ansible.builtin.debug:
-    msg: 'Installing MAAS {{ maas_installation_type }} V. {{ maas_version }} on {{ host_ip }}'
-
 - name: Install "MAAS" from snap
   community.general.snap:
     name: maas
@@ -43,7 +39,7 @@
 
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
-  when: ('maas_postgres_primary' not in group_names) or (maas_installation_type|lower == 'snap') # if database is local to this host, we install a package that will already have run migrations
+  when: ('maas_postgres_primary' not in group_names) # if database is local to this host, we install a package that will already have run migrations
 
 - name: Initialise MAAS Controller - Snap
   ansible.builtin.command: maas init {{ 'region+rack' if 'maas_rack_controller' in role_names else 'region' }} --maas-url={{ maas_url }} --database-uri {{ maas_postgres_uri }}
