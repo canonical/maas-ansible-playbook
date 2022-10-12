@@ -24,4 +24,5 @@
   ansible.builtin.include_role:
     name: common
     tasks_from: TLS
-  when: enable_tls
+  # TLS requires maas 3.2 or greater
+  when: enable_tls and maas_version is version("3.2", '>=')

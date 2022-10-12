@@ -8,12 +8,19 @@
   import_tasks: install_maas.yaml
   when: (maas_package_name not in ansible_facts.packages)
 
-- name: "Update maas"
+- name: Update maas
   import_tasks: update_maas.yaml
   when: (maas_package_name in ansible_facts.packages)
 
-- name: Install maas metrics
+- name: Install MAAS metrics
   ansible.builtin.include_role:
     name: common
     tasks_from: metrics
   when: install_metrics is defined and install_metrics
+
+- name: Use MAAS Vault
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: vault
+  # Vault requires MAAS 3.3 or greater
+  when: vault_integration is defined and vault_integration and maas_version is version("3.3", '>=')
