@@ -2,11 +2,7 @@ maas_package_name: "{{ 'maas' if ('maas_rack_controller' in ansible_facts.packag
 
 # MAAS installation setup
 enable_tls: false               # If an operator wishes to enable TLS
-<<<<<<< HEAD:roles/maas_region_controller/vars/main.yaml
-install_metrics: false          # install metrics for the MAAS
-=======
 install_metrics: false           # install metrics for the MAAS
->>>>>>> main:group_vars/maas_region_controller
 
 # administrator account details
 admin_username: "admin"
