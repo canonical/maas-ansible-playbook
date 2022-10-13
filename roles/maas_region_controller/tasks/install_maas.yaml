@@ -13,11 +13,10 @@
   when: maas_installation_type|lower == 'deb'
 
 - name: Install MAAS - deb
-  ansible.builtin.command: sudo apt install maas
-  # ansible.builtin.apt:
-  #   name: "maas"
-  #   state: "{{ maas_deb_state|default('present') }}"
-    # update_cache: true
+  ansible.builtin.apt:
+    name: "maas"
+    state: "{{ maas_deb_state|default('present') }}"
+    update_cache: true
   register: maas_region_new_installation
   when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in group_names)
 
