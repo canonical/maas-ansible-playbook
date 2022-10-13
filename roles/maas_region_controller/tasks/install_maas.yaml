@@ -48,13 +48,13 @@
 # MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
 - name: Initialise MAAS Controller - Deb
   ansible.builtin.expect:
-    command: "maas init --rbac-url='{{ maas_rbac_url|default('') }}' --candid-agent-file='{{ maas_candid_auth_file|default('') }}' --admin-ssh-import={{ admin_id }}"
+    command: "maas init --rbac-url={{ maas_rbac_url|default('')|quote }} --candid-agent-file={{ maas_candid_auth_file|default('')|quote }} --admin-ssh-import={{ admin_id }}"
     responses:
       "(?i)Username: ": "{{ admin_username }}"
       "(?i)Password: ": "{{ admin_password }}"
       "(?i)Again: ": "{{ admin_password }}"
       "(?i)Email: ": "{{ admin_email }}"
-  when: maas_installation_type|lower == 'deb' and maas_region_new_installation is defined
+  when: maas_installation_type|lower == 'deb' and maas_region_new_installation is defined #and (maas_candid_auth_file is defined or maas_rbac_url is defined)
 
 - name: Starting MAAS region service
   ansible.builtin.systemd:
