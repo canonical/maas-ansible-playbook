@@ -1,12 +1,15 @@
 # Define hosts for MAAS here
 
 [maas_postgres_primary]
+10.10.0.21 ansible_user="ubuntu" maas_postgres_installation_type="deb" maas_postgres_password="maas" maas_postgres_replication_password="maas"
 
 [maas_postgres_secondary]
 
 [maas_region_controller]
+10.10.0.21 ansible_user="ubuntu" maas_version="3.2" maas_installation_type="deb" admin_email="jack.lloyd-walters@canonical.com" admin_id="lloydwaltersj" maas_url="10.10.0.19:5240/MAAS" maas_postgres_password="maas"  maas_postgres_replication_password="maas"
 
 [maas_rack_controller]
+# 10.10.0.21
 
 [maas_proxy]
 
