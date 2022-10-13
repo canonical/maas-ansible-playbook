@@ -7,11 +7,7 @@
 # maintenance (custom daily cronjobs, replication, and similar tasks).
 #
 # Database administrative login by Unix domain socket
-{% if maas_postgres_installation_type|default(maas_installation_type)|lower == 'snap' %}
-local all postgres md5
-{% else %}
 local all postgres peer
-{% endif %}
 
 # TYPE DATABASE USER ADDRESS METHOD
 {% for hba_entry in maas_postgres_hba_entries['local'] %}
