@@ -23,13 +23,6 @@
     chain: FORWARD
     policy: DROP
 
-# - name: Open tcp ports 
-#   ansible.builtin.iptables:
-#     chain: INPUT
-#     protocol: tcp
-#     destination_ports: "{{ maas_open_tcp_ports }}"
-#     jump: ACCEPT
-
 - name: Open tcp ports 
   ansible.builtin.iptables:
     chain: INPUT
@@ -37,6 +30,7 @@
     destination_port: "{{ item }}"
     jump: ACCEPT
   with_items: "{{ maas_open_tcp_ports }}"
+  when: maas_open_tcp_ports is iterable
 
 - name: Open udp ports 
   ansible.builtin.iptables:
@@ -45,3 +39,4 @@
     destination_port: "{{ item }}"
     jump: ACCEPT
   with_items: "{{ maas_open_udp_ports }}"
+  when: maas_open_udp_ports is iterable

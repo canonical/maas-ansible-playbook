@@ -10,7 +10,7 @@ maas_proxy_postgres_upstreams: []
 maas_proxy_state: "install"
 
 maas_open_tcp_ports: 
-- maas_proxy_port
-- maas_proxy_postgres_port
+- "{{ maas_proxy_port }}"
+- "{{ maas_proxy_postgres_port}}"
 
 maas_open_udp_ports:
