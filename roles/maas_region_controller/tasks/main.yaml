@@ -4,15 +4,15 @@
   package_facts:
     manager: "auto"
 
-- name: "Install maas"
+- name: "Install MAAS"
   import_tasks: install_maas.yaml
   when: (maas_package_name not in ansible_facts.packages)
 
-- name: "Update maas"
+- name: "Update MAAS"
   import_tasks: update_maas.yaml
   when: (maas_package_name in ansible_facts.packages)
 
-- name: Install maas metrics
+- name: Install MAAS metrics
   ansible.builtin.include_role:
     name: common
     tasks_from: metrics

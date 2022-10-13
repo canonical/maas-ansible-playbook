@@ -1,0 +1,10 @@
+---
+- name: "Uninstall HAProxy"
+  ansible.builtin.apt:
+    name: haproxy
+    state: absent
+
+- name: "Remove HAProxy Config"
+  ansible.builtin.file:
+    path: /etc/haproxy/haproxy.cfg
+    state: 'absent'

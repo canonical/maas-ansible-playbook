@@ -1,0 +1,17 @@
+---
+# Installs MAAS
+
+- name: Uninstall MAAS - Snap
+  community.general.snap:
+    name: maas
+    state: absent
+  when: maas_installation_type|lower == 'snap'
+
+- name: Uninstall MAAS - Deb
+  ansible.builtin.apt:
+    pkg:
+      - maas
+      - maas_region_api
+    name: maas
+    state: absent
+  when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in group_names)

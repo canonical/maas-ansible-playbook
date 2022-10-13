@@ -1,13 +1,11 @@
 ---
 # Installs MAAS
-- name: Display choices
-  ansible.builtin.debug:
-    msg: 'Installing MAAS {{ maas_installation_type }} V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
 
-- name: Install "MAAS" from snap
+- name: Install MAAS - Snap
   community.general.snap:
     name: maas
     channel: '{{ maas_version }}/{{ maas_snap_channel }}'
+    state: "{{ 'present' if maas_state|lower == 'install' else maas_state }}"
   register: maas_region_new_installation
   when: maas_installation_type|lower == 'snap'
 
@@ -16,7 +14,7 @@
     repo: "ppa:maas/{{ maas_version }}"
   when: maas_installation_type|lower == 'deb'
 
-- name: Install "MAAS" from deb
+- name: Install MAAS - Deb
   ansible.builtin.apt:
     name: "maas"
     state: "{{ maas_deb_state }}"
@@ -24,7 +22,7 @@
   register: maas_region_new_installation
   when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in group_names)
 
-- name: Install "MAAS" Region Controller from deb
+- name: Install MAAS Region Controller - Deb
   ansible.builtin.apt:
     name: "{{ 'maas-region-controller' if 'maas_postgres_primary' in role_names else 'maas-region-api'}}"
     state: "{{ maas_deb_state }}"
@@ -54,10 +52,10 @@
   ansible.builtin.expect:
     command: "maas init --rbac-url={{ maas_rbac_url|default('') }} --candid-agent-file={{ maas_candid_auth_file|default('') }} --admin-ssh-import={{ admin_id }}"
     responses:
-      "(?i)Username: ": "{{admin_username}}"
-      "(?i)Password: ": "{{admin_password}}"
-      "(?i)Again: ": "{{admin_password}}"
-      "(?i)Email: ": "{{admin_email}}"
+      "(?i)Username: ": "{{ admin_username }}"
+      "(?i)Password: ": "{{ admin_password }}"
+      "(?i)Again: ": "{{ admin_password }}"
+      "(?i)Email: ": "{{ admin_email }}"
   when: maas_installation_type|lower == 'deb' and maas_region_new_installation is defined
 
 - name: Starting MAAS region service

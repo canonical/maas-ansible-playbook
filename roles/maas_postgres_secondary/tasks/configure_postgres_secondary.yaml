@@ -3,13 +3,12 @@
   ansible.builtin.systemd:
     name: "postgresql@{{ maas_postgres_version_number }}-main.service"
     state: stopped
-    no_block: no
+    no_block: false
 
 - name: "Remove Previous Data Directory"
   ansible.builtin.file:
     path: "{{ maas_postgres_data_dir }}"
-    state: absent
-  when: maas_postgres_action == "install"
+    state: 'absent'
 
 - name: "Create a New Data Directory"
   ansible.builtin.file:
@@ -18,6 +17,7 @@
     owner: postgres
     group: postgres
     mode: '0700'
+  when: maas_postgres_action|lower == 'install'
 
 - name: "Create Base Backup"
   ansible.builtin.expect:
@@ -25,7 +25,7 @@
     responses:
       '(?i)password': "{{ maas_postgres_replication_password }}"
   when: maas_postgres_action == "install"
-  become: yes
+  become: true
   become_user: postgres
 
 - name: "Write recovery.conf"
@@ -34,9 +34,10 @@
     dest: "{{ maas_postgres_config_dir }}recovery.conf"
     owner: postgres
     group: postgres
+  when: maas_postgres_action|lower == 'install'
 
 - name: "Start Postgres in Hot Standby"
   ansible.builtin.systemd:
     name: "postgresql@{{ maas_postgres_version_number }}-main.service"
     state: started
-    no_block: no
+    no_block: false

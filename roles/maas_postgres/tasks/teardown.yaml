@@ -1,0 +1,53 @@
+---
+- name: Set postgres number for uninstall
+  ansible.builtin.set_fact:
+    maas_postgres_version_number: "{{ 14 if ansible_facts.distribution_release == 'jammy' and maas_version|float > 3.2 else 12 }}"
+
+- name: Setting config dirs for uninstall
+  ansible.builtin.set_fact:
+    maas_postgres_deb_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
+    maas_postgres_snap_config_dir: "/var/snap/maas-test-db/common/postgres/data/"
+
+- name: Setting overarching config dir for uninstall
+  ansible.builtin.set_fact:
+    maas_postgres_config_dir: "{{ maas_postgres_deb_config_dir if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' else maas_postgres_snap_config_dir }}"
+
+- name: "Uninstall libpq-dev for Configuration"
+  ansible.builtin.apt:
+    name: libpq-dev
+    update_cache: true # update cache still if pip was already installed
+    state: absent
+
+- name: "Uninstall psycopg2 For Configuration"
+  ansible.builtin.pip:
+    name: "psycopg2"
+    version: "2.9.3"
+    state: absent
+
+- name: "Uninstall acl to become postgres user"
+  ansible.builtin.apt:
+    name: acl
+    state: absent
+
+- name: "Uninstall Postgres Deb"
+  ansible.builtin.apt:
+    name: "{{ maas_postgres_deb_name | default('postgresql-{{ maas_postgres_version_number') }}"
+    update_cache: true # update cache still if previous packages are already installed
+    state: absent
+  when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'deb'
+
+- name: "Uninstall Postgres Snap"
+  community.general.snap:
+    name: "{{ maas_postgres_snap_name | default('maas-test-db') }}"
+    state: absent
+  when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'snap'
+
+- name: Delete pg_hba.conf"
+  file:
+    state: 'absent'
+    path: "{{ maas_postgres_config_dir }}pg_hba.conf"
+
+- name: "Delete postgresql.conf"
+  file:
+    state: 'absent'
+    path: "{{ maas_postgres_config_dir }}postgresql.conf"

@@ -12,23 +12,23 @@ defaults
 
 {% if (maas_proxy_bind_addr_v4 is defined) and (maas_proxy_bind_addr_v4|length > 0) %}
 
-frontend maas-region-controller-v4
+frontend maas_region_controller-v4
     mode tcp
     bind {{ maas_proxy_bind_addr_v4 }}:{{ maas_proxy_port }}
-    use_backend maas-region-controllers
+    use_backend maas_region_controllers
 
 {% endif %}
 
 {% if (maas_proxy_bind_addr_v6 is defined) and (maas_proxy_bind_addr_v6|length > 0) %}
 
-frontend maas-region-controller-v6
+frontend maas_region_controller-v6
     mode tcp
     bind {{ maas_proxy_bind_addr_v6 }}:{{ maas_proxy_port }}
-    use_backend maas-region-controllers
+    use_backend maas_region_controllers
 
 {% endif %}
 
-backend maas-region-controllers
+backend maas_region_controllers
     balance roundrobin
 {% if maas_proxy_upstreams|length > 0 %}
     {% for upstream in maas_proxy_upstreams %}

@@ -20,7 +20,7 @@
     enabled: true
     state: started
     no_block: no
-  when: maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb'
+  when: (maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb')
 
 - name: "Restart Postgres Snap To Load New Configuration"
   ansible.builtin.command: snap restart maas-test-db
