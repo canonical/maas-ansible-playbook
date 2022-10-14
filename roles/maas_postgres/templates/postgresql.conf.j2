@@ -321,7 +321,7 @@ min_wal_size = 80MB
 
 # These settings are ignored on a standby server.
 
-{% if 'maas_postgres_primary' in role_names and maas_postgres_enable_sync is defined %}
+{% if 'maas_postgres_primary' in group_names and maas_postgres_enable_sync is defined %}
 synchronous_standby_names = '*'
 {% endif %}
                                 # method to choose sync standbys, number of sync standbys,
@@ -333,7 +333,7 @@ synchronous_standby_names = '*'
 
 # These settings are ignored on a primary server.
 
-{% if 'maas_postgres_secondary' in role_names %}
+{% if 'maas_postgres_secondary' in group_names %}
 primary_conninfo = 'postgresql://{{ maas_postgres_replication_user }}:{{ maas_postgres_replication_password }}@{{ maas_postgres_primary_address }}:5432'                  # connection string to sending server
 primary_slot_name = '{{ maas_postgres_replication_slot }}'                 # replication slot on sending server
 promote_trigger_file = '{{ maas_postgres_trigger_file }}'              # file name whose presence ends recovery

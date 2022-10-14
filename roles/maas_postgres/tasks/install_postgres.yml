@@ -2,37 +2,37 @@
 - name: "Install pip for Configuration Dependencies"
   ansible.builtin.apt:
     name: python3-pip
-    update_cache: yes
-    state: present
+    update_cache: true
 
 - name: "Install libpq-dev for Configuration"
   ansible.builtin.apt:
     name: libpq-dev
-    update_cache: yes # update cache still if pip was already installed
-    state: present
+    update_cache: true # update cache still if pip was already installed
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
 
 - name: "Install psycopg2 For Configuration"
   ansible.builtin.pip:
     name: "psycopg2"
     version: "2.9.3"
-    state: present
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
 
 - name: "Install acl to become postgres user"
   ansible.builtin.apt:
     name: acl
-    state: present
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
 
 - name: "Install Postgres - Deb"
   ansible.builtin.apt:
     name: "{{ maas_postgres_deb_name }}"
-    update_cache: yes # update cache still if previous packages are already installed
-    state: present
+    update_cache: true # update cache still if previous packages are already installed
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
   when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'deb'
 
 - name: "Install Postgres - Snap"
   community.general.snap:
     name: "{{ maas_postgres_snap_name }}"
     channel: "{{ maas_postgres_snap_track }}/{{ maas_postgres_snap_channel }}"
+    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
   when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'snap'
 
 - name: "Write pg_hba.conf for deb install"
@@ -51,7 +51,7 @@
     mode: 0644
     owner: snap_daemon
     group: snap_daemon
-  when: maas_postgres_installation_type|default(maas_installation_type)|lower == 'snap'
+  when: (maas_postgres_installation_type|default(maas_installation_type)|lower == 'snap') and (maas_postgres_action|lower == 'absent')
 
 - name: "Write postgresql.conf"
   ansible.builtin.include_tasks:
@@ -63,9 +63,9 @@
     password: "{{ maas_postgres_password }}"
     login_user: "postgres"
     state: present
-  become: yes
+  become: true
   become_user: postgres
-  when: maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb'
+  when: (maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb') and (maas_postgres_action|lower == 'absent')
 
 - name: "Create MAAS Postgres Database"
   community.postgresql.postgresql_db:

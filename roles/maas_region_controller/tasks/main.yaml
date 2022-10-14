@@ -12,7 +12,7 @@
   import_tasks: update_maas.yaml
   when: (maas_package_name in ansible_facts.packages)
 
-- name: Install maas metrics
+- name: Install MAAS metrics
   ansible.builtin.include_role:
     name: common
     tasks_from: metrics

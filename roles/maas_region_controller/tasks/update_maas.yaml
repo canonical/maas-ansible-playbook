@@ -1,10 +1,5 @@
 ---
-# Installs MAAS
-- name: Display choices
-  ansible.builtin.debug:
-    msg: 'Updating MAAS {{ maas_installation_type }} to V. {{ maas_version }} on {{ ansible_facts["distribution"] }}'
-
-- name: Update MAAS snap
+- name: Update MAAS - Snap
   ansible.builtin.command: snap refresh --channel={{ maas_version }} maas
   when: maas_installation_type|lower == 'snap'
 
@@ -13,7 +8,7 @@
     repo: "ppa:maas/{{ maas_version }}"
   when: maas_installation_type|lower == 'deb'
 
-- name: Install deb dependencies
+- name: Update MAAS - Deb
   ansible.builtin.apt:
     name: "{{ 'maas-region-controller' if 'maas_postgres_primary' in role_names else 'maas-region-api' }}"
     state: latest
