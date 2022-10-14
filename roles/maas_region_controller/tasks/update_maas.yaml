@@ -10,14 +10,18 @@
 
 - name: Update MAAS - Deb
   ansible.builtin.apt:
-    name: "{{ 'maas-region-controller' if 'maas_postgres_primary' in role_names else 'maas-region-api' }}"
+    name: maas-region-api
     state: latest
     update_cache: true
   when: maas_installation_type|lower == 'deb' and '"maas_rack_controller" not in group_names'
 
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
-  when: ('maas_postgres_primary' not in role_names) # if database is local to this host, we install a package that will already have run migrations
+
+- name: Wait For MAAS To Create Secret File
+  ansible.builtin.wait_for:
+    path: /var/lib/maas/secret
+    state: present
 
 - name: Read MAAS Secret For Rack Controllers
   ansible.builtin.command: cat /var/lib/maas/secret

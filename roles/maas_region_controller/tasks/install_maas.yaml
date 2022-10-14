@@ -24,7 +24,7 @@
 
 - name: Install MAAS Region Controller - Deb
   ansible.builtin.apt:
-    name: "{{ 'maas-region-controller' if 'maas_postgres_primary' in role_names else 'maas-region-api'}}"
+    name: "maas-region-api"
     state: "{{ maas_deb_state }}"
     update_cache: true
   register: maas_region_new_installation
@@ -41,7 +41,6 @@
 
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
-  when: ('maas_postgres_primary' not in group_names) or (maas_installation_type|lower == 'snap') # if database is local to this host, we install a package that will already have run migrations
 
 - name: Initialise MAAS Controller - Snap
   ansible.builtin.command: maas init {{ 'region+rack' if 'maas_rack_controller' in role_names else 'region' }} --maas-url={{ maas_url }} --database-uri {{ maas_postgres_uri }}
