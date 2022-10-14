@@ -1,4 +1,4 @@
-database_host: "{{ maas_postgres_primary_host_v6 if maas_postgres_primary_host_v6|length > 0 else maas_postgres_primary_host_v4 }}"
+database_host: "{{ maas_postgres_primary_host_v6 if maas_postgres_primary_host_v6 else maas_postgres_primary_host_v4 }}"
 database_name: "{{ maas_postgres_database }}"
 database_pass: "{{ maas_postgres_password }}"
 database_port: 5432
