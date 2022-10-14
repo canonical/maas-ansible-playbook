@@ -40,15 +40,15 @@
 
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
-  when: ('maas_postgres_primary' not in group_names) or (maas_installation_type|lower == 'snap') # if database is local to this host, we install a package that will already have run migrations
 
 - name: Initialise MAAS Controller - Snap
   ansible.builtin.command: maas init {{ 'region+rack' if 'maas_rack_controller' in role_names else 'region' }} --maas-url={{ maas_url }} --database-uri {{ maas_postgres_uri }}
+  when: maas_installation_type|lower == 'snap' and maas_region_new_installation is defined
 
 # MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
 - name: Initialise MAAS Controller - Deb
   ansible.builtin.expect:
-    command: "maas init --rbac-url={{ maas_rbac_url|default('')|quote }} --candid-agent-file={{ maas_candid_auth_file|default('')|quote }} --admin-ssh-import={{ admin_id }}"
+    command: "maas init {{ 'region+rack' if 'maas_rack_controller' in role_names else 'region' }} --rbac-url={{ maas_rbac_url|default('')|quote }} --candid-agent-file={{ maas_candid_auth_file|default('')|quote }} --admin-ssh-import={{ admin_id }}"
     responses:
       "(?i)Username: ": "{{ admin_username }}"
       "(?i)Password: ": "{{ admin_password }}"
