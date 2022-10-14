@@ -51,7 +51,7 @@
     mode: 0644
     owner: snap_daemon
     group: snap_daemon
-  when: (maas_postgres_installation_type|default(maas_installation_type)|lower == 'snap') and (maas_postgres_action|lower == 'absent')
+  when: (maas_postgres_installation_type|default(maas_installation_type)|lower == 'snap')
 
 - name: "Write postgresql.conf"
   ansible.builtin.include_tasks:
@@ -65,7 +65,7 @@
     state: present
   become: true
   become_user: postgres
-  when: (maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb') and (maas_postgres_action|lower == 'absent')
+  when: (maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb')
 
 - name: "Create MAAS Postgres Database"
   community.postgresql.postgresql_db:
