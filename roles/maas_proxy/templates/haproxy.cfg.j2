@@ -10,7 +10,7 @@ defaults
     timeout server 30m
     timeout check 5s
 
-{% if (maas_proxy_bind_addr_v4 is defined) and (maas_proxy_bind_addr_v4|length > 0) %}
+{% if (maas_proxy_bind_addr_v4 is defined) and (maas_proxy_bind_addr_v4) %}
 
 frontend maas_region_controller-v4
     mode tcp
@@ -19,7 +19,7 @@ frontend maas_region_controller-v4
 
 {% endif %}
 
-{% if (maas_proxy_bind_addr_v6 is defined) and (maas_proxy_bind_addr_v6|length > 0) %}
+{% if (maas_proxy_bind_addr_v6 is defined) and (maas_proxy_bind_addr_v6) %}
 
 frontend maas_region_controller-v6
     mode tcp
@@ -30,7 +30,7 @@ frontend maas_region_controller-v6
 
 backend maas_region_controllers
     balance roundrobin
-{% if maas_proxy_upstreams|length > 0 %}
+{% if maas_proxy_upstreams %}
     {% for upstream in maas_proxy_upstreams %}
     server {{ upstream['hostname'] }} {{ upstream['ip'] }}:{{ upstream['port'] }}
     {% endfor %}
@@ -46,7 +46,7 @@ backend maas_region_controllers
 {% endif %}
 
 {% if maas_proxy_postgres_proxy_enabled %}
-    {% if (maas_proxy_postgres_bind_addr_v4 is defined) and (maas_proxy_postgres_bind_addr_v4|length > 0) %}
+    {% if (maas_proxy_postgres_bind_addr_v4 is defined) and (maas_proxy_postgres_bind_addr_v4) %}
 
 frontend maas-postgres-v4
     mode tcp
@@ -55,7 +55,7 @@ frontend maas-postgres-v4
 
     {% endif %}
 
-    {% if (maas_proxy_postgres_bind_addr_v6 is defined) and (maas_proxy_postgres_bind_addr_v6|length > 0) %}
+    {% if (maas_proxy_postgres_bind_addr_v6 is defined) and (maas_proxy_postgres_bind_addr_v6) %}
 
 frontend maas-postgres-v6
     mode tcp
@@ -65,7 +65,7 @@ frontend maas-postgres-v6
     {% endif %}
 
 backend maas-postgres
-    {% if maas_proxy_postgres_upstreams|length > 0 %}
+    {% if maas_proxy_postgres_upstreams %}
         {% for upstream in maas_proxy_postgres_upstreams %}
     server {{ upstream['hostname'] }} {{ upstream['ip'] }}:{{ upstream['port'] }}
         {% endfor %}
