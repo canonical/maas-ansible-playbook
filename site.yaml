@@ -30,6 +30,15 @@
   tags:
     - maas_proxy
 
+- hosts: maas_region_controller
+  roles:
+    - role: maas_region_controller
+  become: true
+  gather_facts: true
+  tags:
+    - maas_region_controller
+    - maas_controller
+
 - hosts: maas_rack_controller
   roles:
     - role: maas_rack_controller
@@ -38,9 +47,3 @@
   tags:
     - maas_rack_controller
     - maas_controller
-
-- hosts: maas_region_controller
-  roles:
-    - role: maas_region_controller
-  become: true
-  gather_facts: true

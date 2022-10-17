@@ -13,21 +13,13 @@
     repo: "ppa:maas/{{ maas_version }}"
   when: maas_installation_type|lower == 'deb'
 
-- name: Install MAAS - Deb
-  ansible.builtin.apt:
-    name: "maas"
-    state: "{{ maas_deb_state|default('present') }}"
-    update_cache: true
-  register: maas_region_new_installation
-  when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in group_names)
-
 - name: Install MAAS Region Controller - Deb
   ansible.builtin.apt:
     name: "maas-region-api"
     state: "{{ maas_deb_state|default('present') }}"
     update_cache: true
   register: maas_region_new_installation
-  when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' not in group_names)
+  when: (maas_installation_type|lower == 'deb')
 
 - name: Update regiond.conf
   ansible.builtin.template:
@@ -48,7 +40,7 @@
 # MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
 - name: Initialise MAAS Controller - Deb
   ansible.builtin.expect:
-    command: "maas init {{ 'region+rack' if 'maas_rack_controller' in group_names else 'region' }} --rbac-url={{ maas_rbac_url|default('')|quote }} --candid-agent-file={{ maas_candid_auth_file|default('')|quote }} --admin-ssh-import={{ admin_id }}"
+    command: "maas init --rbac-url={{ maas_rbac_url|default('')|quote }} --candid-agent-file={{ maas_candid_auth_file|default('')|quote }} --admin-ssh-import={{ admin_id }}"
     responses:
       "(?i)Username: ": "{{ admin_username }}"
       "(?i)Password: ": "{{ admin_password }}"
