@@ -1,20 +1,21 @@
 # Define hosts for MAAS here
 
 [maas_postgres_primary]
-10.10.0.17 ansible_user="ubuntu"
+10.10.0.22 ansible_user="ubuntu"
 
 [maas_postgres_secondary]
-
-[maas_region_controller]
-10.10.0.17 ansible_user="ubuntu"
-
-[maas_rack_controller]
-# 10.10.0.22
-
-[maas_proxy]
-
+# 10.10.0.27 ansible_user="ubuntu"
 
 # DO NOT MODIFY this group
 [maas_postgres:children]
 maas_postgres_primary
 maas_postgres_secondary
+
+[maas_proxy]
+10.10.0.22 ansible_user="ubuntu"
+
+[maas_rack_controller]
+# 10.10.0.23 ansible_user="ubuntu"
+
+[maas_region_controller]
+10.10.0.23 ansible_user="ubuntu"

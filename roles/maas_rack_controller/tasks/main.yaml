@@ -1,4 +1,7 @@
 ---
+- meta: end_play
+  when: ('maas_region_controller' in group_names)
+
 - name: "Check MAAS Url supplied by user or region controller setup"
   ansible.builtin.fail:
     msg: "MAAS Url not found"
@@ -21,3 +24,8 @@
     name: common
     tasks_from: metrics
   when: install_metrics is defined and install_metrics
+ 
+- name: "Setup firewall"
+  ansible.builtin.include_role:
+    name: maas_firewall
+    tasks_from: setup_firewall_rules

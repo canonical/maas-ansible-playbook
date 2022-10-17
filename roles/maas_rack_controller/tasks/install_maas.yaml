@@ -26,24 +26,25 @@
   ansible.builtin.apt:
     name: chrony
     state: present
-  when: (maas_installation_type|lower == 'deb') and ('maas_region_controller' not in group_names)
+  when: (maas_installation_type|lower == 'deb')
 
 - name: Install MAAS Rack Controller
   ansible.builtin.apt:
     name: maas-rack-controller
     state: "{{ maas_deb_state|default('present') }}"
-  when: (maas_installation_type|lower == 'deb') and ('maas_region_controller' not in group_names)
+  when: (maas_installation_type|lower == 'deb')
 
 - name: Initialise MAAS Rack Controller
   ansible.builtin.command: maas init --mode=rack --maas-url={{ maas_url }} --secret={{ maas_rack_secret }}
-  when: (maas_installation_type|lower == 'snap') and ('maas_region_controller' not in group_names)
+  when: (maas_installation_type|lower == 'snap')
 
 - name: Initialise MAAS Rack Controller
   ansible.builtin.command: maas-rack register --url={{ maas_url }} --secret={{ maas_rack_secret }}
-  when: (maas_installation_type|lower == 'deb') and ('maas_region_controller' not in group_names)
+  when: (maas_installation_type|lower == 'deb')
 
 - name: Enable TLS
   ansible.builtin.include_role:
     name: common
     tasks_from: TLS
-  when: enable_tls
+  # TLS is available only in MAAS 3.2 or higher
+  when: maas_version is version("3.2", '>=') and enable_tls

@@ -4,4 +4,18 @@ maas_installation_type: "snap"  # snap or deb
 maas_snap_channel: "stable"     # if using snap, then the channel. ie: stable, beta, edge
 maas_deb_state: "present"       # if using deb, the state for install
 enable_tls: false                # whether to enable tls for this instance
-maas_package_name: "{{ 'maas' if ('maas-region-controller' in ansible_facts.packages) or (maas_installation_type|lower == 'snap') else 'maas-rack-controller' }}"
+maas_package_name: "{{ 'maas' if ('maas_region_controller' in ansible_facts.packages) or (maas_installation_type|lower == 'snap') else 'maas-rack-controller' }}"
+
+maas_open_tcp_ports: 
+- 53		# dns
+- 514 		# rsyslog
+- 5248		# rack http port
+- 3218
+- 8000
+
+maas_open_udp_ports:
+- 53 		# dns
+- 67:69 	# tftp, dhcp 
+- 123		# ntp
+- 514 		# rsyslog
+- 5248		# rack http port

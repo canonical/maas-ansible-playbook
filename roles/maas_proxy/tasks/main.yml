@@ -17,3 +17,8 @@
     name: "haproxy.service"
     state: 'restarted'
     enabled: true
+
+- name: "Setup firewall"
+  ansible.builtin.include_role:
+    name: maas_firewall
+    tasks_from: setup_firewall_rules
