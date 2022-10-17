@@ -1,0 +1,16 @@
+---
+- name: Create MAAS Backup Dir
+  ansible.builtin.file:
+    path: "{{ maas_postgres_backup_dir }}"
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: '0700'
+
+- name: Dump MAAS Database
+  community.postgresql.postgresql_db:
+    name: "{{ maas_postgres_database }}"
+    state: dump
+    target: "{{ maas_postgres_backup_path }}"
+  become: true
+  become_user: postgres

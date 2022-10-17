@@ -1,0 +1,22 @@
+---
+- name: Generate List of Archiveable Directories
+  set_fact:
+    archive_list: "{{ archive_list|default([]) + [item] }}"
+  loop:
+    - "{{ ('maas_postgres_primary' in group_names) | ternary('{{ maas_postgres_backup_dir }}', None) }}"
+    - "{{ (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) | ternary('{{ maas_config_backup_path }}', None)  }}"
+    - "{{ (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) | ternary('{{ maas_runtime_backup_path }}', None)  }}"
+  when: item
+
+- name: Bundle Backup Assets
+  community.general.archive:
+    path: "{{ archive_list }}"
+    exclude_path:
+      - "{{ maas_exclude_backup_path }}"
+    dest: "{{ maas_backup_dest_path }}"
+
+- name: Download Backup
+  ansible.builtin.fetch:
+    src: "{{ maas_backup_dest_path }}"
+    dest: "{{ maas_backup_download_path }}"
+    flat: true
