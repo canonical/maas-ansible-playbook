@@ -7,8 +7,6 @@ maas_url: ""                # The URL maas uses
 enable_tls: false
 
 # Installation variables
-host_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
-
 maas_version: "latest"          # ie: 3.2, 2.8
 maas_installation_type: "snap"  # snap or deb
 maas_snap_channel: "stable"     # if using snap, then the channel. ie: stable, beta, edge
