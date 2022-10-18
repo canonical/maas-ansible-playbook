@@ -32,7 +32,7 @@ maas_postgres_primary_uri: "postgres://{{ maas_postgres_uri_login }}@{{ maas_pos
 maas_postgres_uri: "{{ maas_postgres_proxy_uri if maas_proxy_postgres_proxy_enabled else maas_postgres_primary_uri }}"
 
 maas_postgres_backup_dir: "/tmp/maas_backup/" 
-maas_postgres_backup_path: "{{ maas_postgres_backup_dir }}dump.sql"
+maas_postgres_backup_path: "{{ maas_postgres_backup_dir }}dump.sql.gz"
 maas_config_backup_path: "{{ '/etc/maas/' if maas_installation_type|lower == 'deb' else '' }}"
 maas_runtime_backup_path: "{{ '/var/lib/maas/' if maas_installation_type|lower == 'deb' else '' }}"
 maas_exclude_backup_path: "{{ '/var/lib/maas/boot-resources/' if maas_installation_type|lower == 'deb' else '' }}"

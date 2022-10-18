@@ -15,8 +15,12 @@
       - "{{ maas_exclude_backup_path }}"
     dest: "{{ maas_backup_dest_path }}"
 
+# ansible.builtin.fetch has the ability to be oom killed on large files, so we're using scp instead
 - name: Download Backup
-  ansible.builtin.fetch:
-    src: "{{ maas_backup_dest_path }}"
-    dest: "{{ maas_backup_download_path }}"
-    flat: true
+  local_action: "ansible.builtin.command scp {{ ansible_user }}@{{ inventory_hostname }}:{{ maas_backup_dest_path }} {{ maas_backup_download_path }}"
+  become: false # don't need sudo locally
+
+- name: Remove Backup from Remote Host
+  ansible.builtin.file:
+    path: "{{ maas_backup_dest_path }}"
+    state: absent

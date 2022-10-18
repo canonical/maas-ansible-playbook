@@ -22,3 +22,14 @@
   become: true
   gather_facts: true
 
+- hosts:
+    - maas_postgres_primary
+  tasks:
+    - name: Remove DB dump
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "{{ maas_postgres_backup_path }}"
+        - "{{ maas_postgres_backup_dir }}"
+  become: true
