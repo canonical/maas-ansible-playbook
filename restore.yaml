@@ -1,5 +1,8 @@
 ---
-- hosts: all
+- hosts:
+    - maas_postgres_primary
+    - maas_region_controller
+    - maas_rack_controller
   tasks:
     - name: Restore from backup
       include_role:
@@ -17,7 +20,10 @@
   become: true
   gather_facts: true
 
-- hosts: all
+- hosts:
+    - maas_postgres_primary
+    - maas_region_controller
+    - maas_rack_controller
   tasks:
     - name: Remove Backup Directory
       ansible.builtin.file:
