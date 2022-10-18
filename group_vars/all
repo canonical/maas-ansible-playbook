@@ -29,6 +29,4 @@ maas_postgres_proxy_uri: "postgresql://{{ maas_postgres_uri_login }}@{{ maas_pos
 maas_postgres_primary_host_v4: "{{ hostvars[groups['maas_postgres_primary'][0]]['ansible_default_ipv4']['address'] if groups['maas_postgres_primary'] and hostvars[groups['maas_postgres_primary'][0]]['ansible_default_ipv4'] is defined and hostvars[groups['maas_postgres_primary'][0]]['ansible_default_ipv4']['address'] is defined else ''}}"
 maas_postgres_primary_host_v6: "{{ hostvars[groups['maas_postgres_primary'][0]]['ansible_default_ipv6']['address'] if groups['maas_postgres_primary'] and hostvars[groups['maas_postgres_primary'][0]]['ansible_default_ipv6'] is defined and hostvars[groups['maas_postgres_primary'][0]]['ansible_default_ipv6']['address'] is defined else ''}}"
 maas_postgres_primary_uri: "postgres://{{ maas_postgres_uri_login }}@{{ maas_postgres_primary_host_v4 if maas_postgres_primary_host_v4 else maas_postgres_primary_host_v6 }}"
-maas_postgres_uri_snap: "maas-test-db:///"
-maas_alt_uri: "{{ maas_postgres_primary_uri if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' else maas_postgres_uri_snap }}"
-maas_postgres_uri: "{{ maas_postgres_proxy_uri if maas_proxy_postgres_proxy_enabled else maas_alt_uri }}"
+maas_postgres_uri: "{{ maas_postgres_proxy_uri if maas_proxy_postgres_proxy_enabled else maas_postgres_primary_uri }}"

@@ -30,12 +30,12 @@
     group: maas
   when: maas_installation_type|lower == 'deb'
 
-- name: Migrate MAAS database
-  ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
-
 - name: Initialise MAAS Controller - Snap
   ansible.builtin.command: maas init {{ 'region+rack' if 'maas_rack_controller' in group_names else 'region' }} --maas-url={{ maas_url }} --database-uri {{ maas_postgres_uri }}
   when: maas_installation_type|lower == 'snap' and maas_region_new_installation is defined
+
+- name: Migrate MAAS database
+  ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
 
 # MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
 - name: Initialise MAAS Controller - Deb
