@@ -1,0 +1,27 @@
+---
+- hosts: all
+  tasks:
+    - name: Restore from backup
+      include_role:
+        name: common
+        tasks_from: restore
+  become: true
+  gather_facts: true
+
+- hosts: maas_postgres_primary
+  tasks:
+    - name: Restore from database dump
+      include_role:
+        name: maas_postgres
+        tasks_from: restore
+  become: true
+  gather_facts: true
+
+- hosts: all
+  tasks:
+    - name: Remove Backup Directory
+      ansible.builtin.file:
+        path: /tmp/maas_backup
+        state: absent
+  become: true
+  gather_facts: true

@@ -1,0 +1,53 @@
+---
+- name: Create Temporary Unpack Directory
+  ansible.builtin.file:
+    path: /tmp/maas_backup/
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+
+- name: Unpack Backup Archive
+  ansible.builtin.unarchive:
+    src: "{{ maas_backup_file }}"
+    dest: /tmp/maas_backup/
+
+- name: Stop Region Controller
+  ansible.builtin.systemd:
+    name: maas_regiond.service
+    state: stopped
+  when: ('maas_region_controller' in group_names) and maas_installation_type|lower == 'deb'
+
+- name: Stop Rack Controller
+  ansible.builtin.systemd:
+    name: maas_rackd.service
+    state: stopped
+  when: ('maas_rack_controller' in group_names) and maas_installation_type|lower = 'deb'
+
+- name: Stop MAAS snap
+  ansible.builtin.command: snap stop maas
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (maas_installation_type|lower == 'snap')
+
+- name: Restore Config
+  ansible.builtin.command: "mv /tmp/maas_backup/etc/maas {{ maas_restore_config_path }}"
+  when: ('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)
+
+- name: Restore Runtime Data
+  ansible.builtin.command: "mv /tmp/maas_backup/var/lib/maas {{ maas_restore_runtime_path }}"
+  when: ('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)
+
+- name: Start Region Controller
+  ansible.builtin.systemd:
+    name: maas_regiond.service
+    state: started
+  when: ('maas_region_controller' in group_names) and maas_installation_type|lower == 'deb'
+
+- name: Start Rack Controller
+  ansible.builtin.systemd:
+    name: maas_rackd.service
+    state: started
+  when: ('maas_rack_controller' in group_names) and maas_installation_type|lower = 'deb'
+
+- name: Start MAAS snap
+  ansible.builtin.command: snap start maas
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (maas_installation_type|lower == 'snap')

@@ -5,7 +5,7 @@
     state: directory
     owner: postgres
     group: postgres
-    mode: '0700'
+    mode: '0755'
 
 - name: Dump MAAS Database
   community.postgresql.postgresql_db:
