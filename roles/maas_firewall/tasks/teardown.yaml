@@ -1,0 +1,16 @@
+---
+# Remove iptables rules as part of teardown
+
+- name: Set policy for INPUT chain to accept
+  ansible.builtin.iptables:
+    chain: INPUT
+    policy: ACCEPT
+
+- name: Set policy for FORWARD chain to drop
+  ansible.builtin.iptables:
+    chain: FORWARD
+    policy: ACCEPT
+
+- name: Flush all other rules
+  ansible.builtin.iptables:
+    flush: yes
