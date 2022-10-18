@@ -7,10 +7,6 @@
   ansible.builtin.set_fact:
     maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
 
-- name: Setting overarching config dir for uninstall
-  ansible.builtin.set_fact:
-    maas_postgres_config_dir: "{{ maas_postgres_config_dir }}"
-
 - name: "Uninstall libpq-dev for Configuration"
   ansible.builtin.apt:
     name: libpq-dev
