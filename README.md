@@ -79,10 +79,10 @@ ansible-playbook -i ./hosts ./teardown.yaml
 
 ### Backup the MAAS stack
 
-Backup MAAS requires the `maas_backup_download` variable to be set, it will designate a path local to where the playbook is being run to download backup archives. `maas_installation_type` is also required.
+Backup MAAS requires the `maas_backup_download_path` variable to be set, it will designate a path local to where the playbook is being run to download backup archives. `maas_installation_type` is also required.
 
 ```
-ansible-playbook -i ./hosts --extra-vars="maas_backup_download=/tmp/maas_backups/ maas_installation_type=deb" ./backup.yaml"
+ansible-playbook -i ./hosts --extra-vars="maas_backup_download_path=/tmp/maas_backups/ maas_installation_type=deb" ./backup.yaml"
 ```
 
 ### Restore from Backup
