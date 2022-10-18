@@ -2,5 +2,5 @@
 
 - name: "Remove Previous Data Directory"
   ansible.builtin.file:
-    path: "{{ maas_postgres_data_dir | default( '/var/snap/maas-test-db/common/postgres/data/' if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' else '/etc/postgresql/{{ maas_postgres_version_number }}/main/' ) }}"
+    path: "{{ maas_postgres_data_dir | default( '/var/snap/maas-test-db/common/postgres/data/' ) }}"
     state: 'absent'

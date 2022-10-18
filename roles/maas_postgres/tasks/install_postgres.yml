@@ -21,19 +21,11 @@
     name: acl
     state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
 
-- name: "Install Postgres - Deb"
+- name: "Install Postgres"
   ansible.builtin.apt:
     name: "{{ maas_postgres_deb_name }}"
     update_cache: true # update cache still if previous packages are already installed
     state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
-  when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'deb'
-
-- name: "Install Postgres - Snap"
-  community.general.snap:
-    name: "{{ maas_postgres_snap_name }}"
-    channel: "{{ maas_postgres_snap_track }}/{{ maas_postgres_snap_channel }}"
-    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
-  when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'snap'
 
 - name: "Write pg_hba.conf"
   ansible.builtin.template:
@@ -42,7 +34,6 @@
     mode: 0640
     owner: postgres
     group: postgres
-  when: maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb'
 
 - name: "Write postgresql.conf"
   ansible.builtin.include_tasks:
@@ -56,7 +47,6 @@
     state: present
   become: true
   become_user: postgres
-  when: (maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb')
 
 - name: "Create MAAS Postgres Database"
   community.postgresql.postgresql_db:
@@ -65,4 +55,3 @@
     owner: "{{ maas_postgres_user }}"
   become: yes
   become_user: postgres
-  when: maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb'
