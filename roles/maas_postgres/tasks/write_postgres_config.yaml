@@ -4,8 +4,8 @@
     src: "postgresql.conf.j2"
     dest: "{{ maas_postgres_config_dir }}postgresql.conf"
     mode: 0644
-    owner: "{{ 'postgres' if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' else 'snap_daemon' }}"
-    group: "{{ 'postgres' if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' else 'snap_daemon' }}"
+    owner: 'postgres'
+    group: 'postgres'
 
 - name: "Stop Postgres Service To Load New Configuration"
   ansible.builtin.systemd:
