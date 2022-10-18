@@ -7,11 +7,32 @@
     destination_port: 22
     jump: ACCEPT    
 
-- name: Allow incoming port 22 (ssh)
+- name: Allow incoming port 22
   ansible.builtin.iptables:
     chain: INPUT
-    ctstate: NEW,RELATED,ESTABLISHED
+    protocol: tcp 
+    destination_port: 22
     jump: ACCEPT
+
+- name: Allow related and established connections
+  ansible.builtin.iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: Allow some other stuff
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: 53
+    jump: ACCEPT    
+
+- name: Allow some other stuff
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: udp 
+    destination_port: 53 
+    jump: ACCEPT    
 
 - name: Set policy for INPUT chain to drop (otherwise)
   ansible.builtin.iptables:
