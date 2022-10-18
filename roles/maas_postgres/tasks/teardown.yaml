@@ -5,12 +5,7 @@
 
 - name: Setting config dirs for uninstall
   ansible.builtin.set_fact:
-    maas_postgres_deb_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
-    maas_postgres_snap_config_dir: "/var/snap/maas-test-db/common/postgres/data/"
-
-- name: Setting overarching config dir for uninstall
-  ansible.builtin.set_fact:
-    maas_postgres_config_dir: "{{ maas_postgres_deb_config_dir if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' else maas_postgres_snap_config_dir }}"
+    maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
 
 - name: "Uninstall libpq-dev for Configuration"
   ansible.builtin.apt:
@@ -29,18 +24,11 @@
     name: acl
     state: absent
 
-- name: "Uninstall Postgres Deb"
+- name: "Uninstall Postgres"
   ansible.builtin.apt:
     name: "{{ maas_postgres_deb_name | default('postgresql-{{ maas_postgres_version_number') }}"
     update_cache: true # update cache still if previous packages are already installed
     state: absent
-  when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'deb'
-
-- name: "Uninstall Postgres Snap"
-  community.general.snap:
-    name: "{{ maas_postgres_snap_name | default('maas-test-db') }}"
-    state: absent
-  when: maas_postgres_installation_type|default(maas_installation_type) |lower == 'snap'
 
 - name: Delete pg_hba.conf"
   file:

@@ -4,17 +4,10 @@ maas_postgres_version_number: "{{ 14 if ansible_facts.distribution_release == 'j
 # latest compatible deb version of postgres
 maas_postgres_deb_name: "postgresql-{{ maas_postgres_version_number }}"
 
-# latest compatible snap version of postgres
-maas_postgres_snap_name: "maas-test-db"
-maas_postgres_snap_track: "{{ maas_version }}"
-maas_postgres_snap_channel: "stable"
-
 # action to perform on Postgres db, overriden by backup and restore
 maas_postgres_action: "install"
 
-maas_postgres_deb_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
-maas_postgres_snap_config_dir: "/var/snap/maas-test-db/common/postgres/data/"
-maas_postgres_config_dir: "{{ maas_postgres_deb_config_dir if maas_postgres_installation_type|default(maas_installation_type)|lower == 'deb' else maas_postgres_snap_config_dir }}"
+maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
 
 maas_postgres_primary_address: ""
 maas_postgres_replication_user: "replicator"
