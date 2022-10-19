@@ -1,0 +1,11 @@
+---
+# Add (admin) user to already existing installation
+
+- hosts: all 
+  tasks:    
+    - name: "Checking if region role exists before proceeding"
+      ansible.builtin.include_role:
+        name: maas_region_controller
+        tasks_from: createadmin
+  become: true
+  gather_facts: true

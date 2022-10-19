@@ -1,0 +1,12 @@
+---
+# Create admin
+
+- name: "Create admin"
+  ansible.builtin.expect:
+    command: maas createadmin --username="{{user_name}}"
+    timeout: "40"
+    responses:
+      '(?i)Password: ': "{{ user_pwd }}"
+      '(?i)Again: ': "{{ user_pwd }}"
+      '(?i)Email:': "{{ user_email }}"
+      '(?i)Import SSH keys \[\] (lp:user\-id or gh:user\-id): ': "{{ user_ssh }}" 
