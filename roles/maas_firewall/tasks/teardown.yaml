@@ -6,7 +6,7 @@
     chain: INPUT
     policy: ACCEPT
 
-- name: Set policy for FORWARD chain to drop
+- name: Set policy for FORWARD chain to accept
   ansible.builtin.iptables:
     chain: FORWARD
     policy: ACCEPT
