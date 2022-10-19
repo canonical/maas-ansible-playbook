@@ -31,4 +31,14 @@ maas_postgres_primary_host_v6: "{{ hostvars[groups['maas_postgres_primary'][0]][
 maas_postgres_primary_uri: "postgres://{{ maas_postgres_uri_login }}@{{ maas_postgres_primary_host_v4 if maas_postgres_primary_host_v4 else maas_postgres_primary_host_v6 }}:5432/{{ maas_postgres_database }}"
 maas_postgres_uri: "{{ maas_postgres_proxy_uri if maas_proxy_postgres_proxy_enabled else maas_postgres_primary_uri }}"
 
+maas_postgres_backup_dir: "/tmp/maas_backup/" 
+maas_postgres_backup_path: "{{ maas_postgres_backup_dir }}dump.sql.gz"
+maas_config_backup_path: "{{ '/etc/maas/' if maas_installation_type|lower == 'deb' else '' }}"
+maas_runtime_backup_path: "{{ '/var/lib/maas/' if maas_installation_type|lower == 'deb' else '' }}"
+maas_exclude_backup_path: "{{ '/var/lib/maas/boot-resources/' if maas_installation_type|lower == 'deb' else '' }}"
+maas_backup_dest_path: "/tmp/{{ inventory_hostname }}_maas_backup_{{ ansible_date_time.iso8601 }}.tgz"
+
+maas_restore_config_path: "{{ '/etc/maas' if maas_installation_type|lower == 'deb' else '' }}"
+maas_restore_runtime_path: "{{ '/var/lib/maas' if maas_installation_type|lower == 'deb' else '' }}"
+
 maas_secret_file: "{{ '/var/snap/maas/common' if  maas_installation_type|lower == 'snap' else '/var/lib' }}/maas/secret"
