@@ -36,6 +36,7 @@
 
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
+  when: maas_installation_type|lower == 'deb' and maas_region_new_installation is defined
 
 # MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
 - name: Initialise MAAS Controller - Deb
@@ -58,7 +59,7 @@
 - name: Define MAAS URL
   ansible.builtin.command: maas config | grep maas_url | cut -d "=" -f2
   register: maas_url
-  when: maas_url | length == 0
+  when: not maas_url
 
 - name: Add an administrator to MAAS
   ansible.builtin.command: maas createadmin \
@@ -75,11 +76,11 @@
 
 - name: Wait For MAAS To Create Secret File
   ansible.builtin.wait_for:
-    path: /var/lib/maas/secret
+    path: "{{ maas_secret_file }}"
     state: present
 
 - name: Read MAAS Secret For Rack Controllers
-  ansible.builtin.command: cat /var/lib/maas/secret
+  ansible.builtin.command: cat "{{ maas_secret_file }}"
   register: maas_rack_secret_tmp
 
 - name: Save MAAS Secret
