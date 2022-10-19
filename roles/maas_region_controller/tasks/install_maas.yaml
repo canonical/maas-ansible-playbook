@@ -36,7 +36,6 @@
 
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
-  when: maas_installation_type|lower == 'deb' and maas_region_new_installation is defined
 
 # MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
 - name: Initialise MAAS Controller - Deb
