@@ -22,7 +22,7 @@
   ansible.builtin.systemd:
     name: maas_rackd.service
     state: stopped
-  when: ('maas_rack_controller' in group_names) and maas_installation_type|lower = 'deb'
+  when: ('maas_rack_controller' in group_names) and maas_installation_type|lower == 'deb'
 
 - name: Stop MAAS snap
   ansible.builtin.command: snap stop maas
@@ -46,7 +46,7 @@
   ansible.builtin.systemd:
     name: maas_rackd.service
     state: started
-  when: ('maas_rack_controller' in group_names) and maas_installation_type|lower = 'deb'
+  when: ('maas_rack_controller' in group_names) and maas_installation_type|lower == 'deb'
 
 - name: Start MAAS snap
   ansible.builtin.command: snap start maas
