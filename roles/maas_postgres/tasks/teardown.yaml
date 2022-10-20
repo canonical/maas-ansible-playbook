@@ -7,19 +7,17 @@
   ansible.builtin.set_fact:
     maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
 
-- name: "Uninstall libpq-dev for Configuration"
+- name: "Uninstall libpq-dev"
   ansible.builtin.apt:
     name: libpq-dev
-    update_cache: true # update cache still if pip was already installed
     state: absent
 
-- name: "Uninstall psycopg2 For Configuration"
+- name: "Uninstall psycopg2"
   ansible.builtin.pip:
     name: "psycopg2"
-    version: "2.9.3"
     state: absent
 
-- name: "Uninstall acl to become postgres user"
+- name: "Uninstall acl"
   ansible.builtin.apt:
     name: acl
     state: absent

@@ -1,11 +1,5 @@
 ---
 
-- name: "Install psycopg2 For Configuration"
-  ansible.builtin.pip:
-    name: "psycopg2"
-    version: "2.9.3"
-    state: "present"
-
 - name: "Remove Replication User"
   community.postgresql.postgresql_user:
     name: "{{ maas_postgres_replication_user | default('replicator') }}"
@@ -20,9 +14,3 @@
     db: "maasdb"
     state: absent
   ignore_errors: true
-
-- name: "Uninstall psycopg2"
-  ansible.builtin.pip:
-    name: "psycopg2"
-    version: "2.9.3"
-    state: "absent"
