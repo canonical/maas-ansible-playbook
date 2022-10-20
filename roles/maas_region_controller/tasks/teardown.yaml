@@ -5,7 +5,7 @@
   community.general.snap:
     name: maas
     state: absent
-  when: maas_installation_type|lower == 'snap'
+  when: (maas_installation_type|lower == 'snap')
 
 - name: Uninstall MAAS - Deb
   ansible.builtin.apt:
