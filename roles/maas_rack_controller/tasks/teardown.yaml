@@ -7,10 +7,12 @@
 
 - name: Uninstall MAAS - deb
   ansible.builtin.apt:
-    name: "{{ item }}"
+    name: "maas*"
     purge: true
     state: absent
-  with_items:
-    - "maas"
-    - "maas-rack-controller"
-    - "chrony"
+
+- name: Uninstall MAAS - deb dependencies
+  ansible.builtin.apt:
+    name: "chrony"
+    purge: true
+    state: absent
