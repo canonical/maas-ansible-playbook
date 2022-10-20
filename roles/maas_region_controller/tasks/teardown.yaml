@@ -15,3 +15,8 @@
     name: maas
     state: absent
   when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in group_names)
+
+- name: Remove MAAS Files
+  ansible.builtin.file:
+    path: "{{ maas_data_dir }}"
+    state: absent
