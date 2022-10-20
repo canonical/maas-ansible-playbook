@@ -20,11 +20,11 @@
 
 - name: Wait For MAAS To Create Secret File
   ansible.builtin.wait_for:
-    path: /var/lib/maas/secret
+    path: " {{ maas_secret_file }}"
     state: present
 
 - name: Read MAAS Secret For Rack Controllers
-  ansible.builtin.command: cat /var/lib/maas/secret
+  ansible.builtin.command: cat "{{ maas_secret_file }}"
   register: maas_rack_secret_tmp
 
 - name: Save MAAS Secret

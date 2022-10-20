@@ -4,11 +4,11 @@
   package_facts:
     manager: "auto"
 
-- name: "Install MAAS"
+- name: Install MAAS Region
   import_tasks: install_maas.yaml
   when: (maas_package_name not in ansible_facts.packages)
 
-- name: "Update MAAS"
+- name: Update MAAS Region
   import_tasks: update_maas.yaml
   when: (maas_package_name in ansible_facts.packages)
 
