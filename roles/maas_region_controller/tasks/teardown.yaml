@@ -5,13 +5,16 @@
   community.general.snap:
     name: maas
     state: absent
-  when: (maas_installation_type|lower == 'snap')
 
 - name: Uninstall MAAS - Deb
   ansible.builtin.apt:
-    name: maas_region_api
+    name: "{{ item }}"
     state: absent
-  when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in group_names)
+    purge: true
+  with_items:
+    - "maas"
+    - "maas-region-api"
+    - "maas-region-controller"
 
 - name: Remove MAAS Files
   ansible.builtin.file:
