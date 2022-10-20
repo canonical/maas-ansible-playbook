@@ -35,12 +35,6 @@
       tasks_from: metrics
     when: "'telemetry' in ansible_facts.services"
 
-  - name: "Uninstall postgres primary"
-    ansible.builtin.include_role:
-      name: maas_postgres_primary
-      tasks_from: teardown
-    when: "'postgres' in ansible_facts.packages"
-
   - name: "Uninstall postgres secondary"
     ansible.builtin.include_role:
       name: maas_postgres_secondary
