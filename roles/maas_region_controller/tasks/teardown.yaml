@@ -16,6 +16,12 @@
     state: absent
   when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in group_names)
 
+- name: Remove regiond.conf
+  ansible.builtin.file:
+    path: /etc/maas/regiond.conf
+    state: absent
+  when: maas_installation_type|lower == 'deb'
+
 - name: Remove MAAS Files
   ansible.builtin.file:
     path: "{{ maas_data_dir }}"
