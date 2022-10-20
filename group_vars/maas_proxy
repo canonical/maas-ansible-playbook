@@ -7,3 +7,10 @@ maas_proxy_postgres_bind_addr_v4: ''
 maas_proxy_postgres_bind_addr_v6: ''
 maas_proxy_postgres_port: "{{ 5243 if 'maas_postgres' not in group_names else 5051 }}"
 maas_proxy_postgres_upstreams: []
+maas_proxy_state: "install"
+
+maas_open_tcp_ports: 
+- "{{ maas_proxy_port }}"
+- "{{ maas_proxy_postgres_port}}"
+
+maas_open_udp_ports:

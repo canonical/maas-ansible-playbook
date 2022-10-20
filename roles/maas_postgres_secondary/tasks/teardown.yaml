@@ -1,0 +1,6 @@
+---
+
+- name: "Remove Previous Data Directory"
+  ansible.builtin.file:
+    path: "{{ maas_postgres_data_dir | default( '/var/snap/maas-test-db/common/postgres/data/' ) }}"
+    state: 'absent'

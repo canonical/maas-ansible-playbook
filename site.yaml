@@ -5,7 +5,7 @@
 - hosts: maas_postgres_primary
   roles:
     - role: maas_postgres_primary
-  become: yes
+  become: true
   gather_facts: true
   tags:
     - maas_postgres_primary
@@ -14,35 +14,35 @@
 - hosts: maas_postgres_secondary
   roles:
     - role: maas_postgres_secondary
-  become: yes
+  become: true
   gather_facts: true
   tags:
     - maas_postgres_secondary
     - maas_postgres
-
-- hosts: maas_region_controller
-  roles:
-    - role: maas_region_controller
-  become: yes
-  gather_facts: true
-  tags:
-    - maas_region_controller
-    - maas_controller
 
 # proxies are provisioned prior to rack controllers so the rack controller
 # will request to register to region controllers through the proxy
 - hosts: maas_proxy
   roles:
     - role: maas_proxy
-  become: yes
+  become: true
   gather_facts: true
   tags:
     - maas_proxy
 
+- hosts: maas_region_controller
+  roles:
+    - role: maas_region_controller
+  become: true
+  gather_facts: true
+  tags:
+    - maas_region_controller
+    - maas_controller
+
 - hosts: maas_rack_controller
   roles:
     - role: maas_rack_controller
-  become: yes
+  become: true
   gather_facts: true
   tags:
     - maas_rack_controller

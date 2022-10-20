@@ -1,0 +1,63 @@
+---
+# firewall config for maas. First lock down everything except port 22
+- name: Allow outgoing connection port 22 (ssh)
+  ansible.builtin.iptables:
+    chain: OUTPUT
+    protocol: tcp
+    destination_port: 22
+    jump: ACCEPT    
+
+- name: Allow incoming port 22
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp 
+    destination_port: 22
+    jump: ACCEPT
+
+- name: Allow related and established connections
+  ansible.builtin.iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: Allow port 53 tcp/udp
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: 53
+    jump: ACCEPT    
+
+- name: Allow port 53 tcp/udp
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: udp 
+    destination_port: 53 
+    jump: ACCEPT    
+
+- name: Set policy for INPUT chain to drop (otherwise)
+  ansible.builtin.iptables:
+    chain: INPUT
+    policy: DROP
+
+- name: Set policy for FORWARD chain to drop 
+  ansible.builtin.iptables:
+    chain: FORWARD
+    policy: DROP
+
+- name: Open tcp ports 
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ item }}"
+    jump: ACCEPT
+  with_items: "{{ maas_open_tcp_ports }}"
+  when: maas_open_tcp_ports is iterable
+
+- name: Open udp ports 
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: udp
+    destination_port: "{{ item }}"
+    jump: ACCEPT
+  with_items: "{{ maas_open_udp_ports }}"
+  when: maas_open_udp_ports is iterable

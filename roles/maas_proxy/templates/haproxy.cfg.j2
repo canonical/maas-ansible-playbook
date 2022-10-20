@@ -10,43 +10,43 @@ defaults
     timeout server 30m
     timeout check 5s
 
-{% if (maas_proxy_bind_addr_v4 is defined) and (maas_proxy_bind_addr_v4|length > 0) %}
+{% if (maas_proxy_bind_addr_v4 is defined) and (maas_proxy_bind_addr_v4) %}
 
-frontend maas-region-controller-v4
+frontend maas_region_controller-v4
     mode tcp
     bind {{ maas_proxy_bind_addr_v4 }}:{{ maas_proxy_port }}
-    use_backend maas-region-controllers
+    use_backend maas_region_controllers
 
 {% endif %}
 
-{% if (maas_proxy_bind_addr_v6 is defined) and (maas_proxy_bind_addr_v6|length > 0) %}
+{% if (maas_proxy_bind_addr_v6 is defined) and (maas_proxy_bind_addr_v6) %}
 
-frontend maas-region-controller-v6
+frontend maas_region_controller-v6
     mode tcp
     bind {{ maas_proxy_bind_addr_v6 }}:{{ maas_proxy_port }}
-    use_backend maas-region-controllers
+    use_backend maas_region_controllers
 
 {% endif %}
 
-backend maas-region-controllers
+backend maas_region_controllers
     balance roundrobin
-{% if maas_proxy_upstreams|length > 0 %}
+{% if maas_proxy_upstreams %}
     {% for upstream in maas_proxy_upstreams %}
     server {{ upstream['hostname'] }} {{ upstream['ip'] }}:{{ upstream['port'] }}
     {% endfor %}
 {% else %}
     {% for upstream in groups['maas_region_controller'] %}
-        {% if ('ansible_default_ipv4' in upstream) and ('address' in upstream['ansible_default_ipv4']) %}
-    server {{ upstream['hostname'] }} {{ upstream['ansible_default_ipv4']['address'] }}:5240
+        {% if ('ansible_default_ipv4' in hostvars[upstream]) and ('address' in hostvars[upstream]['ansible_default_ipv4']) %}
+    server {{ hostvars[upstream]['ansible_hostname'] }} {{ hostvars[upstream]['ansible_default_ipv4']['address'] }}:5240
         {% endif %}
-        {% if ('ansible_default_ipv6' in upstream) and ('address' in upstream['ansible_default_ipv6']) %}
-    server {{ upstream['hostname'] }} {{ upstream['ansible_default_ipv6']['address'] }}:5240
+        {% if ('ansible_default_ipv6' in hostvars[upstream]) and ('address' in hostvars[upstream]['ansible_default_ipv6']) %}
+    server {{ hostvars[upstream]['ansible_hostname'] }} {{ hostvars[upstream]['ansible_default_ipv6']['address'] }}:5240
         {% endif %}
     {% endfor %}
 {% endif %}
 
 {% if maas_proxy_postgres_proxy_enabled %}
-    {% if (maas_proxy_postgres_bind_addr_v4 is defined) and (maas_proxy_postgres_bind_addr_v4|length > 0) %}
+    {% if (maas_proxy_postgres_bind_addr_v4 is defined) and (maas_proxy_postgres_bind_addr_v4) %}
 
 frontend maas-postgres-v4
     mode tcp
@@ -55,7 +55,7 @@ frontend maas-postgres-v4
 
     {% endif %}
 
-    {% if (maas_proxy_postgres_bind_addr_v6 is defined) and (maas_proxy_postgres_bind_addr_v6|length > 0) %}
+    {% if (maas_proxy_postgres_bind_addr_v6 is defined) and (maas_proxy_postgres_bind_addr_v6) %}
 
 frontend maas-postgres-v6
     mode tcp
@@ -65,17 +65,17 @@ frontend maas-postgres-v6
     {% endif %}
 
 backend maas-postgres
-    {% if maas_proxy_postgres_upstreams|length > 0 %}
+    {% if maas_proxy_postgres_upstreams %}
         {% for upstream in maas_proxy_postgres_upstreams %}
     server {{ upstream['hostname'] }} {{ upstream['ip'] }}:{{ upstream['port'] }}
         {% endfor %}
     {% else %}
         {% for pg in groups['maas_postgres'] %}
-            {% if ('ansible_default_ipv4' in pg) and ('address' in pg['ansible_default_ipv4']) %}
-    server {{ pg['hostname'] }} {{ pg['ansible_default_ipv4']['address'] }}:5432
+            {% if ('ansible_default_ipv4' in hostvars[pg]) and ('address' in hostvars[pg]['ansible_default_ipv4']) %}
+    server {{ hostvars[pg]['ansible_hostname'] }} {{ hostvars[pg]['ansible_default_ipv4']['address'] }}:5432
             {% endif %}
-            {% if ('ansible_default_ipv6' in pg) and ('address' in pg['ansible_default_ipv6']) %}
-    server {{ pg['hostname'] }} {{ pg['ansible_default_ipv6']['address'] }}:5432
+            {% if ('ansible_default_ipv6' in hostvars[pg]) and ('address' in hostvars[pg]['ansible_default_ipv6']) %}
+    server {{ hostvars[pg]['ansible_hostname'] }} {{ hostvars[pg]['ansible_default_ipv6']['address'] }}:5432
             {% endif %}
         {% endfor %}
     {% endif %}

@@ -1,10 +1,6 @@
-maas_package_name: "{{ 'maas' if ('maas_rack_controller' in ansible_facts.packages) or (maas_installation_type|lower == 'snap') else 'maas-region-api' }}"
+maas_package_name: "{{ 'maas' if (maas_installation_type|lower == 'snap') else 'maas-region-api' }}"
 
 # MAAS installation setup
-maas_version: "latest"          # ie: 3.2, 2.8
-maas_installation_type: "snap"  # snap or deb
-maas_snap_channel: "stable"     # if using snap, then the channel. ie: stable, beta, edge
-maas_deb_state: "present"       # if using deb, the state for install
 enable_tls: false               # If an operator wishes to enable TLS
 install_metrics: false           # install metrics for the MAAS
 
@@ -13,3 +9,20 @@ admin_username: "admin"
 admin_password: "admin"
 admin_email: "admin@email.com"
 admin_id: "admin"
+
+maas_open_tcp_ports: 
+- 53 			# dns
+- 514 			# rsyslog
+- 3128
+- 5240 			# MAAS port
+- 5241:5247
+- 5250:5270 	# region workers (RPC)
+- 5432 			# postgres
+- 5443 			# MAAS https port
+- 8000
+
+maas_open_udp_ports:
+- 53 			# dns
+- 123 			# ntp
+- 514 			# rsyslog
+- 5240 			# MAAS port

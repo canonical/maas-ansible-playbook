@@ -7,11 +7,7 @@
 # maintenance (custom daily cronjobs, replication, and similar tasks).
 #
 # Database administrative login by Unix domain socket
-{% if maas_postgres_installation_type|default(maas_installation_type)|lower == 'snap' %}
-local all postgres md5
-{% else %}
 local all postgres peer
-{% endif %}
 
 # TYPE DATABASE USER ADDRESS METHOD
 {% for hba_entry in maas_postgres_hba_entries['local'] %}
@@ -19,17 +15,17 @@ local all postgres peer
 
 {% endfor %}
 
-{%- if (ansible_all_ipv4_addresses|length > 0) and
+{%- if (ansible_all_ipv4_addresses) and
     ('address' in ansible_default_ipv4) and
-        (maas_postgres_hba_entries['ipv4']|length > 0) -%}
+        (maas_postgres_hba_entries['ipv4']) -%}
   {%- for hba_entry in maas_postgres_hba_entries['ipv4'] -%}
 {{ hba_entry['type'] }} {{ hba_entry['database'] }} {{ hba_entry['user'] }} {{ hba_entry['address'] }} {{ hba_entry['method'] }} 
   
   {% endfor -%}
 {% endif %}
-{%- if (ansible_all_ipv6_addresses|length > 0) and
+{%- if (ansible_all_ipv6_addresses) and
     ('address' in ansible_default_ipv6) and
-        (maas_postgres_hba_entries['ipv6']|length > 0) -%}
+        (maas_postgres_hba_entries['ipv6']) -%}
   {%- for hba_entry in maas_postgres_hba_entries['ipv6'] -%}
 {{ hba_entry['type'] }} {{ hba_entry['database'] }} {{ hba_entry['user'] }} {{ hba_entry['address'] }} {{ hba_entry['method'] }} 
   

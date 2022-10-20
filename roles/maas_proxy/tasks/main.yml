@@ -2,7 +2,7 @@
 - name: "Install HAProxy"
   ansible.builtin.apt:
     name: haproxy
-    state: present
+    state: "{{ 'present' if maas_proxy_state|lower == 'install' else maas_proxy_state }}"
 
 - name: "Write HAProxy Config"
   ansible.builtin.template:
@@ -15,5 +15,10 @@
 - name: "Restart HAProxy"
   ansible.builtin.systemd:
     name: "haproxy.service"
-    state: restarted
+    state: 'restarted'
     enabled: true
+
+- name: "Setup firewall"
+  ansible.builtin.include_role:
+    name: maas_firewall
+    tasks_from: setup_firewall_rules
