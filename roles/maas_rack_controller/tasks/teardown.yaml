@@ -10,4 +10,11 @@
   ansible.builtin.apt:
     name: maas_rack_controller
     state: absent
-  when: (maas_installation_type|lower == 'deb') and ('"maas_rack_controller" in group_names')
+  when: (maas_installation_type|lower == 'deb')
+
+
+- name: Uninstall MAAS Deb Dependancy
+  ansible.builtin.apt:
+    name: chrony
+    state: absent
+  when: (maas_installation_type|lower == 'deb')

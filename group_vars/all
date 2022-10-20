@@ -41,5 +41,4 @@ maas_backup_dest_path: "/tmp/{{ inventory_hostname }}_maas_backup_{{ ansible_dat
 maas_restore_config_path: "{{ '/etc/maas' if maas_installation_type|lower == 'deb' else '' }}"
 maas_restore_runtime_path: "{{ '/var/lib/maas' if maas_installation_type|lower == 'deb' else '' }}"
 
-maas_data_dir: "{{ '/var/snap' if  maas_installation_type|lower == 'snap' else '/var/lib' }}/maas/"
-maas_secret_file: "{{ maas_data_dir }}{{ 'common/maas/' if  maas_installation_type|lower == 'snap' }}/secret"
+maas_secret_file: "{{ '/var/snap/maas/common' if  maas_installation_type|lower == 'snap' else '/var/lib' }}/maas/secret"

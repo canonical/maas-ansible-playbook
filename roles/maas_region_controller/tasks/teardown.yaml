@@ -9,20 +9,15 @@
 
 - name: Uninstall MAAS - Deb
   ansible.builtin.apt:
-    pkg:
-      - maas
-      - maas_region_api
-    name: maas
+    name: maas_region_api
     state: absent
   when: (maas_installation_type|lower == 'deb') and ('maas_rack_controller' in group_names)
 
-- name: Remove regiond.conf
-  ansible.builtin.file:
-    path: /etc/maas/regiond.conf
-    state: absent
-  when: maas_installation_type|lower == 'deb'
-
 - name: Remove MAAS Files
   ansible.builtin.file:
-    path: "{{ maas_data_dir }}"
+    path: "{{ item }}"
     state: absent
+  with_items:
+    - "/var/snap/maas/"
+    - "/var/lib/maas/"
+    - "/etc/maas/"
