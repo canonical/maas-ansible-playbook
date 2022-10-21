@@ -5,7 +5,7 @@
 
 - name: Setting config dirs for uninstall
   ansible.builtin.set_fact:
-    maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}"
+    maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
 
 - name: "Uninstall Postgres"
   ansible.builtin.apt:
@@ -27,11 +27,3 @@
     name: "psycopg2"
     state: absent
   ignore_errors: true
-
-- name: Delete Files"
-  file:
-    state: 'absent'
-    path: "{{ item }}"
-  with_items:
-    - "{{ maas_postgres_config_dir }}"
-    - "write_postgres_config.yaml"
