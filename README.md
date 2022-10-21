@@ -101,5 +101,4 @@ For an already existing MAAS installation, a new admin user can be created. The 
 
 ```
 ansible-playbook -i ./hosts --extra-vars="user_name=newuser user_pwd=newpwd user_email=user@email.com user_ssh=lp:id" ./createadmin.yaml
-
 ```
