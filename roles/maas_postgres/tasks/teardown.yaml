@@ -5,16 +5,16 @@
 
 - name: Setting config dirs for uninstall
   ansible.builtin.set_fact:
-    maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
+    maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}"
+
+- name: "Uninstall Postgres"
+  ansible.builtin.apt:
+    name: "{{ maas_postgres_deb_name | default('postgresql-{{ maas_postgres_version_number }}') }}"
+    state: absent
 
 - name: "Uninstall libpq-dev"
   ansible.builtin.apt:
     name: libpq-dev
-    state: absent
-
-- name: "Uninstall psycopg2"
-  ansible.builtin.pip:
-    name: "psycopg2"
     state: absent
 
 - name: "Uninstall acl"
@@ -22,18 +22,16 @@
     name: acl
     state: absent
 
-- name: "Uninstall Postgres"
-  ansible.builtin.apt:
-    name: "{{ maas_postgres_deb_name | default('postgresql-{{ maas_postgres_version_number') }}"
-    update_cache: true # update cache still if previous packages are already installed
+- name: "Uninstall psycopg2"
+  ansible.builtin.pip:
+    name: "psycopg2"
     state: absent
+  ignore_errors: true
 
-- name: Delete pg_hba.conf"
+- name: Delete Files"
   file:
     state: 'absent'
-    path: "{{ maas_postgres_config_dir }}pg_hba.conf"
-
-- name: "Delete postgresql.conf"
-  file:
-    state: 'absent'
-    path: "{{ maas_postgres_config_dir }}postgresql.conf"
+    path: "{{ item }}"
+  with_items:
+    - "{{ maas_postgres_config_dir }}"
+    - "write_postgres_config.yaml"
