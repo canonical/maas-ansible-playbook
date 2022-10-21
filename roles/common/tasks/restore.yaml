@@ -14,19 +14,19 @@
 
 - name: Stop Region Controller
   ansible.builtin.systemd:
-    name: maas_regiond.service
+    name: maas-regiond.service
     state: stopped
-  when: ('maas_region_controller' in group_names) and maas_installation_type|lower == 'deb'
+  when: ('maas_region_controller' in group_names) and maas_install_deb|bool
 
 - name: Stop Rack Controller
   ansible.builtin.systemd:
-    name: maas_rackd.service
+    name: maas-rackd.service
     state: stopped
-  when: ('maas_rack_controller' in group_names) and maas_installation_type|lower == 'deb'
+  when: ('maas_rack_controller' in group_names) and maas_install_deb|bool
 
 - name: Stop MAAS snap
   ansible.builtin.command: snap stop maas
-  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (maas_installation_type|lower == 'snap')
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb|bool)
 
 - name: Restore Config
   ansible.builtin.command: "mv /tmp/maas_backup/etc/maas {{ maas_restore_config_path }}"
@@ -38,16 +38,16 @@
 
 - name: Start Region Controller
   ansible.builtin.systemd:
-    name: maas_regiond.service
+    name: maas-regiond.service
     state: started
-  when: ('maas_region_controller' in group_names) and maas_installation_type|lower == 'deb'
+  when: ('maas_region_controller' in group_names) and maas_install_deb|bool
 
 - name: Start Rack Controller
   ansible.builtin.systemd:
-    name: maas_rackd.service
+    name: maas-rackd.service
     state: started
-  when: ('maas_rack_controller' in group_names) and maas_installation_type|lower == 'deb'
+  when: ('maas_rack_controller' in group_names) and maas_install_deb|bool
 
 - name: Start MAAS snap
   ansible.builtin.command: snap start maas
-  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (maas_installation_type|lower == 'snap')
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb|bool)
