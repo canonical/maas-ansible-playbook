@@ -11,6 +11,7 @@
   ansible.builtin.apt:
     name: "{{ maas_postgres_deb_name | default('postgresql-{{ maas_postgres_version_number }}') }}"
     state: absent
+    purge: true
 
 - name: "Uninstall libpq-dev"
   ansible.builtin.apt:
@@ -25,5 +26,6 @@
 - name: "Uninstall psycopg2"
   ansible.builtin.pip:
     name: "psycopg2"
+    version: "2.9.3"
     state: absent
   ignore_errors: true
