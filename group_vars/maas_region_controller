@@ -1,4 +1,4 @@
-maas_package_name: "{{ 'maas' if (maas_installation_type|lower == 'snap') else 'maas-region-api' }}"
+maas_package_name: "{{ 'maas' if (not maas_install_deb|bool) else 'maas-region-api' }}"
 
 # MAAS installation setup
 enable_tls: false               # If an operator wishes to enable TLS
