@@ -46,7 +46,7 @@
       args: -E HOSTNAME="$(hostname)" \
             -E AGENT_WAL_DIR="/var/lib/grafana-agent/wal" \
             -E AGENT_POS_DIR="/var/lib/grafana-agent/positions" \
-            -E MAAS_LOGS={%- if maas_installation_type|lower == 'snap' -%} "/var/snap/maas/common/log/" {%- else -%} "/var/log/maas" {%- endif -%} \
+            -E MAAS_LOGS={%- if maas_install_deb|bool -%} "/var/log/maas" {%- else -%} "/var/snap/maas/common/log/" {%- endif -%} \
             -E MAAS_IS_REGION="true" \
             -E MAAS_IS_RACK="false" \
             -E MAAS_AZ="default" \
