@@ -5,14 +5,14 @@ maas_port: 5240             # The port MAAS uses to comunicate on
 maas_https_port: 5443       # The https port MAAS uses to comunicate on
 maas_url: ""                # The URL MAAS uses
 enable_tls: false           # Use TLS for MAAS communication
-vault_integration: false    # Use MAAS vaul for secret storage
+vault_integration: false    # Use MAAS vault for secret storage
 
 # MAAS Vault configuration
 vault_url: ""                 # The URL of the MAAS Vault
 vault_approle_id: ""          # The approle ID used for MAAS Vault
-vault_wrapped_token: ""       # < NEEDS CLARIFICATION >
-vault_secrets_path: ""        # < NEEDS CLARIFICATION >
-vault_secret_mount: ""        # < NEEDS CLARIFICATION >
+vault_wrapped_token: ""
+vault_secrets_path: ""
+vault_secret_mount: ""
 
 # Installation variables
 maas_install_deb: "{{ maas_installation_type == 'deb' }}"
