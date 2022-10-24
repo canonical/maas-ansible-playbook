@@ -35,9 +35,9 @@
       tasks_from: metrics
     when: "'telemetry' in ansible_facts.services"
 
-  - name: "Uninstall postgres primary"
+  - name: "Uninstall postgres"
     ansible.builtin.include_role:
-      name: maas_postgres_primary
+      name: maas_postgres
       tasks_from: teardown
     # when: "'postgres' in ansible_facts.packages"
 
@@ -47,19 +47,13 @@
       tasks_from: teardown
     # when: "'postgres' in ansible_facts.packages"
 
-  - name: "Uninstall postgres"
-    ansible.builtin.include_role:
-      name: maas_postgres
-      tasks_from: teardown
-    # when: "'postgres' in ansible_facts.packages"
-
   - name: "Uninstall HAProxy"
     ansible.builtin.include_role:
       name: maas_proxy
       tasks_from: teardown
     # when: "'haproxy' in ansible_facts.packages"
 
-  - name: "Install pip for Configuration Dependencies"
+  - name: "Uninstall pip"
     ansible.builtin.apt:
       name: python3-pip
       state: absent
