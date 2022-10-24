@@ -26,6 +26,5 @@
 - name: "Uninstall psycopg2"
   ansible.builtin.pip:
     name: "psycopg2"
-    version: "2.9.3"
     state: absent
   ignore_errors: true
