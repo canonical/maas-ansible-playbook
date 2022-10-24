@@ -1,5 +1,6 @@
 ---
 # Installs MAAS
+
 - name: Install MAAS - Snap
   community.general.snap:
     name: maas
