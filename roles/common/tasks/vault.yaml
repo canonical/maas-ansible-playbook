@@ -1,0 +1,8 @@
+---
+# Enable the use of vault on MAAS
+
+- name: Configure MAAS Vault
+  ansible.builtin.command: maas config-vault configure {{ vault_url }} {{ vault_approle_id }} {{ vault_wrapped_token }} {{ vault_secrets_path }} --secrets-mount {{ vault_secret_mount }}
+
+- name: Migrate MAAS secrets
+  ansible.builtin.command: maas config-vault migrate-secrets
