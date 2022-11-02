@@ -51,7 +51,7 @@
     destination_port: "{{ item }}"
     jump: ACCEPT
   with_items: "{{ maas_open_tcp_ports }}"
-  when: maas_open_tcp_ports is iterable
+  when: maas_open_tcp_ports 
 
 - name: Open udp ports 
   ansible.builtin.iptables:
@@ -60,4 +60,4 @@
     destination_port: "{{ item }}"
     jump: ACCEPT
   with_items: "{{ maas_open_udp_ports }}"
-  when: maas_open_udp_ports is iterable
+  when: maas_open_udp_ports 
