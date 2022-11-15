@@ -49,3 +49,5 @@ maas_restore_config_path: "{{ '/etc/maas' if maas_install_deb|bool else '' }}"
 maas_restore_runtime_path: "{{ '/var/lib/maas' if maas_install_deb|bool else '' }}"
 
 maas_secret_file: "{{ '/var/snap/maas/common' if  maas_installation_type|lower == 'snap' else '/var/lib' }}/maas/secret"
+
+maas_installmetric_file: "{{ '/var/snap/maas/common' if maas_installation_type|lower == 'snap' else '/var/lib/maas' }}/.ansible"
