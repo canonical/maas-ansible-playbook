@@ -6,6 +6,7 @@ maas_https_port: 5443       # The https port MAAS uses to comunicate on
 maas_url: ""                # The URL MAAS uses
 enable_tls: false           # Use TLS for MAAS communication
 vault_integration: false    # Use MAAS vault for secret storage
+install_metrics: false           # install metrics for the MAAS
 
 # MAAS Vault configuration
 vault_url: ""                 # The URL of the MAAS Vault
