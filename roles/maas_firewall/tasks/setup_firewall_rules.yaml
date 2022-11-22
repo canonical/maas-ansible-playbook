@@ -44,10 +44,6 @@
     chain: FORWARD
     policy: DROP
 
-- name: Check which vars?  
-  ansible.builtin.debug:
-    msg: "{{ maas_open_tcp_ports }}"
-
 - name: Open tcp ports 
   ansible.builtin.iptables:
     chain: INPUT
