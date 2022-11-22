@@ -9,6 +9,10 @@
   import_tasks:
     configure_postgres_primary.yaml
 
+- name: Check the condition
+  ansible.builtin.debug:
+    msg: "{{ 'maas_region_controller' not in group_names }}" 
+
 - name: "Setup firewall"
   ansible.builtin.include_role:
     name: maas_firewall
