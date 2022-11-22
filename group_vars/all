@@ -6,6 +6,7 @@ maas_https_port: 5443       # The https port MAAS uses to comunicate on
 maas_url: ""                # The URL MAAS uses
 enable_tls: false           # Use TLS for MAAS communication
 vault_integration: false    # Use MAAS vault for secret storage
+install_metrics: false           # install metrics for the MAAS
 
 # MAAS Vault configuration
 vault_url: ""                 # The URL of the MAAS Vault
@@ -49,3 +50,5 @@ maas_restore_config_path: "{{ '/etc/maas' if maas_install_deb|bool else '' }}"
 maas_restore_runtime_path: "{{ '/var/lib/maas' if maas_install_deb|bool else '' }}"
 
 maas_secret_file: "{{ '/var/snap/maas/common' if  maas_installation_type|lower == 'snap' else '/var/lib' }}/maas/secret"
+
+maas_installmetric_file: "{{ '/var/snap/maas/common' if maas_installation_type|lower == 'snap' else '/var/lib/maas' }}/.ansible"

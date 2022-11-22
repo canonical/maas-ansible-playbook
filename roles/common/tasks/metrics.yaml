@@ -5,7 +5,7 @@
   ansible.builtin.command: maas {{ admin_username }} maas set-config name=promtail_port value=5238
 
 - name: enable syslog forwarding
-  anisible.builtin.command: maas {{ admin_username }} maas set-config name=promtail_enabled value=true
+  ansible.builtin.command: maas {{ admin_username }} maas set-config name=promtail_enabled value=true
   when: 'maas_state|lower != "absent"'
 
 - name: Download and unzip grafana agent
