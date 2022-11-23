@@ -57,8 +57,6 @@ This playbook requires a user to set the following set of variables:
 
 - **maas_postgres_password**: The password for the MAAS postgres user. Example: 'my_password'
 
-- **maas_postgres_replication_password**: The password for the replication postgres user. WARNING this variable will be set by the playbook in stable releases.
-
 - **maas_installation_type**: The intended type of MAAS installation. Possible values are: 'deb' or 'snap'
 
 - **maas_url**: The MAAS URL MAAS will be accessed and rack controllers should use for registering with region controllers. Example: 'http://proxy01.example.com:5240/MAAS'
@@ -67,7 +65,7 @@ This playbook requires a user to set the following set of variables:
 
 ```
 ansible-playbook -i ./hosts\
-    --extra-vars="maas_version=3.2 maas_postgres_password=example maas_postgres_replication_password=example maas_installation_type=deb maas_url=http://example.com:5240/MAAS\
+    --extra-vars="maas_version=3.2 maas_postgres_password=example maas_installation_type=deb maas_url=http://example.com:5240/MAAS\
     ./site.yaml"
 ```
 

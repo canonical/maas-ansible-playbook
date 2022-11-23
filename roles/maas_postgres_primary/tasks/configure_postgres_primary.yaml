@@ -1,4 +1,19 @@
 ---
+
+- name: "Generate Replication Password"
+  ansible.builtin.shell: openssl rand -base64 14
+  register: maas_postgres_replication_password_output
+  when: maas_postgres_replication_password is undefined
+
+- name: "Save Replication Password"
+  set_fact:
+    maas_postgres_replication_password: "{{ maas_postgres_replication_password_output.stdout }}"
+    cacheable: true
+  run_once: true
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  loop: "{{ groups['maas_postgres_secondary'] + groups['maas_postgres_primary'] }}"
+
 - name: "Create Replication User"
   community.postgresql.postgresql_user:
     name: "{{ maas_postgres_replication_user }}"
