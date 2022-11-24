@@ -50,7 +50,7 @@
     protocol: tcp
     destination_port: "{{ item }}"
     jump: ACCEPT
-  with_items: "{{ maas_open_tcp_ports }}"
+  with_items: '{{ maas_open_tcp_ports|select() }}'
   when: maas_open_tcp_ports 
 
 - name: Open udp ports 

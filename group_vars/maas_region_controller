@@ -23,8 +23,8 @@ maas_open_tcp_ports:
 - 5432 			# postgres
 - 5443 			# MAAS https port
 - 8000
-- "{{ maas_proxy_port if 'maas_proxy' in group_names }}"
-- "{{ maas_proxy_postgres_port if 'maas_proxy' in group_names }}"
+- "{{ maas_proxy_port if 'maas_proxy' in group_names else (false) }}"
+- "{{ maas_proxy_postgres_port if 'maas_proxy' in group_names else (false) }}"
 
 maas_open_udp_ports:
 - 53 			# dns
