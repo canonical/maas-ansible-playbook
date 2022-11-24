@@ -9,7 +9,8 @@ maas_proxy_postgres_port: "{{ 5243 if 'maas_postgres' not in group_names else 50
 maas_proxy_postgres_upstreams: []
 maas_proxy_state: "install"
 
-maas_open_tcp_ports: 
+maas_open_tcp_ports:
+- "{{ 5432 if 'maas_postgres' in group_names else (false) }}" 
 - "{{ maas_proxy_port }}"
 - "{{ maas_proxy_postgres_port}}"
 
