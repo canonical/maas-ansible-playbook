@@ -6,7 +6,7 @@
     tasks_from: install_postgres
 
 - name: "Configure Postgres Primary"
-  import_tasks:
+  ansible.builtin.import_tasks:
     configure_postgres_primary.yaml
 
 - name: "Setup firewall"

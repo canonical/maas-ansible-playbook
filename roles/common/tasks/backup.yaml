@@ -1,6 +1,6 @@
 ---
 - name: Generate List of Archiveable Directories
-  set_fact:
+  ansible.builtin.set_fact:
     archive_list: "{{ archive_list | default([]) + [item] }}"
   loop:
     - "{{ ('maas_postgres_primary' in group_names) | ternary('{{ maas_postgres_backup_dir }}', None) }}"

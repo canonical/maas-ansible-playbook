@@ -28,7 +28,7 @@
   register: maas_rack_secret_tmp
 
 - name: Save MAAS Secret
-  set_fact:
+  ansible.builtin.set_fact:
     maas_rack_secret: "{{ maas_rack_secret_tmp.stdout }}"
     cacheable: yes
   run_once: true

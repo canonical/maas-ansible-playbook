@@ -2,17 +2,17 @@
 # handle TLS setup, config, and enabling
 
 - name: Set default file locations if none given
-  set_fact:
+  ansible.builtin.set_fact:
     tls_key_path: "{{ tls_key_path | default(/etc/ssl/private/maas_tls.pem) }}"
     tls_cert_path: "{{ tls_cert_path | default(/etc/ssl/crt/maas_tls.crt) }}"
 
 - name: Check if a certificate exists
-  stat:
+  ansible.builtin.stat:
     path: "{{ tls_cert_path }}"
   register: tls_cert_stat
 
 - name: Check if a key exists
-  stat:
+  ansible.builtin.stat:
     path: "{{ tls_key_path }}"
   register: tls_key_stat
 

@@ -6,7 +6,7 @@
   when: maas_postgres_replication_password is undefined
 
 - name: "Save Replication Password"
-  set_fact:
+  ansible.builtin.set_fact:
     maas_postgres_replication_password: "{{ maas_postgres_replication_password_output.stdout }}"
     cacheable: true
   run_once: true
