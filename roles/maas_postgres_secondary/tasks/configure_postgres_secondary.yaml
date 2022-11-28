@@ -21,7 +21,10 @@
 
 - name: "Create Base Backup"
   ansible.builtin.expect:
-    command: "pg_basebackup -h {{ maas_postgres_primary_address }} -U {{ maas_postgres_replication_user }} -P -p 5432 -D {{ maas_postgres_data_dir }} -Fp -Xs -R"
+    command: >
+      "pg_basebackup -h {{ maas_postgres_primary_address }}"
+      "-U {{ maas_postgres_replication_user }} -P"
+      "-p 5432 -D {{ maas_postgres_data_dir }} -Fp -Xs -R"
     responses:
       '(?i)password': "{{ maas_postgres_replication_password }}"
   when: maas_postgres_action == "install"
