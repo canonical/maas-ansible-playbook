@@ -92,9 +92,9 @@
   delegate_facts: true
   loop: "{{ groups['maas_rack_controller'] }}"
 
-- name: Create metrics file  
+- name: Create metrics file
   ansible.builtin.file:
     path: "{{ maas_installmetric_file }}"
-    state: touch 
+    state: touch
     mode: 0644
-  when: install_metrics 
+  when: install_metrics

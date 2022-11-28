@@ -5,12 +5,12 @@
     chain: OUTPUT
     protocol: tcp
     destination_port: 22
-    jump: ACCEPT    
+    jump: ACCEPT
 
 - name: Allow incoming port 22
   ansible.builtin.iptables:
     chain: INPUT
-    protocol: tcp 
+    protocol: tcp
     destination_port: 22
     jump: ACCEPT
 
@@ -25,39 +25,39 @@
     chain: INPUT
     protocol: tcp
     destination_port: 53
-    jump: ACCEPT    
+    jump: ACCEPT
 
 - name: Allow port 53 tcp/udp
   ansible.builtin.iptables:
     chain: INPUT
-    protocol: udp 
-    destination_port: 53 
-    jump: ACCEPT    
+    protocol: udp
+    destination_port: 53
+    jump: ACCEPT
 
 - name: Set policy for INPUT chain to drop (otherwise)
   ansible.builtin.iptables:
     chain: INPUT
     policy: DROP
 
-- name: Set policy for FORWARD chain to drop 
+- name: Set policy for FORWARD chain to drop
   ansible.builtin.iptables:
     chain: FORWARD
     policy: DROP
 
-- name: Open tcp ports 
+- name: Open tcp ports
   ansible.builtin.iptables:
     chain: INPUT
     protocol: tcp
     destination_port: "{{ item }}"
     jump: ACCEPT
   with_items: '{{ maas_open_tcp_ports|select() }}'
-  when: maas_open_tcp_ports 
+  when: maas_open_tcp_ports
 
-- name: Open udp ports 
+- name: Open udp ports
   ansible.builtin.iptables:
     chain: INPUT
     protocol: udp
     destination_port: "{{ item }}"
     jump: ACCEPT
   with_items: "{{ maas_open_udp_ports }}"
-  when: maas_open_udp_ports 
+  when: maas_open_udp_ports
