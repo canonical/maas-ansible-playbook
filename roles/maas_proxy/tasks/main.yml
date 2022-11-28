@@ -2,7 +2,7 @@
 - name: "Install HAProxy"
   ansible.builtin.apt:
     name: haproxy
-    state: "{{ 'present' if maas_proxy_state|lower == 'install' else maas_proxy_state }}"
+    state: "{{ 'present' if maas_proxy_state | lower == 'install' else maas_proxy_state }}"
 
 - name: "Write HAProxy Config"
   ansible.builtin.template:

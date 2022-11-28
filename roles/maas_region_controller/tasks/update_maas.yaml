@@ -16,7 +16,7 @@
   when: maas_installation_type|lower == 'deb' and '"maas_rack_controller" not in group_names'
 
 - name: Migrate MAAS database
-  ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
+  ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
 
 - name: Wait For MAAS To Create Secret File
   ansible.builtin.wait_for:

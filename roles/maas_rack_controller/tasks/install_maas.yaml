@@ -31,7 +31,7 @@
 - name: Install MAAS Rack Controller
   ansible.builtin.apt:
     name: maas-rack-controller
-    state: "{{ maas_deb_state|default('present') }}"
+    state: "{{ maas_deb_state | default('present') }}"
   when: (maas_installation_type|lower == 'deb')
 
 - name: Initialise MAAS Rack Controller

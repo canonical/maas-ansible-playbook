@@ -5,7 +5,7 @@
   community.general.snap:
     name: maas
     channel: '{{ maas_version }}/{{ maas_snap_channel }}'
-    state: "{{ 'present' if maas_state|lower == 'install' else maas_state }}"
+    state: "{{ 'present' if maas_state | lower == 'install' else maas_state }}"
   register: maas_region_new_installation
   when: maas_installation_type|lower == 'snap'
 
@@ -17,7 +17,7 @@
 - name: Install MAAS Region Controller - Deb
   ansible.builtin.apt:
     name: "maas-region-api"
-    state: "{{ maas_deb_state|default('present') }}"
+    state: "{{ maas_deb_state | default('present') }}"
     update_cache: true
   register: maas_region_new_installation
   when: (maas_installation_type|lower == 'deb')
@@ -36,12 +36,12 @@
   when: maas_installation_type|lower == 'snap' and maas_region_new_installation is defined
 
 - name: Migrate MAAS database
-  ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
+  ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
 
 # MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
 - name: Initialise MAAS Controller - Deb
   ansible.builtin.expect:
-    command: "maas init --rbac-url={{ maas_rbac_url|default('')|quote }} --candid-agent-file={{ maas_candid_auth_file|default('')|quote }} --admin-ssh-import={{ admin_id }}"
+    command: "maas init --rbac-url={{ maas_rbac_url | default('') | quote }} --candid-agent-file={{ maas_candid_auth_file | default('') | quote }} --admin-ssh-import={{ admin_id }}"
     responses:
       "(?i)Username: ": "{{ admin_username }}"
       "(?i)Password: ": "{{ admin_password }}"
