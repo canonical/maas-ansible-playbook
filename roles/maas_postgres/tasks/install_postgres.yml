@@ -53,5 +53,5 @@
     name: "{{ maas_postgres_database }}"
     state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
     owner: "{{ maas_postgres_user }}"
-  become: yes
+  become: true
   become_user: postgres

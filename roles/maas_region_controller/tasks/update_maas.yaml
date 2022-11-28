@@ -30,7 +30,7 @@
 - name: Save MAAS Secret
   ansible.builtin.set_fact:
     maas_rack_secret: "{{ maas_rack_secret_tmp.stdout }}"
-    cacheable: yes
+    cacheable: true
   run_once: true
   delegate_to: "{{ item }}"
   delegate_facts: true

@@ -53,7 +53,7 @@
   ansible.builtin.systemd:
     name: maas-regiond.service
     state: started
-    no_block: no
+    no_block: false
   when: maas_installation_type|lower == 'deb'
 
 - name: Define MAAS URL
@@ -86,7 +86,7 @@
 - name: Save MAAS Secret
   ansible.builtin.set_fact:
     maas_rack_secret: "{{ maas_rack_secret_tmp.stdout }}"
-    cacheable: yes
+    cacheable: true
   run_once: true
   delegate_to: "{{ item }}"
   delegate_facts: true
