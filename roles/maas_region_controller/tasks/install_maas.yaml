@@ -7,12 +7,12 @@
     channel: '{{ maas_version }}/{{ maas_snap_channel }}'
     state: "{{ 'present' if maas_state | lower == 'install' else maas_state }}"
   register: maas_region_new_installation
-  when: maas_installation_type|lower == 'snap'
+  when: maas_installation_type | lower == 'snap'
 
 - name: Add MAAS apt Respository
   ansible.builtin.apt_repository:
     repo: "ppa:maas/{{ maas_version }}"
-  when: maas_installation_type|lower == 'deb'
+  when: maas_installation_type | lower == 'deb'
 
 - name: Install MAAS Region Controller - Deb
   ansible.builtin.apt:
@@ -20,7 +20,7 @@
     state: "{{ maas_deb_state | default('present') }}"
     update_cache: true
   register: maas_region_new_installation
-  when: (maas_installation_type|lower == 'deb')
+  when: (maas_installation_type | lower == 'deb')
 
 - name: Update regiond.conf
   ansible.builtin.template:
@@ -29,7 +29,7 @@
     mode: 0644
     owner: maas
     group: maas
-  when: maas_installation_type|lower == 'deb'
+  when: maas_installation_type | lower == 'deb'
 
 - name: Initialise MAAS Controller - Snap
   ansible.builtin.command: >
@@ -37,10 +37,11 @@
     {{ 'region+rack' if 'maas_rack_controller' in group_names else 'region' }}
     --maas-url={{ maas_url }}
     --database-uri {{ maas_postgres_uri }}
-  when: maas_installation_type|lower == 'snap' and maas_region_new_installation is defined
+  when: maas_installation_type | lower == 'snap' and maas_region_new_installation is defined
 
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
+  changed_when: false
 
 # MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
 - name: Initialise MAAS Controller - Deb
@@ -54,14 +55,14 @@
       "(?i)Password: ": "{{ admin_password }}"
       "(?i)Again: ": "{{ admin_password }}"
       "(?i)Email: ": "{{ admin_email }}"
-  when: maas_installation_type|lower == 'deb' and maas_region_new_installation is defined
+  when: maas_installation_type | lower == 'deb' and maas_region_new_installation is defined
 
 - name: Starting MAAS region service
   ansible.builtin.systemd:
     name: maas-regiond.service
     state: started
     no_block: false
-  when: maas_installation_type|lower == 'deb'
+  when: maas_installation_type | lower == 'deb'
 
 - name: Define MAAS URL
   ansible.builtin.command: maas config | grep maas_url | cut -d "=" -f2
@@ -72,7 +73,7 @@
   ansible.builtin.command: maas createadmin \
    --username={{ admin_username }} --password={{ admin_password }} \
    --email={{ admin_email }} --ssh-import={{ admin_id }}
-  when: not maas_region_new_installation or maas_installation_type|lower == 'snap'
+  when: not maas_region_new_installation or maas_installation_type | lower == 'snap'
 
 - name: Enable TLS
   ansible.builtin.include_role:
@@ -89,6 +90,7 @@
 - name: Read MAAS Secret For Rack Controllers
   ansible.builtin.command: cat "{{ maas_secret_file }}"
   register: maas_rack_secret_tmp
+  changed_when: false
 
 - name: Save MAAS Secret
   ansible.builtin.set_fact:

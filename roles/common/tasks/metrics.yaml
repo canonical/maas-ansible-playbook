@@ -3,33 +3,34 @@
 
 - name: Set the TCP port for grafana
   ansible.builtin.command: maas {{ admin_username }} maas set-config name=promtail_port value=5238
+  changed_when: false
 
-- name: enable syslog forwarding
+- name: Enable syslog forwarding
   ansible.builtin.command: maas {{ admin_username }} maas set-config name=promtail_enabled value=true
-  when: 'maas_state|lower != "absent"'
+  when: 'maas_state | lower != "absent"'
 
 - name: Download and unzip grafana agent
   ansible.builtin.unarchive:
       src: "{{ grafana_agent_pkg }}"
       dest: /opt/agent
       remote_src: true
-  when: maas_state|lower != 'absent'
+  when: maas_state | lower != 'absent'
 
 - name: Remove grafana agent pkg
   ansible.builtin.file:
       path: /opt/agent
       state: 'absent'
-  when: maas_state|lower == 'absent'
+  when: maas_state | lower == 'absent'
 
 - name: Make agent executable
   ansible.builtin.file: dest=/opt/agent/agent-linux-amd64 mode=a+x
-  when: maas_state|lower != 'absent'
+  when: maas_state | lower != 'absent'
 
 - name: Create agent directories
   ansible.builtin.file:
       path: "{{ item.src }}"
       state: "{{ 'directory' if maas_state | lower != 'absent' else maas_state }}"
-      mode: '0755'
+      mode: 0755
   loop:
       - {src: "/var/lib/grafana-agent/positions"}
       - {src: "/var/lib/grafana-agent/wal"}
@@ -38,7 +39,8 @@
   ansible.builtin.copy:
       src: /snap/maas/current/usr/share/maas/grafana_agent/agent.yaml.example
       dest: /opt/agent/agent.yml
-  when: maas_state|lower != 'absent'
+      mode: 0644
+  when: maas_state | lower != 'absent'
 
 - name: Start the grafana agent
   ansible.builtin.service:
@@ -46,7 +48,7 @@
       args: -E HOSTNAME="$(hostname)" \
             -E AGENT_WAL_DIR="/var/lib/grafana-agent/wal" \
             -E AGENT_POS_DIR="/var/lib/grafana-agent/positions" \
-            -E MAAS_LOGS={%- if maas_install_deb | bool -%} "/var/log/maas"{%- else -%}"/var/snap/maas/common/log/" %- endif -%} \
+            -E MAAS_LOGS={%- if maas_install_deb | bool -%} "/var/log/maas"{%- else -%}"/var/snap/maas/common/log/" {%- endif -%} \
             -E MAAS_IS_REGION="true" \
             -E MAAS_IS_RACK="false" \
             -E MAAS_AZ="default" \

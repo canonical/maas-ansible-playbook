@@ -17,7 +17,7 @@
     owner: postgres
     group: postgres
     mode: '0700'
-  when: maas_postgres_action|lower == 'install'
+  when: maas_postgres_action | lower == 'install'
 
 - name: "Create Base Backup"
   ansible.builtin.expect:
@@ -37,7 +37,8 @@
     dest: "{{ maas_postgres_config_dir }}recovery.conf"
     owner: postgres
     group: postgres
-  when: maas_postgres_action|lower == 'install'
+    mode: 0644
+  when: maas_postgres_action | lower == 'install'
 
 - name: "Start Postgres in Hot Standby"
   ansible.builtin.systemd:

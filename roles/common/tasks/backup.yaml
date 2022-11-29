@@ -11,14 +11,17 @@
 - name: Bundle Backup Assets
   community.general.archive:
     path: "{{ archive_list }}"
+    mode: 0644
     exclude_path:
       - "{{ maas_exclude_backup_path }}"
     dest: "{{ maas_backup_dest_path }}"
 
 # ansible.builtin.fetch has the ability to be oom killed on large files, so we're using scp instead
 - name: Download Backup
-  local_action: "ansible.builtin.command scp {{ ansible_user }}@{{ inventory_hostname }}:{{ maas_backup_dest_path }} {{ maas_backup_download_path }}"
+  ansible.builtin.command: scp {{ ansible_user }}@{{ inventory_hostname }}:{{ maas_backup_dest_path }} {{ maas_backup_download_path }}
+  delegate_to: localhost
   become: false # don't need sudo locally
+  changed_when: false
 
 - name: Remove Backup from Remote Host
   ansible.builtin.file:

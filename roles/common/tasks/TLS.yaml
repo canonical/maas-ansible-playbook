@@ -3,8 +3,8 @@
 
 - name: Set default file locations if none given
   ansible.builtin.set_fact:
-    tls_key_path: "{{ tls_key_path | default(/etc/ssl/private/maas_tls.pem) }}"
-    tls_cert_path: "{{ tls_cert_path | default(/etc/ssl/crt/maas_tls.crt) }}"
+    tls_key_path: "{{ tls_key_path | default('/etc/ssl/private/maas_tls.pem') }}"
+    tls_cert_path: "{{ tls_cert_path | default('/etc/ssl/crt/maas_tls.crt') }}"
 
 - name: Check if a certificate exists
   ansible.builtin.stat:
@@ -30,3 +30,4 @@
 
 - name: Configure TLS
   ansible.builtin.command: maas config-tls enable {{ tls_key_path }} {{ tls_cert_path }}
+  changed_when: false
