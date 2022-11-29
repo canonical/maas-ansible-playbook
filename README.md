@@ -1,5 +1,5 @@
 # MAAS-ansible-playbook
-An Ansible playbook for installing and configuring MAAS
+An Ansible playbook for installing and configuring MAAS, further documentation is found [here](https://maas.io/docs/ansible-playbooks-reference).
 
 ## Install
 
