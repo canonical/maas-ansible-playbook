@@ -1,13 +1,9 @@
 ---
 
 - name: "Generate Replication Password"
-  ansible.builtin.shell: openssl rand -base64 14
+  ansible.builtin.command: openssl rand -base64 14
   register: maas_postgres_replication_password_output
   when: maas_postgres_replication_password is undefined
-
-- name: Print rep password 
-  ansible.builtin.debug:
-    var: maas_postgres_replication_password_output
 
 - name: "Save Replication Password"
   ansible.builtin.set_fact:

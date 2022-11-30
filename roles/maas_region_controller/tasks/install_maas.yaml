@@ -47,9 +47,9 @@
 - name: Initialise MAAS Controller - Deb
   ansible.builtin.expect:
     command: >
-      "maas init --rbac-url={{ maas_rbac_url | default('') | quote }}"
-      "--candid-agent-file={{ maas_candid_auth_file | default('') | quote }}"
-      "--admin-ssh-import={{ admin_id }}"
+      maas init --rbac-url={{ maas_rbac_url | default('') | quote }}
+      --candid-agent-file={{ maas_candid_auth_file | default('') | quote }}
+      --admin-ssh-import={{ admin_id }}
     responses:
       "(?i)Username: ": "{{ admin_username }}"
       "(?i)Password: ": "{{ admin_password }}"
