@@ -23,7 +23,9 @@
   when: maas_state | lower == 'absent'
 
 - name: Make agent executable
-  ansible.builtin.file: dest=/opt/agent/agent-linux-amd64 mode=a+x
+  ansible.builtin.file:
+      path: /opt/agent/agent-linux-amd64
+      mode: 'a+x'
   when: maas_state | lower != 'absent'
 
 - name: Create agent directories
