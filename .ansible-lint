@@ -1,0 +1,9 @@
+---
+# .ansible-lint
+
+exclude_paths:
+  - .github/
+
+# skip_list to skip error when package state=latest
+skip_list:
+  - '403'

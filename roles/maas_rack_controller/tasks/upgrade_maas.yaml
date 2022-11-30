@@ -1,22 +1,22 @@
 ---
 - name: Update MAAS - Snap
   ansible.builtin.command: snap refresh --channel={{ maas_version }} maas
-  when: maas_installation_type|lower == 'snap'
+  when: maas_installation_type | lower == 'snap'
 
 - name: Add MAAS apt Respository
   ansible.builtin.apt_repository:
     repo: "ppa:maas/{{ maas_version }}"
-  when: maas_installation_type|lower == 'deb'
+  when: maas_installation_type | lower == 'deb'
 
-- name: Install Deb Dependancy
+- name: Install Deb Dependency
   ansible.builtin.apt:
     name: chrony
     state: latest
-  when: (maas_installation_type|lower == 'deb')
+  when: (maas_installation_type | lower == 'deb')
 
 - name: Install MAAS Rack Controller
   ansible.builtin.apt:
     name: "maas-rack-controller"
     state: latest
-    update_cache: yes
-  when: (maas_installation_type|lower == 'deb')
+    update_cache: true
+  when: (maas_installation_type | lower == 'deb')
