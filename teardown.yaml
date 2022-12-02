@@ -7,7 +7,7 @@
   tasks:
 
   - name: "Collect facts about installed packages"
-    package_facts:
+    ansible.builtin.package_facts:
       manager: auto
       strategy: all
 

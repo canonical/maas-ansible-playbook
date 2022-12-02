@@ -1,12 +1,12 @@
 ---
 
 - name: "Generate Replication Password"
-  ansible.builtin.shell: openssl rand -base64 14
+  ansible.builtin.command: openssl rand -base64 14
   register: maas_postgres_replication_password_output
   when: maas_postgres_replication_password is undefined
 
 - name: "Save Replication Password"
-  set_fact:
+  ansible.builtin.set_fact:
     maas_postgres_replication_password: "{{ maas_postgres_replication_password_output.stdout }}"
     cacheable: true
   run_once: true
@@ -19,7 +19,7 @@
     name: "{{ maas_postgres_replication_user }}"
     password: "{{ maas_postgres_replication_password }}"
     role_attr_flags: replication
-    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
+    state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
   become: true
   become_user: postgres
 
@@ -27,7 +27,7 @@
   community.postgresql.postgresql_slot:
     name: "{{ maas_postgres_replication_slot }}"
     db: "maasdb"
-    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
+    state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
   become: true
   become_user: postgres
   register: maas_postgres_enable_sync

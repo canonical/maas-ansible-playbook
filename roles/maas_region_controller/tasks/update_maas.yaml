@@ -13,10 +13,11 @@
     name: maas-region-api
     state: latest
     update_cache: true
-  when: maas_installation_type|lower == 'deb' and '"maas_rack_controller" not in group_names'
+  when: maas_installation_type | lower == 'deb' and '"maas_rack_controller" not in group_names'
 
 - name: Migrate MAAS database
-  ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
+  ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
+  changed_when: false
 
 - name: Refresh MAAS API
   ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} refresh"
@@ -29,11 +30,12 @@
 - name: Read MAAS Secret For Rack Controllers
   ansible.builtin.command: cat "{{ maas_secret_file }}"
   register: maas_rack_secret_tmp
+  changed_when: false
 
 - name: Save MAAS Secret
-  set_fact:
+  ansible.builtin.set_fact:
     maas_rack_secret: "{{ maas_rack_secret_tmp.stdout }}"
-    cacheable: yes
+    cacheable: true
   run_once: true
   delegate_to: "{{ item }}"
   delegate_facts: true

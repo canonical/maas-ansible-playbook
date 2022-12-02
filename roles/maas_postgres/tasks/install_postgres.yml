@@ -8,24 +8,24 @@
   ansible.builtin.apt:
     name: libpq-dev
     update_cache: true # update cache still if pip was already installed
-    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
+    state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
 
 - name: "Install psycopg2 For Configuration"
   ansible.builtin.pip:
     name: "psycopg2"
     version: "2.9.3"
-    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
+    state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
 
 - name: "Install acl to become postgres user"
   ansible.builtin.apt:
     name: acl
-    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
+    state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
 
 - name: "Install Postgres"
   ansible.builtin.apt:
     name: "{{ maas_postgres_deb_name }}"
     update_cache: true # update cache still if previous packages are already installed
-    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
+    state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
 
 - name: "Write pg_hba.conf"
   ansible.builtin.template:
@@ -51,7 +51,7 @@
 - name: "Create MAAS Postgres Database"
   community.postgresql.postgresql_db:
     name: "{{ maas_postgres_database }}"
-    state: "{{ 'present' if maas_postgres_action|lower == 'install' else maas_postgres_action }}"
+    state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
     owner: "{{ maas_postgres_user }}"
-  become: yes
+  become: true
   become_user: postgres

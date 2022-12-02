@@ -1,17 +1,17 @@
 ---
 # Add (admin) user to already existing installation
 
-- hosts: maas_region_controller 
-  tasks:    
+- hosts: maas_region_controller
+  tasks:
     - name: "Create admin"
       ansible.builtin.expect:
-        command: maas createadmin 
+        command: maas createadmin
         responses:
           "(?i)Username: ": "{{ user_name }}"
           "(?i)Password: ": "{{ user_pwd }}"
           "(?i)Again: ": "{{ user_pwd }}"
           "(?i)Email:": "{{ user_email }}"
-          "(?i)Import SSH keys": "{{ user_ssh }}" 
+          "(?i)Import SSH keys": "{{ user_ssh }}"
   become: true
   no_log: true
   gather_facts: true

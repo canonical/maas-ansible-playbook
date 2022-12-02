@@ -65,8 +65,8 @@ This playbook requires a user to set the following set of variables:
 
 ```
 ansible-playbook -i ./hosts\
-    --extra-vars="maas_version=3.2 maas_postgres_password=example maas_installation_type=deb maas_url=http://example.com:5240/MAAS\
-    ./site.yaml"
+    --extra-vars="maas_version=3.2 maas_postgres_password=example maas_installation_type=deb maas_url=http://example.com:5240/MAAS"\
+    ./site.yaml
 ```
 
 ### Teardown the MAAS stack
@@ -80,7 +80,7 @@ ansible-playbook -i ./hosts ./teardown.yaml
 Backup MAAS requires the `maas_backup_download_path` variable to be set, it will designate a path local to where the playbook is being run to download backup archives. This path must exist prior to running the playbook. `maas_installation_type` is also required.
 
 ```
-ansible-playbook -i ./hosts --extra-vars="maas_backup_download_path=/tmp/maas_backups/ maas_installation_type=deb" ./backup.yaml"
+ansible-playbook -i ./hosts --extra-vars="maas_backup_download_path=/tmp/maas_backups/ maas_installation_type=deb" ./backup.yaml
 ```
 
 ### Restore from Backup

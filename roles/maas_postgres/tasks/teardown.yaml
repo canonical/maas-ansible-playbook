@@ -27,4 +27,4 @@
   ansible.builtin.pip:
     name: "psycopg2"
     state: absent
-  ignore_errors: true
+  failed_when: false
