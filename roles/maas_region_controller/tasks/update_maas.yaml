@@ -1,11 +1,11 @@
 ---
 - name: Update MAAS - Snap
-  ansible.builtin.command: snap refresh --channel={{ maas_version }} maas
+  ansible.builtin.command: snap refresh --channel={{ maas_use_version }} maas
   when: maas_installation_type | lower == 'snap'
 
 - name: Add MAAS apt Respository
   ansible.builtin.apt_repository:
-    repo: "ppa:maas/{{ maas_version }}"
+    repo: "ppa:maas/{{ maas_use_version }}"
   when: maas_installation_type | lower == 'deb'
 
 - name: Update MAAS - Deb
@@ -17,6 +17,10 @@
 
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
+  changed_when: false
+
+- name: Refresh MAAS API
+  ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} refresh"
   changed_when: false
 
 - name: Wait For MAAS To Create Secret File

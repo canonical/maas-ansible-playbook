@@ -1,5 +1,5 @@
 # postgres version number
-maas_postgres_version_number: "{{ 14 if ansible_facts.distribution_release == 'jammy' and maas_version | float > 3.2 else 12 }}"
+maas_postgres_version_number: "{{ 14 if ansible_distribution_major_version | float >= 22 and maas_use_version is version('3.2', '>') else 12 }}"
 
 # latest compatible deb version of postgres
 maas_postgres_deb_name: "postgresql-{{ maas_postgres_version_number }}"

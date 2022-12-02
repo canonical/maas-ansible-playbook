@@ -4,14 +4,14 @@
 - name: Install MAAS - Snap
   community.general.snap:
     name: maas
-    channel: '{{ maas_version }}/{{ maas_snap_channel }}'
+    channel: '{{ maas_use_version }}/{{ maas_snap_channel }}'
     state: "{{ 'present' if maas_state | lower == 'install' else maas_state }}"
   register: maas_region_new_installation
   when: maas_installation_type | lower == 'snap'
 
 - name: Add MAAS apt Respository
   ansible.builtin.apt_repository:
-    repo: "ppa:maas/{{ maas_version }}"
+    repo: "ppa:maas/{{ maas_use_version }}"
   when: maas_installation_type | lower == 'deb'
 
 - name: Install MAAS Region Controller - Deb
@@ -80,7 +80,7 @@
     name: common
     tasks_from: TLS
   # TLS is available only in MAAS 3.2 or higher
-  when: maas_version is version("3.2", '>=') and enable_tls
+  when: maas_use_version is version("3.2", '>=') and enable_tls
 
 - name: Wait For MAAS To Create Secret File
   ansible.builtin.wait_for:
@@ -100,6 +100,7 @@
   delegate_to: "{{ item }}"
   delegate_facts: true
   loop: "{{ groups['maas_rack_controller'] }}"
+  when: ('maas_rack_controller' in group_names)
 
 - name: Create metrics file
   ansible.builtin.file:
