@@ -4,7 +4,7 @@
     msg: "MAAS Url not found"
   when: maas_url | length == 0
 - name: Check installed packages
-  package_facts:
+  ansible.builtin.package_facts:
     manager: "auto"
 
 
@@ -14,15 +14,15 @@
 
 - name: Determine MAAS installation status
   ansible.builtin.set_fact:
-    maas_installed: "{{ (maas_installation_type == 'snap' and 'maas' in snaps_installed.stdout.split('\n') )
-                      or (maas_installation_type == 'deb' and maas_package_name in ansible_facts.packages) }}"
+    maas_installed: "{{ (maas_installation_type | lower == 'snap' and 'maas' in snaps_installed.stdout.split('\n') )
+                      or (maas_installation_type | lower == 'deb' and maas_package_name in ansible_facts.packages) }}"
 
 - name: "Install MAAS rack controller"
-  import_tasks: install_maas.yaml
+  ansible.builtin.import_tasks: install_maas.yaml
   when: (not maas_installed)
 
 - name: "Update MAAS rack controller"
-  import_tasks: upgrade_maas.yaml
+  ansible.builtin.import_tasks: upgrade_maas.yaml
   when: (maas_installed)
 
 - name: Install metrics

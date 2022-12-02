@@ -1,7 +1,7 @@
 ---
 # Playbook to generate a MAAS region
 - name: Check installed packages
-  package_facts:
+  ansible.builtin.package_facts:
     manager: "auto"
 
 - name: Check installed snaps
@@ -10,15 +10,15 @@
 
 - name: Determine MAAS installation status
   ansible.builtin.set_fact:
-    maas_installed: "{{ (maas_installation_type == 'snap' and 'maas' in snaps_installed.stdout.split('\n') )
-                      or (maas_installation_type == 'deb' and maas_package_name in ansible_facts.packages) }}"
+    maas_installed: "{{ (maas_installation_type | lower == 'snap' and 'maas' in snaps_installed.stdout.split('\n') )
+                      or (maas_installation_type | lower == 'deb' and maas_package_name in ansible_facts.packages) }}"
 
 - name: Install MAAS Region
-  import_tasks: install_maas.yaml
+  ansible.builtin.import_tasks: install_maas.yaml
   when: (not maas_installed)
 
 - name: Update MAAS Region
-  import_tasks: update_maas.yaml
+  ansible.builtin.import_tasks: update_maas.yaml
   when: (maas_installed)
 
 - name: Install MAAS metrics

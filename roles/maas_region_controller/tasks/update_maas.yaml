@@ -1,25 +1,25 @@
 ---
 - name: Update MAAS - Snap
   ansible.builtin.command: snap refresh --channel={{ maas_use_version }} maas
-  when: maas_installation_type|lower == 'snap'
+  when: maas_installation_type | lower == 'snap'
 
 - name: Add MAAS apt Respository
   ansible.builtin.apt_repository:
     repo: "ppa:maas/{{ maas_use_version }}"
-  when: maas_installation_type|lower == 'deb'
+  when: maas_installation_type | lower == 'deb'
 
 - name: Update MAAS - Deb
   ansible.builtin.apt:
     name: maas-region-api
     state: latest
     update_cache: true
-  when: maas_installation_type|lower == 'deb' and '"maas_rack_controller" not in group_names'
+  when: maas_installation_type | lower == 'deb' and '"maas_rack_controller" not in group_names'
 
 - name: Migrate MAAS database
-  ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} migrate"
+  ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
 
 - name: Refresh MAAS API
-  ansible.builtin.command: "{{ 'maas' if maas_installation_type|lower == 'snap' else 'maas-region' }} refresh"
+  ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} refresh"
 
 - name: Wait For MAAS To Create Secret File
   ansible.builtin.wait_for:
