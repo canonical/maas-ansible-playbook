@@ -17,7 +17,7 @@
 - name: Install MAAS Region Controller - Deb
   ansible.builtin.apt:
     name: "maas-region-api"
-    state: "{{ maas_deb_state|default('present') }}"
+    state: "{{ maas_deb_state | default('present') }}"
     update_cache: true
   register: maas_region_new_installation
   when: (maas_installation_type | lower == 'deb')
@@ -32,16 +32,24 @@
   when: maas_installation_type | lower == 'deb'
 
 - name: Initialise MAAS Controller - Snap
-  ansible.builtin.command: maas init {{ 'region+rack' if 'maas_rack_controller' in group_names else 'region' }} --maas-url={{ maas_url }} --database-uri {{ maas_postgres_uri }}
+  ansible.builtin.command: >
+    maas init
+    {{ 'region+rack' if 'maas_rack_controller' in group_names else 'region' }}
+    --maas-url={{ maas_url }}
+    --database-uri {{ maas_postgres_uri }}
   when: maas_installation_type | lower == 'snap' and maas_region_new_installation is defined
 
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
+  changed_when: false
 
 # MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
 - name: Initialise MAAS Controller - Deb
   ansible.builtin.expect:
-    command: "maas init --rbac-url={{ maas_rbac_url|default('')|quote }} --candid-agent-file={{ maas_candid_auth_file|default('')|quote }} --admin-ssh-import={{ admin_id }}"
+    command: >
+      maas init --rbac-url={{ maas_rbac_url | default('') | quote }}
+      --candid-agent-file={{ maas_candid_auth_file | default('') | quote }}
+      --admin-ssh-import={{ admin_id }}
     responses:
       "(?i)Username: ": "{{ admin_username }}"
       "(?i)Password: ": "{{ admin_password }}"
@@ -53,7 +61,7 @@
   ansible.builtin.systemd:
     name: maas-regiond.service
     state: started
-    no_block: no
+    no_block: false
   when: maas_installation_type | lower == 'deb'
 
 - name: Define MAAS URL
@@ -82,20 +90,21 @@
 - name: Read MAAS Secret For Rack Controllers
   ansible.builtin.command: cat "{{ maas_secret_file }}"
   register: maas_rack_secret_tmp
+  changed_when: false
 
 - name: Save MAAS Secret
-  set_fact:
+  ansible.builtin.set_fact:
     maas_rack_secret: "{{ maas_rack_secret_tmp.stdout }}"
-    cacheable: yes
+    cacheable: true
   run_once: true
   delegate_to: "{{ item }}"
   delegate_facts: true
   loop: "{{ groups['maas_rack_controller'] }}"
   when: ('maas_rack_controller' in group_names)
 
-- name: Create metrics file  
+- name: Create metrics file
   ansible.builtin.file:
     path: "{{ maas_installmetric_file }}"
-    state: touch 
+    state: touch
     mode: 0644
-  when: install_metrics 
+  when: install_metrics

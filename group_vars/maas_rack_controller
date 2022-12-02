@@ -4,7 +4,7 @@ maas_installation_type: "snap"  # snap or deb
 maas_snap_channel: "stable"     # if using snap, then the channel. ie: stable, beta, edge
 maas_deb_state: "present"       # if using deb, the state for install
 enable_tls: false                # whether to enable tls for this instance
-maas_package_name: "{{ 'maas' if (not maas_install_deb|bool) else 'maas-rack-controller' }}"
+maas_package_name: "{{ 'maas' if (not maas_install_deb | bool) else 'maas-rack-controller' }}"
 
 maas_open_tcp_ports: 
 - 53		# dns

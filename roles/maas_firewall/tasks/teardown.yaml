@@ -13,4 +13,4 @@
 
 - name: Flush all other rules
   ansible.builtin.iptables:
-    flush: yes
+    flush: true

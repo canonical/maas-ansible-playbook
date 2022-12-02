@@ -6,4 +6,3 @@
     target: "{{ maas_postgres_backup_path }}"
   become: true
   become_user: postgres
-

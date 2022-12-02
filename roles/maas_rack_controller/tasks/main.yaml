@@ -30,7 +30,7 @@
     name: common
     tasks_from: metrics
   when: install_metrics is defined and install_metrics
- 
+
 - name: "Setup firewall"
   ansible.builtin.include_role:
     name: maas_firewall
