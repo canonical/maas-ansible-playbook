@@ -1,16 +1,25 @@
 ---
 # Playbook to generate a MAAS region
-- name: "Check if MAAS is installed"
+- name: Check installed packages
   package_facts:
     manager: "auto"
 
+- name: Check installed snaps
+  ansible.builtin.shell: "snap list | awk '{ print $1}'"
+  register: snaps_installed
+
+- name: Determine MAAS installation status
+  ansible.builtin.set_fact:
+    maas_installed: "{{ (maas_installation_type == 'snap' and 'maas' in snaps_installed.stdout.split('\n') )
+                      or (maas_installation_type == 'deb' and maas_package_name in ansible_facts.packages) }}"
+
 - name: Install MAAS Region
   import_tasks: install_maas.yaml
-  when: (maas_package_name not in ansible_facts.packages)
+  when: (not maas_installed)
 
 - name: Update MAAS Region
   import_tasks: update_maas.yaml
-  when: (maas_package_name in ansible_facts.packages)
+  when: (maas_installed)
 
 - name: Install MAAS metrics
   ansible.builtin.include_role:
@@ -23,7 +32,7 @@
     name: common
     tasks_from: vault
   # Vault requires MAAS 3.3 or greater
-  when: vault_integration is defined and vault_integration and maas_version is version("3.3", '>=')
+  when: vault_integration is defined and vault_integration and maas_use_version is version("3.3", '>=')
 
 - name: "Setup firewall"
   ansible.builtin.include_role:
