@@ -6,7 +6,10 @@
 
 - name: Check installed snaps
   ansible.builtin.shell: "\
+    set -o pipefail && \
     snap list | awk '{ print $1}'"
+  args:
+    executable: /bin/bash
   register: snaps_installed
   changed_when: false
 

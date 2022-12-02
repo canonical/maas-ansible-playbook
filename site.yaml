@@ -6,8 +6,11 @@
   tasks:
   - name: Fetch MAAS Version if number not given
     ansible.builtin.shell: "\
+      set -o pipefail && \
       snap info maas | grep /{{ maas_snap_channel | default('stable') }} | \
       awk -F ' ' '{print $2}' | sort -n | tail -n1 | grep -oP '[0-9]+(.[0-9]+)+'"
+    args:
+      executable: /bin/bash
     register: maas_tmp_ver
     when: "{{ maas_version is not regex('[0-9]+.[0-9]+(.[0-9]+)?') }}"
 
