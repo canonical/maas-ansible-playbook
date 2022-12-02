@@ -5,14 +5,16 @@
 - hosts: all
   tasks:
   - name: Fetch MAAS Version if number not given
-    ansible.builtin.shell: "snap info maas | grep /{{ maas_snap_channel | default('stable') }} | awk -F ' ' '{print $2}' | sort -n | tail -n1 | grep -oP '[0-9]+(.[0-9]+)+'"
+    ansible.builtin.shell: "\
+      snap info maas | grep /{{ maas_snap_channel | default('stable') }} | \
+      awk -F ' ' '{print $2}' | sort -n | tail -n1 | grep -oP '[0-9]+(.[0-9]+)+'"
     register: maas_tmp_ver
     when: "{{ maas_version is not regex('[0-9]+.[0-9]+(.[0-9]+)?') }}"
 
   - name: Register valid MAAS version
     ansible.builtin.set_fact:
       maas_use_version: "{{ maas_tmp_ver.stdout | regex_search('[0-9]+.[0-9]+') if maas_version is not regex('[0-9]+.[0-9]+(.[0-9]+)?') else maas_version }}"
-      cacheable: yes
+      cacheable: true
 
 - hosts: maas_postgres_primary
   roles:

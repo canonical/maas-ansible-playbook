@@ -9,8 +9,10 @@
 
 
 - name: Check installed snaps
-  ansible.builtin.shell: "snap list | awk '{ print $1}'"
+  ansible.builtin.shell: "\
+    snap list | awk '{ print $1}'"
   register: snaps_installed
+  changed_when: false
 
 - name: Determine MAAS installation status
   ansible.builtin.set_fact:

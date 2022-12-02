@@ -21,6 +21,7 @@
 
 - name: Refresh MAAS API
   ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} refresh"
+  changed_when: false
 
 - name: Wait For MAAS To Create Secret File
   ansible.builtin.wait_for:

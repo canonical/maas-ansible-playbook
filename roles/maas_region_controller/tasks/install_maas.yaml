@@ -5,7 +5,7 @@
   community.general.snap:
     name: maas
     channel: '{{ maas_use_version }}/{{ maas_snap_channel }}'
-    state: "{{ 'present' if maas_state|lower == 'install' else maas_state }}"
+    state: "{{ 'present' if maas_state | lower == 'install' else maas_state }}"
   register: maas_region_new_installation
   when: maas_installation_type | lower == 'snap'
 
