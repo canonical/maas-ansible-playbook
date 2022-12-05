@@ -25,7 +25,7 @@
 
 - name: Wait For MAAS To Create Secret File
   ansible.builtin.wait_for:
-    path: " {{ maas_secret_file }}"
+    path: "{{ maas_secret_file }}"
     state: present
 
 - name: Read MAAS Secret For Rack Controllers
