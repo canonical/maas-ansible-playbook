@@ -100,7 +100,7 @@
   delegate_to: "{{ item }}"
   delegate_facts: true
   loop: "{{ groups['maas_rack_controller'] }}"
-  when: ('maas_rack_controller' in group_names)
+  when: ('maas_rack_controller' not in group_names)
 
 - name: Create metrics file
   ansible.builtin.file:

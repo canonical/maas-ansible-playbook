@@ -35,7 +35,7 @@
   when: (maas_installation_type | lower == 'deb')
 
 - name: Initialise MAAS Rack Controller
-  ansible.builtin.command: maas init --mode=rack --maas-url={{ maas_url }} --secret={{ maas_rack_secret }}
+  ansible.builtin.command: maas init rack --maas-url={{ maas_url }} --secret={{ maas_rack_secret }}
   when: (maas_installation_type | lower == 'snap') and ('maas_region_controller' not in group_names)
 
 - name: Initialise MAAS Rack Controller
