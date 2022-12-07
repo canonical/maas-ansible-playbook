@@ -1,5 +1,5 @@
 # MAAS-ansible-playbook
-An Ansible playbook for installing and configuring MAAS, further documentation is found [here](https://maas.io/docs/ansible-playbooks-reference).
+An Ansible playbook for installing and configuring MAAS
 
 ## Install
 
@@ -59,14 +59,14 @@ This playbook requires a user to set the following set of variables:
 
 - **maas_installation_type**: The intended type of MAAS installation. Possible values are: 'deb' or 'snap'
 
-- **maas_url**: The MAAS URL MAAS will be accessed and rack controllers should use for registering with region controllers. Example: 'http://proxy01.example.com:5240/MAAS'
+- **maas_url**: The MAAS URL where MAAS will be accessed and which the rack controllers should use for registering with region controllers. Example: 'http://proxy01.example.com:5240/MAAS'
 
 ### Deploy the MAAS stack
 
 ```
 ansible-playbook -i ./hosts\
-    --extra-vars="maas_version=3.2 maas_postgres_password=example maas_installation_type=deb maas_url=http://example.com:5240/MAAS"\
-    ./site.yaml
+    --extra-vars="maas_version=3.2 maas_postgres_password=example maas_installation_type=deb maas_url=http://example.com:5240/MAAS\
+    ./site.yaml"
 ```
 
 ### Teardown the MAAS stack
@@ -80,7 +80,7 @@ ansible-playbook -i ./hosts ./teardown.yaml
 Backup MAAS requires the `maas_backup_download_path` variable to be set, it will designate a path local to where the playbook is being run to download backup archives. This path must exist prior to running the playbook. `maas_installation_type` is also required.
 
 ```
-ansible-playbook -i ./hosts --extra-vars="maas_backup_download_path=/tmp/maas_backups/ maas_installation_type=deb" ./backup.yaml
+ansible-playbook -i ./hosts --extra-vars="maas_backup_download_path=/tmp/maas_backups/ maas_installation_type=deb" ./backup.yaml"
 ```
 
 ### Restore from Backup

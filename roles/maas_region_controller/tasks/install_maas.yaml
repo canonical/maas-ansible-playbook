@@ -9,7 +9,7 @@
   register: maas_region_new_installation
   when: maas_installation_type | lower == 'snap'
 
-- name: Add MAAS apt Respository
+- name: Add MAAS apt Repository
   ansible.builtin.apt_repository:
     repo: "ppa:maas/{{ maas_use_version }}"
   when: maas_installation_type | lower == 'deb'
