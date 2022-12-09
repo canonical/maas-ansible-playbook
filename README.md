@@ -59,7 +59,7 @@ This playbook requires a user to set the following set of variables:
 
 - **maas_installation_type**: The intended type of MAAS installation. Possible values are: 'deb' or 'snap'
 
-- **maas_url**: The MAAS URL MAAS will be accessed and rack controllers should use for registering with region controllers. Example: 'http://proxy01.example.com:5240/MAAS'
+- **maas_url**: The MAAS URL where MAAS will be accessed and which rack controllers should use for registering with region controllers. Example: 'http://proxy01.example.com:5240/MAAS'
 
 ### Deploy the MAAS stack
 

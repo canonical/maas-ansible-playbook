@@ -9,7 +9,7 @@
   register: maas_region_new_installation
   when: maas_installation_type | lower == 'snap'
 
-- name: Add MAAS apt Respository
+- name: Add MAAS apt Repository
   ansible.builtin.apt_repository:
     repo: "ppa:maas/{{ maas_use_version }}"
   when: maas_installation_type | lower == 'deb'
@@ -100,7 +100,7 @@
   delegate_to: "{{ item }}"
   delegate_facts: true
   loop: "{{ groups['maas_rack_controller'] }}"
-  when: ('maas_rack_controller' in group_names)
+  when: ('maas_rack_controller' not in group_names)
 
 - name: Create metrics file
   ansible.builtin.file:
