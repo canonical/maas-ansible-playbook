@@ -20,9 +20,15 @@ This playbook has several main roles, each has a corresponding group to assign h
 
 - **maas_proxy**: This role and group is for hosts to be configured as an HAProxy instance in front of region controllers for HA stacks. This role is optional.
 
-Example Host File:
+### Host file
 
-```
+Two formats can be use to define the inventory (`ini` and `yaml`). Below can be found the same inventory defined in both formats. Only one is to be chosen when running the playbook.  
+
+More information can be found on [inventory ansible documentation page](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html).
+
+#### ini
+
+```ini
 [maas_postgres_primary]
 db01.example.com
 
@@ -47,6 +53,36 @@ rack02.example.com
 
 [maas_proxy]
 proxy01.example.com
+```
+
+#### yaml
+
+```yaml
+---
+all:
+  children:
+    maas_postgres:
+      children:
+        maas_postgres_primary:
+          hosts:
+            db01.example.com:
+        maas_postgres_secondary:
+          hosts:
+            db02.example.com:
+            db03.example.com:
+    maas_proxy:
+      hosts:
+        proxy01.example.com:
+    maas_region_controller:
+      hosts:
+        region01.example.com:
+        region02.example.com:
+        region03.example.com:
+    maas_rack_controller:
+      hosts:
+        region01.example.com:
+        rack01.example.com:
+        rack02.example.com:
 ```
 
 ## Run
