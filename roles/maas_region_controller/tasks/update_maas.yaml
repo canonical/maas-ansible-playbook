@@ -1,6 +1,6 @@
 ---
 - name: Update MAAS - Snap
-  ansible.builtin.command: snap refresh --channel={{ maas_use_version }} maas
+  ansible.builtin.command: snap refresh --channel={{ maas_use_version }}/{{ maas_snap_channel }} maas
   when: maas_installation_type | lower == 'snap'
 
 - name: Add MAAS apt Repository
