@@ -1,9 +1,9 @@
 ---
-
 - name: "Install Corosync"
   ansible.builtin.apt:
     name: "corosync"
     state: present
+    update_cache: true
 
 - name: "Write Corosync config"
   ansible.builtin.template:

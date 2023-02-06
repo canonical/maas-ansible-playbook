@@ -27,7 +27,7 @@ nodelist {
 {% for i, pacemaker_host in enumerate(groups['pacemaker']) %}
     node {
         ring0_addr: {{ pacemaker_host.hostname }}
-        nodeid: {{ 100 + i }}
+        nodeid: {{ i }}
     }
 {% endfor %}
 }
