@@ -19,6 +19,15 @@
       maas_use_version: "{{ maas_tmp_ver.stdout | regex_search('[0-9]+.[0-9]+') if maas_version is not regex('[0-9]+.[0-9]+(.[0-9]+)?') else maas_version }}"
       cacheable: true
 
+- hosts: maas_corosync:
+  roles:
+    - role: maas_corosync
+  become: true
+  gather_facts: true
+  tags:
+    - maas_corosync
+    - maas_ha_postgres
+
 - hosts: maas_postgres_primary
   roles:
     - role: maas_postgres_primary
