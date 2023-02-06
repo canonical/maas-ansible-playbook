@@ -1,5 +1,7 @@
 # Define hosts for MAAS here
 
+[maas_corosync]
+
 [maas_postgres_primary]
 
 [maas_postgres_secondary]

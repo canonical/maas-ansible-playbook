@@ -1,0 +1,41 @@
+system {
+    allow_knet_handle_fallback: no
+}
+
+totem {
+    version: 2
+    secauth: off
+    cluster_name: postgres_pacemaker
+    transport: udpu
+}
+
+logging {
+    fileline: off
+    to_stderr: yes
+    to_logfile: yes
+    logfile: /var/log/corosync/corosync.log
+    to_syslog: yes
+    debug: off
+    logger_subsys {
+        subsys: QUORUM
+        debug: off
+    }
+}
+
+
+nodelist {
+{% for i, pacemaker_host in enumerate(groups['pacemaker']) %}
+    node {
+        ring0_addr: {{ pacemaker_host.hostname }}
+        nodeid: {{ 100 + i }}
+    }
+{% endfor %}
+}
+
+quorum {
+    provider: corosync_votequorum
+    two_node: 1
+    wait_for_all: 1
+    last_man_standing: 1
+    auto_tie_breker: 0
+}
