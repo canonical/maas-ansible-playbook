@@ -1,6 +1,9 @@
 # MAAS-ansible-playbook
 An Ansible playbook for installing and configuring MAAS, further documentation is found [here](https://maas.io/docs/ansible-playbooks-reference).
 
+## Supported versions
+This playbook has been tested with Ansible version 5.10.0 and above. We recommend using the latest available stable version of Ansible (currently 7.x). The `netaddr` Python library needs to be installed on the machine on which Ansible is used; note that this is not required on remote hosts.
+
 ## Install
 
 ```
@@ -22,9 +25,9 @@ This playbook has several main roles, each has a corresponding group to assign h
 
 ### Host file
 
-Two formats can be use to define the inventory (`ini` and `yaml`). Below can be found the same inventory defined in both formats. Only one is to be chosen when running the playbook.  
+Two formats can be used to define the inventory (`ini` and `yaml`). Below, the same inventory can be found twice: defined in both formats. Only one is to be chosen when running the playbook.  
 
-More information can be found on [inventory ansible documentation page](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html).
+More information can be found on the [Ansible inventory documentation page](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html).
 
 #### ini
 
