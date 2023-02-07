@@ -45,6 +45,15 @@
         cache_valid_time: 3600
       become: true
 
+- hosts: maas_corosync
+  roles:
+    - role: maas_corosync
+  become: true
+  gather_facts: true
+  tags:
+    - maas_corosync
+    - maas_ha_postgres
+
 - hosts: maas_postgres_primary
   roles:
     - role: maas_postgres_primary
