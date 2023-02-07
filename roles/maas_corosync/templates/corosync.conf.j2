@@ -6,7 +6,7 @@ totem {
     version: 2
     secauth: off
     cluster_name: postgres_pacemaker
-    transport: udpu
+    transport: knet
 }
 
 logging {
@@ -24,10 +24,10 @@ logging {
 
 
 nodelist {
-{% for i, pacemaker_host in enumerate(groups['pacemaker']) %}
+{% for pacemaker_host in groups['maas_corosync'] %}
     node {
-        ring0_addr: {{ pacemaker_host.hostname }}
-        nodeid: {{ i }}
+        ring0_addr: {{ pacemaker_host }}
+        nodeid: {{ loop.index }}
     }
 {% endfor %}
 }
