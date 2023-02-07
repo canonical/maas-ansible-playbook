@@ -1,0 +1,41 @@
+---
+- name: "Install Pacemaker packages"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update-cache: true
+  with_items:
+    - pacemaker
+    - pcs
+    - fence-agents
+
+- name: "Ensure Pacemaker is started"
+  ansible.builtin.systemd:
+    name: "pacemaker.service"
+    state: started
+    enabled: false # if the system is rebooted, the user may not want this member to rejoin automatically
+
+- name: "Check if fencing is configured"
+  ansible.builtin.shell:
+    cmd: "set -o pipefail; pcs stonith status | tee {{ maas_pacemaker_tmp_status }}"
+    creates: "{{ maas_pacemaker_tmp_status }}"
+    executable: /bin/bash
+  register: pacemaker_stonith_status
+
+- name: "Dump existing CIB"
+  ansible.builtin.command:
+    cmd: "pcs cluster cib {{ maas_pacemaker_tmp_cib }}"
+    creates: "{{ maas_pacemaker_tmp_cib }}"
+  when: pacemaker_stonith_status.stdout == "NO stonith devices configured"
+
+- name: "Update CIB"
+  ansible.builtin.shell:
+    cmd: >
+      pcs -f {{ maas_pacemaker_tmp_cib }}\
+        stonith create {{ maas_pacemaker_fence_name }}\
+        {{ maas_pacemaker_fencing_driver }}\
+        {%- for key, value in maas_pacemaker_stonith_params|items() -%}{{ key }}={{ value }} {%- endfor -%}
+      && rm {{ maas_pacemaker_tmp_cib }}
+    removes: "{{ maas_pacemaker_tmp_cib }}"
+    executable: /bin/bash
+  when: pacemaker_stonith_status.stdout == "NO stonith devices configured"
