@@ -54,6 +54,15 @@
       ansible.builtin.set_fact:
         ubuntu_arch: "{{ arch_out.stdout }}"
 
+- hosts: maas_corosync
+  roles:
+    - role: maas_corosync
+  become: true
+  gather_facts: true
+  tags:
+    - maas_corosync
+    - maas_ha_postgres
+
 - hosts: maas_postgres_primary
   roles:
     - role: maas_postgres_primary
