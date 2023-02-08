@@ -54,6 +54,15 @@
     - maas_corosync
     - maas_ha_postgres
 
+- hosts: maas_pacemaker
+  roles:
+    - role: maas_pacemaker
+  become: true
+  gather_facts: true
+  tags:
+    - maas_pacemaker
+    - maas_ha_postgres
+
 - hosts: maas_postgres_primary
   roles:
     - role: maas_postgres_primary
