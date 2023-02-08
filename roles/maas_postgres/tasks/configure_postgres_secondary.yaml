@@ -1,0 +1,15 @@
+---
+- name: "Write recovery.conf"
+  ansible.builtin.template:
+    src: recovery.conf.j2
+    dest: "{{ maas_postgres_config_dir }}recovery.conf.pcmk"
+    owner: postgres
+    group: postgres
+    mode: 0644
+  when: maas_postgres_action | lower == 'install'
+
+- name: "Start Postgres in Hot Standby"
+  ansible.builtin.systemd:
+    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
+    state: started
+    no_block: false

@@ -37,23 +37,16 @@
     - maas_pacemaker
     - maas_ha_postgres
 
-- hosts: maas_postgres_primary
+- hosts: maas_postgres
   roles:
-    - role: maas_postgres_primary
+    - role: maas_postgres
   become: true
   gather_facts: true
   tags:
     - maas_postgres_primary
-    - maas_postgres
-
-- hosts: maas_postgres_secondary
-  roles:
-    - role: maas_postgres_secondary
-  become: true
-  gather_facts: true
-  tags:
     - maas_postgres_secondary
     - maas_postgres
+    - maas_ha_postgres
 
 - hosts: maas_postgres_proxy
   roles:

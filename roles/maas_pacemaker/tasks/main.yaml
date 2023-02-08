@@ -34,7 +34,7 @@
       pcs -f {{ maas_pacemaker_tmp_cib }}\
         stonith create {{ maas_pacemaker_fence_name }}\
         {{ maas_pacemaker_fencing_driver }}\
-        {%- for key, value in maas_pacemaker_stonith_params|items() -%}{{ key }}={{ value }} {%- endfor -%}
+        {%- for key, value in maas_pacemaker_stonith_params.items() -%}{{ key }}={{ value }} {%- endfor -%}
       && rm {{ maas_pacemaker_tmp_cib }}
     removes: "{{ maas_pacemaker_tmp_cib }}"
     executable: /bin/bash

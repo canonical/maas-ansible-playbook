@@ -1,18 +1,17 @@
 # Define hosts for MAAS here
 
 [maas_corosync]
+192.168.10.168 ansible_user=ubuntu
+192.168.10.172 ansible_user=ubuntu
+192.168.10.171 ansible_user=ubuntu
 
 [maas_pacemaker:children]
 maas_corosync
 
-[maas_postgres_primary]
-
-[maas_postgres_secondary]
-
-# DO NOT MODIFY this group
-[maas_postgres:children]
-maas_postgres_primary
-maas_postgres_secondary
+[maas_postgres]
+192.168.10.168 ansible_user=ubuntu
+192.168.10.172 ansible_user=ubuntu
+192.168.10.171 ansible_user=ubuntu
 
 [maas_postgres_proxy]
 

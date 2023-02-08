@@ -202,7 +202,9 @@ dynamic_shared_memory_type = posix      # the default is the first option
 
 # - Settings -
 
-#wal_level = replica                    # minimal, replica, or logical
+{% if maas_ha_postgres_enabled %}
+wal_level = replica                    # minimal, replica, or logical
+{% endif %}
                                         # (change requires restart)
 #fsync = on                             # flush data to disk for crash safety
                                         # (turning this off can cause
@@ -295,7 +297,9 @@ min_wal_size = 80MB
 
 # Set these on the primary and on any standby that will send replication data.
 
-#max_wal_senders = 10           # max number of walsender processes
+{% if maas_ha_postgres_enabled %}
+max_wal_senders = 10           # max number of walsender processes
+{% endif %}
                                 # (change requires restart)
 #max_replication_slots = 10     # max number of replication slots
                                 # (change requires restart)
@@ -309,7 +313,7 @@ min_wal_size = 80MB
 
 # These settings are ignored on a standby server.
 
-{% if 'maas_postgres_primary' in group_names and maas_postgres_enable_sync is defined and groups['maas_postgres_secondary'] %}
+{% if maas_ha_postgres_enabled and maas_postgres_enable_sync is defined %}
 synchronous_standby_names = '*'
 {% endif %}
                                 # method to choose sync standbys, number of sync standbys,
@@ -321,11 +325,12 @@ synchronous_standby_names = '*'
 
 # These settings are ignored on a primary server.
 
-{% if 'maas_postgres_secondary' in group_names %}
-primary_conninfo = 'postgresql://{{ maas_postgres_replication_user }}:{{ maas_postgres_replication_password }}@{{ maas_postgres_primary_address }}:5432'                  # connection string to sending server
-primary_slot_name = '{{ maas_postgres_replication_slot }}'                 # replication slot on sending server
-promote_trigger_file = '{{ maas_postgres_trigger_file }}'              # file name whose presence ends recovery
+{% if maas_ha_postgres_enabled %}
+#primary_conninfo = 'postgresql://{{ maas_postgres_replication_user }}:{{ maas_postgres_replication_password }}@{{ maas_postgres_primary_address }}:5432'                  # connection string to sending server
+#primary_slot_name = '{{ maas_postgres_replication_slot }}'                 # replication slot on sending server
+#promote_trigger_file = '{{ maas_postgres_trigger_file }}'              # file name whose presence ends recovery
 hot_standby = 'on'                       # "off" disallows queries during recovery
+hot_standby_feedback = 'on'
 {% else %}
 hot_standby = 'off'                       # "off" disallows queries during recovery
 {% endif %}
@@ -442,7 +447,9 @@ hot_standby = 'off'                       # "off" disallows queries during recov
                                         # requires logging_collector to be on.
 
 # This is used when logging to stderr:
-#logging_collector = off                # Enable capturing of stderr and csvlog
+{% if maas_ha_postgres_enabled %}
+logging_collector = 'on'       # Enable capturing of stderr and csvlog
+{% endif %}
                                         # into log files. Required to be on for
                                         # csvlogs.
                                         # (change requires restart)

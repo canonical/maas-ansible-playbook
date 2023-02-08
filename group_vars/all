@@ -28,6 +28,7 @@ grafana_agent_pkg: https://github.com/grafana/agent/releases/download/v0.22.0/ag
 
 maas_postgres_user: "maas"
 maas_postgres_database: "maasdb"
+maas_ha_postgres_enabled: true
 
 maas_postgres_uri_login: "{{ maas_postgres_user }}:{{ maas_postgres_password }}"
 

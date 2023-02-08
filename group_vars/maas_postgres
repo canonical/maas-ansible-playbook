@@ -1,6 +1,11 @@
 # postgres version number
 maas_postgres_version_number: "{{ 14 if ansible_distribution_major_version | float >= 22 and maas_use_version is version('3.2', '>=') else 12 }}"
 
+maas_paf_version: "2.3.0"
+maas_paf_revision: "1"
+maas_paf_deb_url: "https://github.com/ClusterLabs/PAF/releases/download/v{{ maas_paf_version }}/resource-agents-paf_{{ maas_paf_version }}-{{ maas_paf_revision }}_all.deb"
+maas_paf_deb_dest: "/tmp/resource-agents-paf_{{maas_paf_version }}-{{ maas_paf_revision }}_all.deb"
+
 # latest compatible deb version of postgres
 maas_postgres_deb_name: "postgresql-{{ maas_postgres_version_number }}"
 
@@ -20,4 +25,54 @@ maas_postgres_ssl_enabled: true
 maas_open_tcp_ports: 
 - 5432
 
-maas_open_udp_ports:
+maas_open_udp_ports: []
+
+maas_postgres_trigger_file: "/tmp/promotedb"
+
+maas_postgres_ipv4: "{{ ansible_default_ipv4['address'] if 'address' in ansible_default_ipv4 else '127.0.0.1' }}"
+maas_postgres_ipv6: "{{ ansible_default_ipv6['address'] if 'address' in ansible_default_ipv6 else '::1' }}"
+maas_postgres_ipv4_netmask: "{{ ansible_default_ipv4['netmask'] if 'netmask' in ansible_default_ipv4 else '255.255.255.255' }}"
+maas_postgres_ipv6_prefixlen: "{{ ansible_default_ipv6['prefixlen'] if 'prefixlen' in ansible_default_ipv6 else '128' }}"
+maas_postgres_replication_v4_cidr: "{{ maas_postgres_ipv4 }}/{{ maas_postgres_ipv4_netmask }}"
+maas_postgres_replication_v6_cidr: "{{ maas_postgres_ipv6 }}/{{ maas_postgres_ipv6_prefixlen }}"
+maas_postgres_replication_v4_subnet: "{{ maas_postgres_ipv4 }}/{{ maas_postgres_replication_v4_cidr | ansible.utils.ipaddr('prefix') }}"
+maas_postgres_replication_v6_subnet: "{{ maas_postgres_replication_v6_cidr | ansible.utils.ipaddr('prefix') }}"
+maas_postgres_hba_entries:
+  local:
+    - type: 'local'
+      database: 'all'
+      user: 'all'
+      address: ''
+      method: 'peer'
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: '127.0.0.1/32'
+      method: 'md5'
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: '::1/128'
+      method: 'md5'
+  ipv4:
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: "{{ maas_postgres_ipv4 }}/24" 
+      method: 'md5'
+    - type: 'host'
+      database: 'replication'
+      user: "{{ maas_postgres_replication_user }}"
+      address: "{{ maas_postgres_replication_v4_subnet }}"
+      method: 'md5'
+  ipv6:
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: "{{ maas_postgres_ipv6 }}/128"
+      method: 'md5'
+    - type: 'host'
+      database: 'replication'
+      user: "{{ maas_postgres_replication_user }}"
+      address: "{{ maas_postgres_replication_v6_subnet }}"
+      method: 'md5'

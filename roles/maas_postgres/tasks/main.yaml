@@ -1,0 +1,25 @@
+---
+- name: "Install Postgres"
+  ansible.builtin.include_tasks:
+    file: install_postgres.yaml
+
+- name: "Configure Postgres as a primary"
+  ansible.builtin.include_tasks:
+    file: configure_postgres_primary.yaml
+  when: not maas_ha_postgres_enabled
+
+- name: "Configure Postgres as a secondary"
+  ansible.builtin.include_tasks:
+    file: configure_postgres_secondary.yaml
+  when: maas_ha_postgres_enabled
+
+- name: "Install PAF resource agent"
+  ansible.builtin.include_tasks:
+    file: install_paf.yaml
+  when: maas_ha_postgres_enabled
+
+- name: "Setup firewall"
+  ansible.builtin.include_role:
+    name: maas_firewall
+    tasks_from: setup_firewall_rules
+  when: ('maas_region_controller' not in group_names)

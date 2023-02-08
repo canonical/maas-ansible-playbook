@@ -5,9 +5,6 @@ all:
       children:
         maas_corosync:
     maas_postgres:
-      children:
-        maas_postgres_primary:
-        maas_postgres_secondary:
     maas_postgres_proxy:
     maas_proxy:
     maas_region_controller:

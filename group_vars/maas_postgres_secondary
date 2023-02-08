@@ -3,7 +3,6 @@ maas_postgres_primary_address: "{{ hostvars[groups['maas_postgres_primary'][0]][
 maas_postgres_ipv4: "{{ ansible_default_ipv4['address'] if 'address' in ansible_default_ipv4 else '127.0.0.1' }}"
 maas_postgres_ipv6: "{{ ansible_default_ipv6['address'] if 'address' in ansible_default_ipv6 else '::1' }}"
 
-maas_postgres_trigger_file: "/tmp/promotedb"
 
 maas_postgres_hba_entries:
   local:
