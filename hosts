@@ -2,6 +2,9 @@
 
 [maas_corosync]
 
+[maas_pacemaker:children]
+maas_corosync
+
 [maas_postgres_primary]
 
 [maas_postgres_secondary]
