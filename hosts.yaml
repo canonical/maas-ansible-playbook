@@ -1,7 +1,9 @@
 ---
 all:
   children:
-    maas_corosync:
+    maas_pacemaker:
+      children:
+        maas_corosync:
     maas_postgres:
       children:
         maas_postgres_primary:
