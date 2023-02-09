@@ -1,6 +1,6 @@
 ---
-maas_proxy_postgres_bind_addr_v4: "{{ hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv4']['address'] }}"
-maas_proxy_postgres_bind_addr_v6: "{{ hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv6']['address'] }}"
+maas_proxy_postgres_bind_addr_v4: "{{ (hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv4']['address']) if hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv4']['address'] is defined else '' }}"
+maas_proxy_postgres_bind_addr_v6: "{{ (hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv6']['address']) if hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv6']['address'] is defined else '' }}"
 maas_proxy_postgres_port: "{{ 5432 if 'maas_postgres' not in group_names else 5051 }}"
 maas_proxy_postgres_upstreams: []
 maas_proxy_state: "install"

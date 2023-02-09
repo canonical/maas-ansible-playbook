@@ -30,6 +30,7 @@ frontend maas-postgres-v6
 {% endif %}
 
 backend maas-postgres
+    option pgsql-check user {{ maas_postgres_user }}
     {% if maas_proxy_postgres_upstreams %}
         {% for upstream in maas_proxy_postgres_upstreams %}
     server {{ upstream['hostname'] }} {{ upstream['ip'] }}:{{ upstream['port'] }}
