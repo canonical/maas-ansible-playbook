@@ -50,3 +50,13 @@ maas_restore_runtime_path: "{{ '/var/lib/maas' if maas_install_deb | bool else '
 maas_secret_file: "{{ '/var/snap/maas/common' if  maas_installation_type | lower == 'snap' else '/var/lib' }}/maas/secret"
 
 maas_installmetric_file: "{{ '/var/snap/maas/common' if maas_installation_type | lower == 'snap' else '/var/lib/maas' }}/.ansible"
+
+# Operating system releases and the minimum version of MAAS they can run
+supported_distributions:
+  Ubuntu:
+    "22.04": # Jammy and up supports any version of MAAS
+      max: "any"
+      min: "any"
+    "0.0": # MAAS 3.2 requires lower than jammy
+      max: "3.2"
+      min: "any"
