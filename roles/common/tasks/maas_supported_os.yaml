@@ -17,5 +17,5 @@
   ansible.builtin.assert:
     fail_msg: "MAAS {{ maas_version }} is not compatible with {{ ansible_distribution }}-{{ ansible_distribution_version }}"
     that:
-      - (maas_version is version(closest_distro_version["max"] | string | replace("any", "9999"), "<=")) and
+      - (maas_version is version(closest_distro_version["max"] | string | replace("any", "9999"), "<")) and
         (maas_version is version(closest_distro_version["min"] | string | replace("any", "0.0"), ">="))

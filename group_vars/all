@@ -54,9 +54,12 @@ maas_installmetric_file: "{{ '/var/snap/maas/common' if maas_installation_type |
 # Operating system releases and the minimum version of MAAS they can run
 supported_distributions:
   Ubuntu:
-    "22.04": # Jammy and up supports any version of MAAS
+    "22.04":  # Jammy supports MAAS >= 3.3
       max: "any"
-      min: "any"
-    "0.0": # MAAS 3.2 requires lower than jammy
-      max: "3.2"
+      min: "3.3"
+    "20.04":  # Focal supports MAAS >= 2.9 and < 3.3
+      max: "3.3"
+      min: "2.9"
+    "0.0":    # Versions below Focal are used for MAAS < 2.9
+      max: "2.9"
       min: "any"
