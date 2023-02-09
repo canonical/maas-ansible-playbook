@@ -12,7 +12,7 @@
       strategy: all
 
   - name: "Collect facts about system services"
-    service_facts:
+    ansible.builtin.service_facts:
 
   - name: "Remove iptables rules"
     ansible.builtin.include_role:
