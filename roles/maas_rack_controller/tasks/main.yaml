@@ -1,4 +1,10 @@
 ---
+# Playbook to generate a MAAS region
+- name: Verify MAAS Version supported on OS
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: maas_supported_os
+
 - name: "Check MAAS Url supplied by user or region controller setup"
   ansible.builtin.fail:
     msg: "MAAS Url not found"
