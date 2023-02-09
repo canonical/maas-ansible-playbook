@@ -4,20 +4,19 @@
 
 - hosts: all
   tasks:
-  - name: Fetch MAAS Version if number not given
-    ansible.builtin.shell: "\
-      set -o pipefail && \
-      snap info maas | grep /{{ maas_snap_channel | default('stable') }} | \
-      awk -F ' ' '{print $2}' | sort -n | tail -n1 | grep -oP '[0-9]+(.[0-9]+)+'"
-    args:
-      executable: /bin/bash
-    register: maas_tmp_ver
-    when: (maas_version is not regex('[0-9]+.[0-9]+(.[0-9]+)?'))
+    - assert:
+        giet: True
+        fail_msg: "Required variable has not been defined"
+        that:
+          - maas_url is defined
+          - maas_version is defined
+          - maas_installation_type is defined
+          - maas_postgres_password is defined
 
-  - name: Register valid MAAS version
-    ansible.builtin.set_fact:
-      maas_use_version: "{{ maas_tmp_ver.stdout | regex_search('[0-9]+.[0-9]+') if maas_version is not regex('[0-9]+.[0-9]+(.[0-9]+)?') else maas_version }}"
-      cacheable: true
+    - assert:
+        fail_msg: "'{{ maas_version }}' is not a valid version number"
+        that:
+          - maas_version is regex('\d+\.\d+(\.\d+)?')
 
 - hosts: maas_postgres_primary
   roles:
