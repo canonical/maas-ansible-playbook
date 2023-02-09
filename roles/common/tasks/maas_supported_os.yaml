@@ -1,15 +1,20 @@
 ---
 # If the distibution is not in the supported dictionary
-- assert:
+- ansible.builtin.assert:
+    name: "Verify Distro supported"
     fail_msg: "MAAS cannot be installed on {{ ansible_distribution }}!"
     that:
       - ansible_distribution in supported_distributions
 
 # fetch the highest release number in the dictionary that is equal or less than the host release number
-- set_fact: closest_distro_version={{ supported_distributions[ansible_distribution][supported_distributions[ansible_distribution].keys() | community.general.version_sort | reject('>', ansible_distribution_version | string) | last] }}
+- ansible.builtin.assertset_fact:
+    name: "Fetch highest supported distro verison"
+    closest_distro_version: "{{ supported_distributions[ansible_distribution][supported_distributions[ansible_distribution].keys() | community.general.version_sort | reject('>', ansible_distribution_version | string) | last] }}"
 
 # Make sure our maas version is within the minimum and maximum supported version numbers
-- assert:
+- ansible.builtin.assert:
+    name: "Verify version supports installed MAAS"
     fail_msg: "MAAS {{ maas_version }} is not compatible with {{ ansible_distribution }}-{{ ansible_distribution_version }}"
     that:
-      - maas_version is version(closest_distro_version["max"] | string | replace("any", "9999"), "<=") and maas_version is version(closest_distro_version["min"] | string | replace("any", "0.0"), ">=")
+      - (maas_version is version(closest_distro_version["max"] | string | replace("any", "9999"), "<=")) and
+        (maas_version is version(closest_distro_version["min"] | string | replace("any", "0.0"), ">="))

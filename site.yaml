@@ -4,7 +4,7 @@
 
 - hosts: all
   tasks:
-    - assert:
+    - ansible.builtin.assert:
         quiet: true
         fail_msg: "Required variable has not been defined"
         that:
@@ -13,7 +13,7 @@
           - maas_installation_type is defined
           - maas_postgres_password is defined
 
-    - assert:
+    - ansible.builtin.assert:
         fail_msg: "'{{ maas_version }}' is not a valid version number"
         that:
           - maas_version is regex('\d+\.\d+(\.\d+)?')
