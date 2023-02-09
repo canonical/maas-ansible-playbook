@@ -5,7 +5,7 @@
 - hosts: all
   tasks:
     - assert:
-        quiet: True
+        quiet: true
         fail_msg: "Required variable has not been defined"
         that:
           - maas_url is defined
