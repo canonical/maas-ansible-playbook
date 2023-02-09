@@ -26,8 +26,6 @@ uninstall_pip: false            # Whether to uninstall pip when executing the te
 # grafana agent repo
 grafana_agent_pkg: https://github.com/grafana/agent/releases/download/v0.22.0/agent-linux-amd64.zip
 
-maas_postgres_proxy_enabled: true
-
 maas_postgres_user: "maas"
 maas_postgres_database: "maasdb"
 
