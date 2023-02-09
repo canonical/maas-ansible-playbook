@@ -1,6 +1,6 @@
 ---
 # Playbook to generate a MAAS region
-- name: Verify MAAS Version supported on OS
+- name: Verify MAAS Version supported on the host OS
   ansible.builtin.include_role:
     name: common
     tasks_from: maas_supported_os
