@@ -1,0 +1,25 @@
+---
+- name: "Install HAProxy"
+  ansible.builtin.apt:
+    name: haproxy
+    state: "{{ 'present' if maas_proxy_state | lower == 'install' else maas_proxy_state }}"
+
+- name: "Write HAProxy Config"
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    mode: '0644'
+    owner: haproxy
+    group: haproxy
+
+- name: "Restart HAProxy"
+  ansible.builtin.systemd:
+    name: "haproxy.service"
+    state: 'restarted'
+    enabled: true
+
+- name: "Setup firewall"
+  ansible.builtin.include_role:
+    name: maas_firewall
+    tasks_from: setup_firewall_rules
+  when: ('maas_region_controller' not in group_names and 'maas_rack_controller' not in group_names)
