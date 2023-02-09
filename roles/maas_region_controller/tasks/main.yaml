@@ -37,7 +37,7 @@
     name: common
     tasks_from: vault
   # Vault requires MAAS 3.3 or greater
-  when: vault_integration is defined and vault_integration and maas_use_version is version("3.3", '>=')
+  when: vault_integration is defined and vault_integration and maas_version is version("3.3", '>=')
 
 - name: "Setup firewall"
   ansible.builtin.include_role:
