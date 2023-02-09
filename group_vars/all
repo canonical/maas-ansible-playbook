@@ -3,7 +3,6 @@
 # Standard MAAS Variables
 maas_port: 5240             # The port MAAS uses to comunicate on
 maas_https_port: 5443       # The https port MAAS uses to comunicate on
-maas_url: ""                # The URL MAAS uses
 enable_tls: false           # Use TLS for MAAS communication
 vault_integration: false    # Use MAAS vault for secret storage
 install_metrics: false           # install metrics for the MAAS
@@ -17,7 +16,6 @@ vault_secret_mount: ""
 
 # Installation variables
 maas_install_deb: "{{ maas_installation_type == 'deb' }}"
-maas_version: "latest"          # ie: 3.2, 2.8
 maas_snap_channel: "stable"     # if using snap, then the channel. ie: stable, beta, edge
 maas_deb_state: "present"       # if using deb, the state for install
 maas_state: "install"           # whether to install, or upgrade maas
@@ -52,3 +50,16 @@ maas_restore_runtime_path: "{{ '/var/lib/maas' if maas_install_deb | bool else '
 maas_secret_file: "{{ '/var/snap/maas/common' if  maas_installation_type | lower == 'snap' else '/var/lib' }}/maas/secret"
 
 maas_installmetric_file: "{{ '/var/snap/maas/common' if maas_installation_type | lower == 'snap' else '/var/lib/maas' }}/.ansible"
+
+# Operating system releases and the minimum version of MAAS they can run
+supported_distributions:
+  Ubuntu:
+    "22.04":  # Jammy supports MAAS >= 3.3
+      max: "any"
+      min: "3.3"
+    "20.04":  # Focal supports MAAS >= 2.9 and < 3.3
+      max: "3.3"
+      min: "2.9"
+    "0.0":    # Versions below Focal are used for MAAS < 2.9
+      max: "2.9"
+      min: "any"

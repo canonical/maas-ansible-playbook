@@ -3,12 +3,12 @@
 - name: Install MAAS - Snap
   community.general.snap:
     name: maas
-    channel: '{{ maas_use_version }}/{{ maas_snap_channel }}'
+    channel: '{{ maas_version }}/{{ maas_snap_channel }}'
   when: (maas_installation_type | lower == 'snap') and ('maas_region_controller' not in group_names)
 
 - name: Add MAAS apt Repository
   ansible.builtin.apt_repository:
-    repo: "ppa:maas/{{ maas_use_version }}"
+    repo: "ppa:maas/{{ maas_version }}"
   when: (maas_installation_type | lower == 'deb') and ('maas_region_controller' not in group_names)
 
 - name: Create MAAS Unix Group
@@ -47,7 +47,7 @@
     name: common
     tasks_from: TLS
   # TLS is available only in MAAS 3.2 or higher
-  when: maas_use_version is version("3.2", '>=') and enable_tls
+  when: maas_version is version("3.2", '>=') and enable_tls
 
 - name: Create metrics file
   ansible.builtin.file:

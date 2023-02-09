@@ -2,7 +2,7 @@
 - hosts: maas_postgres_primary
   tasks:
     - name: Backup Postgres
-      include_role:
+      ansible.builtin.include_role:
         name: maas_postgres
         tasks_from: backup
   become: true
@@ -16,7 +16,7 @@
     - maas_rack_controller
   tasks:
     - name: Archive and Download Backups
-      include_role:
+      ansible.builtin.include_role:
         name: common
         tasks_from: backup
   become: true

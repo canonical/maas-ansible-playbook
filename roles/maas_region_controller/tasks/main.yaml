@@ -1,5 +1,10 @@
 ---
 # Playbook to generate a MAAS region
+- name: Verify MAAS Version supported on the host OS
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: maas_supported_os
+
 - name: Check installed packages
   ansible.builtin.package_facts:
     manager: "auto"
@@ -37,7 +42,7 @@
     name: common
     tasks_from: vault
   # Vault requires MAAS 3.3 or greater
-  when: vault_integration is defined and vault_integration and maas_use_version is version("3.3", '>=')
+  when: vault_integration is defined and vault_integration and maas_version is version("3.3", '>=')
 
 - name: "Setup firewall"
   ansible.builtin.include_role:

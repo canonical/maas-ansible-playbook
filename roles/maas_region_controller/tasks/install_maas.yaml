@@ -4,14 +4,14 @@
 - name: Install MAAS - Snap
   community.general.snap:
     name: maas
-    channel: '{{ maas_use_version }}/{{ maas_snap_channel }}'
+    channel: '{{ maas_version }}/{{ maas_snap_channel }}'
     state: "{{ 'present' if maas_state | lower == 'install' else maas_state }}"
   register: maas_region_new_installation
   when: maas_installation_type | lower == 'snap'
 
 - name: Add MAAS apt Repository
   ansible.builtin.apt_repository:
-    repo: "ppa:maas/{{ maas_use_version }}"
+    repo: "ppa:maas/{{ maas_version }}"
   when: maas_installation_type | lower == 'deb'
 
 - name: Install MAAS Region Controller - Deb
@@ -64,11 +64,6 @@
     no_block: false
   when: maas_installation_type | lower == 'deb'
 
-- name: Define MAAS URL
-  ansible.builtin.command: maas config | grep maas_url | cut -d "=" -f2
-  register: maas_url
-  when: not maas_url
-
 - name: Add an administrator to MAAS
   ansible.builtin.command: maas createadmin \
    --username={{ admin_username }} --password={{ admin_password }} \
@@ -80,7 +75,7 @@
     name: common
     tasks_from: TLS
   # TLS is available only in MAAS 3.2 or higher
-  when: maas_use_version is version("3.2", '>=') and enable_tls
+  when: maas_version is version("3.2", '>=') and enable_tls
 
 - name: Wait For MAAS To Create Secret File
   ansible.builtin.wait_for:

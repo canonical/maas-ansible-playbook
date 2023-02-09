@@ -5,7 +5,7 @@
     - maas_rack_controller
   tasks:
     - name: Restore from backup
-      include_role:
+      ansible.builtin.include_role:
         name: common
         tasks_from: restore
   become: true
@@ -14,7 +14,7 @@
 - hosts: maas_postgres_primary
   tasks:
     - name: Restore from database dump
-      include_role:
+      ansible.builtin.include_role:
         name: maas_postgres
         tasks_from: restore
   become: true
