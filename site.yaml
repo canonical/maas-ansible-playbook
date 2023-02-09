@@ -94,6 +94,14 @@
     - maas_postgres
   environment: "{{ proxy_env }}"
 
+- hosts: maas_postgres_proxy
+  roles:
+    - role: maas_postgres_proxy
+  become: true
+  gather_facts: true
+  tags:
+    - maas_postgres_proxy
+
 # proxies are provisioned prior to rack controllers so the rack controller
 # will request to register to region controllers through the proxy
 - hosts: maas_proxy
