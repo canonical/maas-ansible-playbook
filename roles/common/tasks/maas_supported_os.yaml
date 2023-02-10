@@ -7,7 +7,7 @@
       - ansible_distribution in supported_distributions
 
 # fetch the highest release number in the dictionary that is equal or less than the host release number
-- name: "Fetch highest supported distro verison"
+- name: "Fetch highest supported distro version"
   ansible.builtin.set_fact:
     closest_distro_version: "{{ supported_distributions[ansible_distribution][supported_distributions[ansible_distribution].keys()
       | community.general.version_sort | reject('>', ansible_distribution_version | string) | last] }}"
