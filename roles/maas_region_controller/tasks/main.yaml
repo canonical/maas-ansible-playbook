@@ -4,6 +4,7 @@
   ansible.builtin.include_role:
     name: common
     tasks_from: maas_supported_os
+  when: maas_installation_type | lower != 'snap'
 
 - name: Check installed packages
   ansible.builtin.package_facts:

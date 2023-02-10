@@ -92,13 +92,65 @@ all:
 
 This playbook requires a user to set the following set of variables:
 
-- **maas_version**: The intended version of MAAS to install. Example: '3.2'
+- **maas_version**: The intended version of MAAS to install.\
+  Example: `'3.2'`
 
-- **maas_postgres_password**: The password for the MAAS postgres user. Example: 'my_password'
+- **maas_postgres_password**: The password for the MAAS postgres user.\
+  Example: `'my_password'`
 
-- **maas_installation_type**: The intended type of MAAS installation. Possible values are: 'deb' or 'snap'
+- **maas_installation_type**: The intended type of MAAS installation.\
+  Possible values are: `'deb'` or `'snap'`
 
-- **maas_url**: The MAAS URL where MAAS will be accessed and which rack controllers should use for registering with region controllers. Example: 'http://proxy01.example.com:5240/MAAS'
+
+- **maas_url**: The MAAS URL where MAAS will be accessed and which rack controllers should use for registering with region controllers.\
+  Example: `'http://proxy01.example.com:5240/MAAS'`
+
+
+There are additional optional variables that can be passed to the playbooks:
+
+- ### Admin credentials (if setting up an admin user)
+
+  - **admin_username**: The username of the admin user\
+    Default: `admin`
+
+  - **admin_password**: The password of the admin user\
+    Default: `admin`
+
+  - **admin_email**: The email address of the admin user\
+    Default: `admin@email.com`
+
+  - **admin_id**: The launchpad id of the admin user\
+    Default: `admin`
+
+- **maas_proxy_postgres_proxy_enabled**: Use postgres proxy uri\
+  Default: `false`
+
+- **install_metrics**: Whether MAAS should install metrics\
+  Default: `false`
+
+- **enable_tls**: Whether MAAS should enable TLS\
+  Default: `false` (only valid for MAAS >= 3.2)
+
+- ### MAAS Vault (only valid for MAAS >= 3.3)
+
+  - **vault_integration**: Whether MAAS Should use Vault for secret storage\
+    Default: `false`
+  - **vault_url**: The URL of the MAAS Vault\
+    Default: undefined
+  - **vault_approle_id**: The approle id of the MAAS Vault\
+    Default: undefined
+  - **vault_wrapped_token**: The wrapped token for the MAAS Vault\
+    Default: undefined
+  - **vault_secrets_path**: The secrets path of the MAAS Vault\
+    Default: undefined
+  - **vault_secret_mount**: The secret mount of the MAAS Vault\
+    Default: undefined
+
+- **http_proxy**: The HTTP Proxy to use\
+  Default: proxy not used
+
+- **https_proxy**: The HTTPS Proxy to use\
+  Default: proxy not used
 
 ### Deploy the MAAS stack
 
