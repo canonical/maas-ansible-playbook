@@ -108,7 +108,7 @@ This playbook requires a user to set the following set of variables:
 
 There are additional optional variables that can be passed to the playbooks:
 
-- [Admin credentials] [If setting up an admin user]
+- ### Admin credentials (if setting up an admin user)
 
   - **admin_username**: The username of the admin user\
     Default: `admin`
@@ -129,9 +129,9 @@ There are additional optional variables that can be passed to the playbooks:
   Default: `false`
 
 - **enable_tls**: Whether MAAS should enable TLS\
-  Default: `false` [Only valid for MAAS >= 3.2]
+  Default: `false` (only valid for MAAS >= 3.2)
 
-- [MAAS Vault] [Only valid for MAAS >= 3.3]
+- ### MAAS Vault (only valid for MAAS >= 3.3)
 
   - **vault_integration**: Whether MAAS Should use Vault for secret storage\
     Default: `false`
