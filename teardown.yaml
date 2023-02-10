@@ -53,6 +53,6 @@
       tasks_from: teardown
     # when: "'haproxy' in ansible_facts.packages"
 
-  - name: "Remove ununsed packages from the cache"
+  - name: "Remove unused packages from the cache"
     ansible.builtin.apt:
       autoclean: true
