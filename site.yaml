@@ -20,6 +20,10 @@
         that:
           - maas_version is regex('\d+\.\d+(\.\d+)?')
 
+    - name: "Debug"
+      ansible.builtin.debug:
+        msg: Playbooks using {{ proxy_env }} as a proxy
+
 - hosts: maas_postgres_primary
   roles:
     - role: maas_postgres_primary
@@ -28,6 +32,7 @@
   tags:
     - maas_postgres_primary
     - maas_postgres
+  environment: "{{ proxy_env }}"
 
 - hosts: maas_postgres_secondary
   roles:
@@ -37,6 +42,7 @@
   tags:
     - maas_postgres_secondary
     - maas_postgres
+  environment: "{{ proxy_env }}"
 
 # proxies are provisioned prior to rack controllers so the rack controller
 # will request to register to region controllers through the proxy
@@ -47,6 +53,7 @@
   gather_facts: true
   tags:
     - maas_proxy
+  environment: "{{ proxy_env }}"
 
 - hosts: maas_region_controller
   roles:
@@ -56,6 +63,7 @@
   tags:
     - maas_region_controller
     - maas_controller
+  environment: "{{ proxy_env }}"
 
 - hosts: maas_rack_controller
   roles:
@@ -65,3 +73,4 @@
   tags:
     - maas_rack_controller
     - maas_controller
+  environment: "{{ proxy_env }}"
