@@ -53,12 +53,6 @@
       tasks_from: teardown
     # when: "'haproxy' in ansible_facts.packages"
 
-  - name: "Uninstall pip"
-    ansible.builtin.apt:
-      name: python3-pip
-      state: absent
-    when: uninstall_pip
-
   - name: "Remove ununsed packages from the cache"
     ansible.builtin.apt:
       autoclean: true

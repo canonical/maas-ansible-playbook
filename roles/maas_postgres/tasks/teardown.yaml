@@ -24,7 +24,6 @@
     state: absent
 
 - name: "Uninstall psycopg2"
-  ansible.builtin.pip:
-    name: "psycopg2"
+  ansible.builtin.apt:
+    name: "python3-psycopg2"
     state: absent
-  failed_when: false

@@ -1,19 +1,13 @@
 ---
-- name: "Install pip for Configuration Dependencies"
-  ansible.builtin.apt:
-    name: python3-pip
-    update_cache: true
-
 - name: "Install libpq-dev for Configuration"
   ansible.builtin.apt:
     name: libpq-dev
-    update_cache: true # update cache still if pip was already installed
+    update_cache: true
     state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
 
 - name: "Install psycopg2 For Configuration"
-  ansible.builtin.pip:
-    name: "psycopg2"
-    version: "2.9.3"
+  ansible.builtin.apt:
+    name: python3-psycopg2
     state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
 
 - name: "Install acl to become postgres user"
