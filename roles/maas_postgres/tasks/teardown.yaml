@@ -13,11 +13,6 @@
     state: absent
     purge: true
 
-- name: "Uninstall libpq-dev"
-  ansible.builtin.apt:
-    name: libpq-dev
-    state: absent
-
 - name: "Uninstall acl"
   ansible.builtin.apt:
     name: acl

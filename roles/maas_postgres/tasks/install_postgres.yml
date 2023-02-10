@@ -1,10 +1,4 @@
 ---
-- name: "Install libpq-dev for Configuration"
-  ansible.builtin.apt:
-    name: libpq-dev
-    update_cache: true
-    state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
-
 - name: "Install psycopg2 For Configuration"
   ansible.builtin.apt:
     name: python3-psycopg2
