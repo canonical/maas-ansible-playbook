@@ -20,15 +20,15 @@
         that:
           - maas_version is regex('\d+\.\d+(\.\d+)?')
 
-    - name: "Define proxy environment if given"
+    - name: "Define proxy environment if proxies given"
       ansible.builtin.set_fact:
         proxy_env: "{{ proxy_env | combine({'http_proxy' : http_proxy | d(omit)}) |
           combine({'https_proxy' : https_proxy | d(omit)}) }}"
 
-    - name: "Debug https"
+    - name: "Show proxy environment if in use"
       ansible.builtin.debug:
         msg: "Playbooks using proxy settings: {{ proxy_env }}"
-      when: proxy_env
+      with_dict: "{{ proxy_env }}"
 
 - hosts: maas_postgres_primary
   roles:
