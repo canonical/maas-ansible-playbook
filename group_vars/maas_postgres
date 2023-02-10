@@ -12,6 +12,7 @@ maas_postgres_deb_name: "postgresql-{{ maas_postgres_version_number }}"
 # action to perform on Postgres db, overriden by backup and restore
 maas_postgres_action: "install"
 
+maas_postgres_bin_dir: "/usr/lib/postgresql/{{ maas_postgres_version_number }}/main/"
 maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
 
 maas_postgres_primary_address: ""
@@ -58,7 +59,7 @@ maas_postgres_hba_entries:
     - type: 'host'
       database: 'all'
       user: 'all'
-      address: "{{ maas_postgres_ipv4 }}/24" 
+      address: "{{ maas_postgres_ipv4 }}/{{ maas_postgres_ipv4_netmask | ansible.utils.ipaddr('prefix') }}" 
       method: 'md5'
     - type: 'host'
       database: 'replication'
@@ -69,7 +70,7 @@ maas_postgres_hba_entries:
     - type: 'host'
       database: 'all'
       user: 'all'
-      address: "{{ maas_postgres_ipv6 }}/128"
+      address: "{{ maas_postgres_ipv6 }}/{{ maas_postgres_ipv6_prefixlen | ansible.utils.ipaddr('prefix') }}"
       method: 'md5'
     - type: 'host'
       database: 'replication'

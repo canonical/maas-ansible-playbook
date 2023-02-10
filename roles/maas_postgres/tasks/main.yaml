@@ -13,11 +13,6 @@
     file: configure_postgres_secondary.yaml
   when: maas_ha_postgres_enabled
 
-- name: "Install PAF resource agent"
-  ansible.builtin.include_tasks:
-    file: install_paf.yaml
-  when: maas_ha_postgres_enabled
-
 - name: "Setup firewall"
   ansible.builtin.include_role:
     name: maas_firewall

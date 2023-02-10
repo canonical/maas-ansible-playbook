@@ -8,12 +8,29 @@
     - pacemaker
     - pcs
     - fence-agents
+    - resource-agents-paf
+  register: install_pacemaker
+
+#- name: "Fetch PAF deb package"
+#  ansible.builtin.get_url:
+#    url: "{{ maas_paf_deb_url }}"
+#    dest: "{{ maas_paf_deb_dest }}"
+#    owner: root
+#    group: root
+#    mode: 0644
+
+#- name: "Install PAF"
+#  ansible.builtin.apt:
+#    deb: "{{ maas_paf_deb_dest }}"
+#    state: present
+#  register: install_paf
 
 - name: "Ensure Pacemaker is started"
   ansible.builtin.systemd:
     name: "pacemaker.service"
     state: started
     enabled: false # if the system is rebooted, the user may not want this member to rejoin automatically
+  when: install_pacemaker.changed
 
 - name: "Check if fencing is configured"
   ansible.builtin.shell:
@@ -22,20 +39,62 @@
     executable: /bin/bash
   register: pacemaker_stonith_status
 
-- name: "Dump existing CIB"
-  ansible.builtin.command:
-    cmd: "pcs cluster cib {{ maas_pacemaker_tmp_cib }}"
-    creates: "{{ maas_pacemaker_tmp_cib }}"
-  when: pacemaker_stonith_status.stdout == "NO stonith devices configured"
-
 - name: "Update CIB"
   ansible.builtin.shell:
     cmd: >
-      pcs -f {{ maas_pacemaker_tmp_cib }}\
+      pcs cluster cib {{ maas_pacemaker_tmp_cib }}\
+      && pcs -f {{ maas_pacemaker_tmp_cib }}\
         stonith create {{ maas_pacemaker_fence_name }}\
         {{ maas_pacemaker_fencing_driver }}\
-        {%- for key, value in maas_pacemaker_stonith_params.items() -%}{{ key }}={{ value }} {%- endfor -%}
-      && rm {{ maas_pacemaker_tmp_cib }}
-    removes: "{{ maas_pacemaker_tmp_cib }}"
+        {%- for key, value in maas_pacemaker_stonith_params.items() %} {{ key }}={{ value }}{%- endfor -%}\
+      && pcs cluster cib-push scope=configuration {{ maas_pacemaker_tmp_cib }}\
+    creates: "{{ maas_pacemaker_tmp_cib }}"
     executable: /bin/bash
   when: pacemaker_stonith_status.stdout == "NO stonith devices configured"
+
+- name: "Dump resource CIB"
+  ansible.builtin.command:
+    cmd: "pcs cluster cib {{ maas_pacemaker_tmp_cib }}"
+    creates: "{{ maas_pacemaker_tmp_cib }}"
+  when: not (pacemaker_stonith_status.stdout == "NO stonith devices configured")
+
+- name: "Configure PAF resource agent"
+  ansible.builtin.shell:
+    cmd: >
+      pcs resource defaults update migration-threshold=5\
+      && pcs resource defaults update resource-stickiness=10\
+      && pcs -f {{ maas_pacemaker_tmp_cib }} resource create pgsqld ocf:heartbeat:pgsqlms\
+        bindir="{{ maas_postgres_bin_dir }}"\
+        pgdata="{{ maas_postgres_config_dir }}"\
+        datadir="{{ maas_postgres_data_dir }}"\
+        op start timeout=60s\
+        op stop timeout=60s\
+        op promote timeout=30s\
+        op demote timeout=120s\
+        op monitor interval=15s timeout=10s role="Master"\
+        op monitor interval=16s timeout=10s role="Slave"\
+        op notify timeout=60s\
+        promotable notify=true\
+      {%- if maas_postgres_primary_host_v4 -%}
+      && pcs -f {{ maas_pacemaker_tmp_cib }} resource create pgsql-pri-ipv4 ocf:heartbeat:IPaddr2\
+        ip="{{ maas_postgres_primary_host_v4 }}"\
+        cidr_netmask="{{ maas_postgres_ipv4_netmask | ansible.utils.ipaddr('prefix') }}"\
+        op monitor interval=10s\
+      && pcs -f {{ maas_pacemaker_tmp_cib }} constraint colocation add pgsql-pri-ipv4 with master pgsqld-clone INFINITY\
+      && pcs -f {{ maas_pacemaker_tmp_cib }} constraint order promote pgsqld-clone then start pgsql-pri-ipv4 symmetrical=false kind=Mandatory\
+      && pcs -f {{ maas_pacemaker_tmp_cib }} constraint order demote pgsqld-clone then stop pgsql-pri-ipv4 symmetrical=false kind=Mandatory\
+      {%- endif -%}
+      {%- if maas_postgres_primary_host_v6 -%}
+      && pcs -f {{ maas_pacemaker_tmp_cib }} resource create pgsql-pri-ipv6 ocf:heartbeat:IPaddr2\
+        ip="{{ maas_postgres_primary_host_v6 }}"\
+        cidr_netmask="{{ maas_postgres_ipv6_netmask | ansible.utils.ipaddr('prefix') }}"\
+        op monitor interval=10s\
+      && pcs -f {{ maas_pacemaker_tmp_cib }} constraint colocation add pgsql-pri-ipv6 with master pgsqld-clone INFINITY\
+      && pcs -f {{ maas_pacemaker_tmp_cib }} constraint order promote pgsqld-clone then start pgsql-pri-ipv6 symmetrical=false kind=Mandatory\
+      && pcs -f {{ maas_pacemaker_tmp_cib }} constraint order demote pgsqld-clone then stop pgsql-pri-ipv6 symmetrical=false kind=Mandatory\
+      {%- endif -%}
+      && pcs cluster cib-push scope=configuration {{ maas_pacemaker_tmp_cib }}
+      && rm {{ maas_pacemaker_tmp_cib }}
+    removes: "{{ maas_pacemaker_tmp_cib }}" 
+    executable: /bin/bash
+    #when: install_paf.changed

@@ -10,15 +10,18 @@
     src: "corosync.conf.j2"
     dest: "/etc/corosync/corosync.conf"
     mode: 0644
+  register: corosync_config_update
 
 - name: "Stop Corosync"
   ansible.builtin.systemd:
     name: "corosync.service"
     state: stopped
     no_block: false
+  when: corosync_config_update.changed
 
 - name: "Start Corosync"
   ansible.builtin.systemd:
     name: "corosync.service"
     enabled: true
     state: started
+  when: corosync_config_update.changed
