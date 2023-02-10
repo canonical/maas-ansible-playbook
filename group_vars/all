@@ -50,14 +50,6 @@ maas_secret_file: "{{ '/var/snap/maas/common' if  maas_installation_type | lower
 
 maas_installmetric_file: "{{ '/var/snap/maas/common' if maas_installation_type | lower == 'snap' else '/var/lib/maas' }}/.ansible"
 
-# proxy support (default empty)
-http_proxy:
-https_proxy:
-# combined dict, don't touch
-proxy_env:
-  http_proxy: "{{ http_proxy }}"
-  https_proxy: "{{ https_proxy }}"
-
 # Operating system releases and the minimum version of MAAS they can run
 supported_distributions:
   Ubuntu:
