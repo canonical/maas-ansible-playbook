@@ -1,15 +1,85 @@
 ---
-- name: "Write recovery.conf"
-  ansible.builtin.template:
-    src: recovery.conf.j2
-    dest: "{{ maas_postgres_config_dir }}recovery.conf.pcmk"
+#- name: "Write recovery.conf"
+#  ansible.builtin.template:
+#    src: recovery.conf.j2
+#    dest: "{{ maas_postgres_config_dir }}recovery.conf.pcmk"
+#    owner: postgres
+#    group: postgres
+#    mode: 0644
+#  when: maas_postgres_action | lower == 'install'
+
+- name: "Add temporary primary IP"
+  ansible.builtin.shell: >
+    ip addr add\
+      {{ maas_postgres_floating_ip }}/{{ maas_postgres_floating_ip_prefix_len }}\
+      dev {{ hostvars[inventory_hostname]['ansible_default_ipv4']['interface'] if 'ansible_default_ipv4' in hostvars[inventory_hostname] else hostvars[inventory_hostname]['ansible_default_ipv6']['interface'] }}
+  when: (inventory_hostname == groups['maas_postgres'][0]) and (maas_postgres_floating_ip is defined)
+
+- name: "Add floating IP to postgres' bind addresses"
+  ansible.builtin.include_tasks:
+    file: write_postgres_config.yaml
+  vars:
+    extra_ip: "{{ maas_postgres_floating_ip }}"
+  when: (inventory_hostname == groups['maas_postgres'][0]) and (maas_postgres_floating_ip is defined)
+
+- name: "Stop Postgres To Clear Out Data"
+  ansible.builtin.systemd:
+    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
+    state: stopped
+    no_block: false
+  register: postgres_stopped
+  when: not (inventory_hostname == groups['maas_postgres'][0])
+
+- name: "Remove Previous Data Directory"
+  ansible.builtin.file:
+    path: "{{ maas_postgres_data_dir }}"
+    state: 'absent'
+  when: postgres_stopped.changed
+
+- name: "Create a New Data Directory"
+  ansible.builtin.file:
+    path: "{{ maas_postgres_data_dir }}"
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: '0700'
+  when: postgres_stopped.changed
+
+- name: "Create Base Backup"
+  ansible.builtin.expect:
+    command: >
+      pg_basebackup -h {{ maas_postgres_floating_ip }}
+      -U {{ maas_postgres_replication_user }} -P
+      -p 5432 -D {{ maas_postgres_data_dir }} -Fp -Xs -R
+    responses:
+      '(?i)password': "{{ maas_postgres_replication_password }}"
+  when: postgres_stopped.changed
+  become: true
+  become_user: postgres
+
+- name: "Create standby.signal"
+  ansible.builtin.file:
+    path: "{{ maas_postgres_data_dir }}/standby.signal"
     owner: postgres
     group: postgres
     mode: 0644
-  when: maas_postgres_action | lower == 'install'
+  when: postgres_stopped.changed
 
 - name: "Start Postgres in Hot Standby"
   ansible.builtin.systemd:
     name: "postgresql@{{ maas_postgres_version_number }}-main.service"
-    state: started
+    state: restarted
     no_block: false
+  when: postgres_stopped.changed
+
+- name: "Disable Postgres in systemd for pacemaker management"
+  ansible.builtin.systemd:
+    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
+    enabled: false
+
+- name: "Remove temporary primary IP"
+  ansible.builtin.command: >
+    ip addr del\
+      {{ maas_postgres_floating_ip }}/{{ maas_postgres_floating_ip_prefix_len }}\
+      dev {{ hostvars[ansible_hostname]['ansible_default_ipv4']['interface'] if 'ansible_default_ipv4' in hostvars[ansible_hostname] else hostvars[ansible_hostname]['ansible_default_ipv6']['interface'] }}
+  when: (ansible_hostname == groups['maas_postgres'][0]) and (maas_postgres_floating_ip is defined)

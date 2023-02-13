@@ -57,7 +57,7 @@ external_pid_file = '/var/run/postgresql/{{ maas_postgres_version_number }}-main
 {% if maas_postgres_primary_listen_all_ifaces|default(false) %}
 listen_addresses = '*'
 {% else %}
-listen_addresses = '{%- if maas_postgres_ipv4 is defined -%}{{ maas_postgres_ipv4 }}, {% endif -%}{%- if maas_postgres_ipv6 is defined -%}{{ maas_postgres_ipv6 }}, {% endif -%}localhost'         # what IP address(es) to listen on;
+listen_addresses = '{%- if extra_ip is defined -%}{{ extra_ip }}, {% endif -%}{%- if maas_postgres_ipv4 is defined -%}{{ maas_postgres_ipv4 }}, {% endif -%}{%- if maas_postgres_ipv6 is defined -%}{{ maas_postgres_ipv6 }}, {% endif -%}localhost'         # what IP address(es) to listen on;
 {% endif %}
                                         # comma-separated list of addresses;
                                         # defaults to 'localhost'; use '*' for all
@@ -268,7 +268,8 @@ min_wal_size = 80MB
 
 # Set these only when performing a targeted recovery.
 
-#recovery_target = ''           # 'immediate' to end recovery as soon as a
+{% if maas_ha_postgres_enabled %}
+recovery_target = 'immediate'           # 'immediate' to end recovery as soon as a
                                 # consistent state is reached
                                 # (change requires restart)
 #recovery_target_name = ''      # the named restore point to which recovery will proceed
@@ -283,11 +284,11 @@ min_wal_size = 80MB
                                 # just after the specified recovery target (on)
                                 # just before the recovery target (off)
                                 # (change requires restart)
-#recovery_target_timeline = 'latest'    # 'current', 'latest', or timeline ID
+recovery_target_timeline = 'latest'    # 'current', 'latest', or timeline ID
                                 # (change requires restart)
 #recovery_target_action = 'pause'       # 'pause', 'promote', 'shutdown'
                                 # (change requires restart)
-
+{% endif %}
 
 #------------------------------------------------------------------------------
 # REPLICATION
@@ -326,7 +327,7 @@ synchronous_standby_names = '*'
 # These settings are ignored on a primary server.
 
 {% if maas_ha_postgres_enabled %}
-#primary_conninfo = 'postgresql://{{ maas_postgres_replication_user }}:{{ maas_postgres_replication_password }}@{{ maas_postgres_primary_address }}:5432'                  # connection string to sending server
+primary_conninfo = 'user={{ maas_postgres_replication_user }} password={{ maas_postgres_replication_password }} host={{ maas_postgres_floating_ip }} application_name={{ ansible_hostname }}'                  # connection string to sending server
 #primary_slot_name = '{{ maas_postgres_replication_slot }}'                 # replication slot on sending server
 #promote_trigger_file = '{{ maas_postgres_trigger_file }}'              # file name whose presence ends recovery
 hot_standby = 'on'                       # "off" disallows queries during recovery

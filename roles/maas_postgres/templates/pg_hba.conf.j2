@@ -32,10 +32,7 @@ local all postgres peer
   {% endfor -%}
 {% endif %}
 # don't allow replication of self
-{%- if maas_postgres_ipv4 -%}
-host replication postgres {{ maas_postgres_ipv4 }}/32 reject
-{%- endif -%}
-{%- if maas_postgres_ipv6 -%}
-host replication postgres {{ maas_postgres_ipv6 }}/128 reject
+{%- if maas_postgres_floating_ip is defined -%}
+host replication postgres {{ maas_postgres_floating_ip }}/{{ 32 if maas_postgres_floating_ip|ansible.utils.ipv4 else 128 }}
 {%- endif -%}
 host replication postgres {{ ansible_hostname }} reject

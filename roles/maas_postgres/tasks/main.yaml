@@ -3,18 +3,18 @@
   ansible.builtin.include_tasks:
     file: install_postgres.yaml
 
-- name: "Configure Postgres as a primary"
+- name: "Create Replication User"
   ansible.builtin.include_tasks:
-    file: configure_postgres_primary.yaml
-  when: not maas_ha_postgres_enabled
+    file: create_replication_user.yaml
+  when: maas_ha_postgres_enabled and (inventory_hostname == groups["maas_postgres"][0])
 
 - name: "Configure Postgres as a secondary"
   ansible.builtin.include_tasks:
     file: configure_postgres_secondary.yaml
-  when: maas_ha_postgres_enabled
+  when: maas_ha_postgres_enabled|bool
 
 - name: "Setup firewall"
   ansible.builtin.include_role:
     name: maas_firewall
     tasks_from: setup_firewall_rules
-  when: ('maas_region_controller' not in group_names)
+  when: ('maas_region_controller' not in group_names) and ('maas_pacemaker' not in group_names)

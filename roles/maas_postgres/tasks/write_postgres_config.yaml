@@ -6,12 +6,15 @@
     mode: 0644
     owner: 'postgres'
     group: 'postgres'
+  register: conf_update
 
 - name: "Stop Postgres Service To Load New Configuration"
   ansible.builtin.systemd:
     name: "postgresql@{{ maas_postgres_version_number }}-main.service"
     state: stopped
     no_block: false # wait for clean stop
+  when: conf_update.changed
+  register: pg_stop
 
 - name: "Start Postgres Service To Load New Configuration"
   ansible.builtin.systemd:
@@ -19,3 +22,4 @@
     enabled: true
     state: started
     no_block: false
+  when: pg_stop.changed
