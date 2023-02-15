@@ -30,6 +30,8 @@ maas_postgres_replication_v4_cidr: "{{ maas_postgres_ipv4 }}/{{ maas_postgres_ip
 maas_postgres_replication_v6_cidr: "{{ maas_postgres_ipv6 }}/{{ maas_postgres_ipv6_prefixlen }}"
 maas_postgres_replication_v4_subnet: "{{ maas_postgres_ipv4 }}/{{ maas_postgres_replication_v4_cidr | ansible.utils.ipaddr('prefix') }}"
 maas_postgres_replication_v6_subnet: "{{ maas_postgres_replication_v6_cidr | ansible.utils.ipaddr('prefix') }}"
+maas_postgres_floating_ip_iface: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['interface'] if 'ansible_default_ipv4' in hostvars[inventory_hostname]\
+        else hostvars[inventory_hostname]['ansible_default_ipv6']['interface'] }}"
 maas_postgres_hba_entries:
   local:
     - type: 'local'
