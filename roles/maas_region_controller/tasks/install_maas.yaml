@@ -45,7 +45,7 @@
   changed_when: false
   run_once: true
 
-# MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
+# MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the regiond.conf write handles init
 - name: Initialise MAAS Controller - Deb
   ansible.builtin.expect:
     command: >
@@ -84,7 +84,6 @@
   ansible.builtin.wait_for:
     path: "{{ maas_secret_file }}"
     state: present
-  # run_once: true
 
 - name: Read MAAS Secret For Rack Controllers
   ansible.builtin.command: cat "{{ maas_secret_file }}"
