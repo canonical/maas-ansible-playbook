@@ -18,6 +18,7 @@
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
   changed_when: false
+  run_once: true
 
 - name: Refresh MAAS API
   ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} refresh"
