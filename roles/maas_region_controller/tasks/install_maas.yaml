@@ -38,12 +38,14 @@
     --maas-url={{ maas_url }}
     --database-uri {{ maas_postgres_uri }}
   when: maas_installation_type | lower == 'snap' and maas_region_new_installation is defined
+  throttle: 1
 
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
   changed_when: false
+  run_once: true
 
-# MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
+# MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the regiond.conf write handles init
 - name: Initialise MAAS Controller - Deb
   ansible.builtin.expect:
     command: >
@@ -69,6 +71,7 @@
    --username={{ admin_username }} --password={{ admin_password }} \
    --email={{ admin_email }} --ssh-import={{ admin_id }}
   when: not maas_region_new_installation or maas_installation_type | lower == 'snap'
+  run_once: true
 
 - name: Enable TLS
   ansible.builtin.include_role:
