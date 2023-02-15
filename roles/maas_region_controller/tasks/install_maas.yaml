@@ -38,13 +38,7 @@
     --maas-url={{ maas_url }}
     --database-uri {{ maas_postgres_uri }}
   when: maas_installation_type | lower == 'snap' and maas_region_new_installation is defined
-  register: out
-  ignore_errors: true
-
-- name: Save maas init output to file
-  ansible.builtin.copy:
-    content: "{{ out }}"
-    dest: "output.{{ inventory_hostname }}.txt"
+  throttle: 1
 
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
