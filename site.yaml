@@ -45,6 +45,18 @@
         cache_valid_time: 3600
       become: true
 
+- hosts: maas_postgres
+  roles:
+    - role: maas_postgres
+  become: true
+  gather_facts: true
+  tags:
+    - maas_postgres_primary
+    - maas_postgres_secondary
+    - maas_postgres
+    - maas_ha_postgres
+  environment: "{{ proxy_env }}"
+
 - hosts: maas_corosync
   roles:
     - role: maas_corosync
@@ -53,6 +65,7 @@
   tags:
     - maas_corosync
     - maas_ha_postgres
+  environment: "{{ proxy_env }}"
 
 - hosts: maas_pacemaker
   roles:
@@ -62,27 +75,6 @@
   tags:
     - maas_pacemaker
     - maas_ha_postgres
-
-- hosts: maas_postgres_primary
-  roles:
-    - role: maas_postgres_primary
-    - role: o11y_agent
-  become: true
-  gather_facts: true
-  tags:
-    - maas_postgres_primary
-    - maas_postgres
-  environment: "{{ proxy_env }}"
-
-- hosts: maas_postgres_secondary
-  roles:
-    - role: maas_postgres_secondary
-    - role: o11y_agent
-  become: true
-  gather_facts: true
-  tags:
-    - maas_postgres_secondary
-    - maas_postgres
   environment: "{{ proxy_env }}"
 
 - hosts: maas_postgres_proxy
@@ -92,6 +84,7 @@
   gather_facts: true
   tags:
     - maas_postgres_proxy
+  environment: "{{ proxy_env }}"
 
 # proxies are provisioned prior to rack controllers so the rack controller
 # will request to register to region controllers through the proxy

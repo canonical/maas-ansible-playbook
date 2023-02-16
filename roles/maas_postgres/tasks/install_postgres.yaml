@@ -8,6 +8,22 @@
     update_cache: true
     cache_valid_time: 3600
     state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
+  register: postgres_installed
+
+- name: "Generate Replication Password"
+  ansible.builtin.command: openssl rand -base64 14
+  register: maas_postgres_replication_password_output
+  when: (maas_postgres_replication_password is undefined) and (maas_ha_postgres_enabled|bool) and (postgres_installed.changed)
+
+- name: "Save Replication Password"
+  ansible.builtin.set_fact:
+    maas_postgres_replication_password: "{{ maas_postgres_replication_password_output.stdout }}"
+    cacheable: true
+  run_once: true
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  loop: "{{ groups['maas_postgres'] }}"
+  when: (maas_ha_postgres_enabled|bool) and (postgres_installed.changed)
 
 - name: "Write pg_hba.conf"
   ansible.builtin.template:

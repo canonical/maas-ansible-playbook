@@ -1,0 +1,13 @@
+---
+- name: "Stop Postgres Service To Load New Configuration"
+  ansible.builtin.systemd:
+    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
+    state: stopped
+    no_block: false # wait for clean stop
+
+- name: "Start Postgres Service To Load New Configuration"
+  ansible.builtin.systemd:
+    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
+    enabled: true
+    state: started
+    no_block: false
