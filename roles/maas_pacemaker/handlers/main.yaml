@@ -1,0 +1,13 @@
+---
+- name: "Ensure Pacemaker is started"
+  ansible.builtin.systemd:
+    name: "pacemaker.service"
+    state: started
+    enabled: false # if the system is rebooted, the user may not want this member to rejoin automatically
+    no_block: false
+
+- name: "Restart sshd"
+  ansible.builtin.systemd:
+    name: "sshd.service"
+    state: restarted
+    no_block: false
