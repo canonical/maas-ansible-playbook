@@ -30,20 +30,20 @@ frontend maas-postgres-v6
 {% endif %}
 
 backend maas-postgres
-    option pgsql-check user {{ maas_postgres_user }}
-    {% if maas_proxy_postgres_upstreams %}
+    option pgsql-check user {{ maas_postgres_replication_user }}
+    {%- if maas_proxy_postgres_upstreams %}
         {% for upstream in maas_proxy_postgres_upstreams %}
-    server {{ upstream['hostname'] }} {{ upstream['ip'] }}:{{ upstream['port'] }}
-        {% endfor %}
-    {% else %}
-        {% for pg in groups['maas_postgres'] %}
-            {% if ('ansible_default_ipv4' in hostvars[pg]) and ('address' in hostvars[pg]['ansible_default_ipv4']) %}
-    server {{ hostvars[pg]['ansible_hostname'] }} {{ hostvars[pg]['ansible_default_ipv4']['address'] }}:5432
-            {% endif %}
-            {% if ('ansible_default_ipv6' in hostvars[pg]) and ('address' in hostvars[pg]['ansible_default_ipv6']) %}
+    server {{ upstream['hostname'] }} {{ upstream['ip'] }}:{{ upstream['port'] }} check
+        {%- endfor -%}
+    {%- else -%}
+        {%- for pg in groups['maas_postgres'] %}
+            {%- if ('ansible_default_ipv4' in hostvars[pg]) and ('address' in hostvars[pg]['ansible_default_ipv4']) %}
+    server {{ hostvars[pg]['ansible_hostname'] }} {{ hostvars[pg]['ansible_default_ipv4']['address'] }}:5432 
+            {%- endif -%}
+            {%- if ('ansible_default_ipv6' in hostvars[pg]) and ('address' in hostvars[pg]['ansible_default_ipv6']) %}
     server {{ hostvars[pg]['ansible_hostname'] }} {{ hostvars[pg]['ansible_default_ipv6']['address'] }}:5432
-            {% endif %}
-        {% endfor %}
-    {% endif %}
+            {%- endif -%}
+        {%- endfor -%}
+    {%- endif -%}
 
 

@@ -1,6 +1,6 @@
-database_host: "{{ maas_postgres_primary_host_v6 if maas_postgres_primary_host_v6 else maas_postgres_primary_host_v4 }}"
+database_host: "{{ 'localhost' if 'maas_postgres_proxy' in group_names else (maas_postgres_primary_host_v6 if maas_postgres_primary_host_v6 else maas_postgres_primary_host_v4) }}"
 database_name: "{{ maas_postgres_database }}"
 database_pass: "{{ maas_postgres_password }}"
-database_port: 5432
+database_port: {{ 5432 }}
 database_user: "{{ maas_postgres_user }}"
 maas_url: "{{ maas_url }}"
