@@ -13,9 +13,9 @@ git clone git@github.com:maas/maas-ansible-playbook
 ## Setup
 This playbook has several main roles, each has a corresponding group to assign hosts to. They are as follows:
 
-- **maas_pacemaker**: This role and group are for a set of hosts to be configured as a pacemaker cluster to manage HA Postgres. It is recommended that `maas_corosync` is a child group of this group. It is also recommended that these are the same hosts as the postgres group.
+- **maas_pacemaker**: This role and group are for a set of hosts to be configured as a Pacemaker cluster to manage HA Postgres. It is recommended that `maas_corosync` is a child group of this group. It is also recommended that these are the same hosts as the `maas_postgres` group. This role is optional, but required for HA Postgres.
 
-- **maas_corosync**: This role and group are for a set of hosts to be configured to run a corosync cluster, used for managing quorum of a HA Postgres cluster
+- **maas_corosync**: This role and group are for a set of hosts to be configured to run a Corosync cluster, used for managing quorum of a HA Postgres cluster. This role is optional, but required for HA Postgres.
 
 - **maas_postgres**: This role and group are for a host to be configured as a Postgres instance for the MAAS stack. If more than one host is assigned this role, Postgres will be configured in HA, which then makes the `maas_corosync` and `maas_pacemaker` roles required. This role is required.
 
@@ -23,9 +23,9 @@ This playbook has several main roles, each has a corresponding group to assign h
 
 - **maas_rack_controller**: This role and group are for hosts to be configured as MAAS Rack Controllers. This role is required at least once.
 
-- **maas_postgres_proxy**: This role and group are for hosts to be configured as a HAProxy instance in front of the HA Postgres cluster, in order to ensure queries are directed to the primary instance. We recommend this group is assigned to the same hosts as `maas_region_controller`, this will have HAProxy's listener bind to localhost and route queries for that specific region controller.
+- **maas_postgres_proxy**: This role and group are for hosts to be configured as an HAProxy instance in front of the HA Postgres cluster, in order to ensure queries are directed to the primary instance. We recommend this group is assigned to the same hosts as `maas_region_controller`, this will have HAProxy's listener bind to localhost and route queries for that specific region controller. This role is optional, but recommended for HA Postgres.
 
-- **maas_proxy**: This role and group are for hosts to be configured as a HAProxy instance in front of region controllers for HA stacks. This role is optional.
+- **maas_proxy**: This role and group are for hosts to be configured as an HAProxy instance in front of region controllers for HA stacks. This role is optional.
 
 ### Host file
 
@@ -104,11 +104,11 @@ all:
         rack02.example.com:
 ```
 
-Note: the pacmaker role requires host-specifc variables that should be defined in the hosts file, they are as follows:
+Note: the Pacemaker role requires host-specifc variables that should be defined in the hosts file, they are as follows:
 
-- `maas_pacemaker_fencing_driver`: The pacemaker STONITH fencing driver, defaults to `ipmilan`. This driver is used to forcefully remove a member from the pacemaker cluster when it exhibits erroneous behavior. Pacemaker will list the available drivers with the following command: `stonith_admin --list-installed`
+- `maas_pacemaker_fencing_driver`: The Oacemaker STONITH fencing driver, defaults to `ipmilan`. This driver is used to forcefully remove a member from the Oacemaker cluster when it exhibits erroneous behavior. Pacemaker will list the available drivers with the following command: `stonith_admin --list-installed`
 
-- `maas_pacemaker_stonith_params`: The parameters specific to the fencing driver selected. These must be defined when using pacemaker, to see the 
+- `maas_pacemaker_stonith_params`: The parameters specific to the fencing driver selected. These must be defined when using Oacemaker, to see the 
 
 ## Run
 
