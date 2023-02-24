@@ -1,0 +1,26 @@
+name: jenkins-CI
+
+on:
+  # test any push to, or PR against main
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Jenkins
+        uses: joshlk/jenkins-githubaction@master
+        with:
+          url: ${{ secrets.JENKINS_URL }}
+          job_name: ansible-playbook-tests
+          username: ${{ secrets.JENKINS_USER }}
+          api_token: ${{ secrets.JENKINS_TOKEN }}
+          # tests can take anywhere between 30 and 60 minutes
+          timeout: 3600
+          parameters:
+            {
+              "ANSIBLE_REPO": "${{ github.event.repository.url }}",
+              "ANSIBLE_BRANCH": "${{ github.event.pull_request.head.ref }}"
+            }
