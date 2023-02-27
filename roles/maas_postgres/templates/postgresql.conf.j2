@@ -327,7 +327,7 @@ synchronous_standby_names = '*'
 # These settings are ignored on a primary server.
 
 {% if maas_ha_postgres_enabled %}
-primary_conninfo = 'user={{ maas_postgres_replication_user }} password={{ maas_postgres_replication_password }} host={{ maas_postgres_floating_ip }} application_name={{ ansible_hostname }}'                  # connection string to sending server
+primary_conninfo = 'user={{ maas_postgres_replication_user }} password={{ maas_postgres_replication_password }} host={{ maas_postgres_floating_ip }} port=5432 application_name="{{ ansible_hostname }}"'                  # connection string to sending server
 #primary_slot_name = '{{ maas_postgres_replication_slot }}'                 # replication slot on sending server
 #promote_trigger_file = '{{ maas_postgres_trigger_file }}'              # file name whose presence ends recovery
 hot_standby = 'on'                       # "off" disallows queries during recovery

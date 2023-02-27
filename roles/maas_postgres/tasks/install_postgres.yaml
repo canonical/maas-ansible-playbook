@@ -28,6 +28,12 @@
     state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
   register: postgres_installed
 
+- name: "Install xinetd"
+  ansible.builtin.apt:
+    name: "xinetd"
+    state: present
+  when: maas_ha_postgres_enabled|bool
+
 - name: "Generate Replication Password"
   ansible.builtin.command: openssl rand -base64 14
   register: maas_postgres_replication_password_output
@@ -71,3 +77,22 @@
     owner: "{{ maas_postgres_user }}"
   become: true
   become_user: postgres
+
+- name: "Write pgsql_check script"
+  ansible.builtin.template:
+    src: pgsql_check.j2
+    dest: /opt/pgsql_check
+    mode: 0711
+    owner: root
+    group: root
+  when: maas_ha_postgres_enabled|bool
+
+- name: "Write pgsql_check xinetd config file"
+  ansible.builtin.template:
+    src: pgsql_check_conf.j2
+    dest: /etc/xinetd.d/pgsql_check
+    mode: 0644
+    owner: root
+    group: root
+  when: maas_ha_postgres_enabled|bool
+  notify: "Restart xinetd"

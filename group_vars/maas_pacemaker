@@ -8,3 +8,5 @@ maas_paf_version: "2.3.0"
 maas_paf_revision: "1"
 maas_paf_deb_url: "https://github.com/ClusterLabs/PAF/releases/download/v{{ maas_paf_version }}/resource-agents-paf_{{ maas_paf_version }}-{{ maas_paf_revision }}_all.deb"
 maas_paf_deb_dest: "/tmp/resource-agents-paf_{{maas_paf_version }}-{{ maas_paf_revision }}_all.deb"
+
+maas_pacemaker_self_address: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] if 'ansible_default_ipv4' in hostvars[inventory_hostname] else hostvars['invenory_hostname']['ansible_default_ipv6']['address'] }}"
