@@ -310,24 +310,12 @@ max_wal_senders = 10           # max number of walsender processes
 #track_commit_timestamp = off   # collect timestamp of transaction commit
                                 # (change requires restart)
 
-# - Primary Server -
-
-# These settings are ignored on a standby server.
-
-{% if maas_ha_postgres_enabled and maas_postgres_enable_sync is defined %}
-synchronous_standby_names = '*'
-{% endif %}
-                                # method to choose sync standbys, number of sync standbys,
-                                # and comma-separated list of application_name
-                                # from standby(s); '*' = all
-#vacuum_defer_cleanup_age = 0   # number of xacts by which cleanup is delayed
-
 # - Standby Servers -
 
 # These settings are ignored on a primary server.
 
 {% if maas_ha_postgres_enabled %}
-primary_conninfo = 'user={{ maas_postgres_replication_user }} password={{ maas_postgres_replication_password }} host={{ maas_postgres_floating_ip }} port=5432 application_name="{{ ansible_hostname }}"'                  # connection string to sending server
+primary_conninfo = '{{ maas_postgres_primary_conninfo }}'                  # connection string to sending server
 #primary_slot_name = '{{ maas_postgres_replication_slot }}'                 # replication slot on sending server
 #promote_trigger_file = '{{ maas_postgres_trigger_file }}'              # file name whose presence ends recovery
 hot_standby = 'on'                       # "off" disallows queries during recovery

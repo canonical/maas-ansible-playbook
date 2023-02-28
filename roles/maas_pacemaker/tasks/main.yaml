@@ -61,6 +61,10 @@
     cmd: "pcs host auth {{ groups['maas_pacemaker'] | join(' ') }} -u hacluster -p '{{ maas_pacemaker_user_password }}' && touch /tmp/pacemaker_auth"
     creates: "/tmp/pacemaker_auth"
     executable: /bin/bash
+  register: pacemaker_auth
+  until: pacemaker_auth is not failed
+  retries: 3
+  delay: 2
 
 - name: "Check if fencing is configured"
   ansible.builtin.shell:
