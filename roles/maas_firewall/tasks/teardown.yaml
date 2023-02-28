@@ -14,3 +14,8 @@
 - name: Flush all other rules
   ansible.builtin.iptables:
     flush: true
+
+- name: Remove persistent iptables package
+  ansible.builtin.apt:
+    name: "iptables-persistent"
+    state: absent

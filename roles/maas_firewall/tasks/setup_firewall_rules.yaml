@@ -1,5 +1,11 @@
 ---
 # firewall config for maas. First lock down everything except port 22
+- name: Install persistent iptables package
+  ansible.builtin.apt:
+    name: "iptables-persistent"
+    state: present
+    update_cache: true
+
 - name: Allow outgoing connection port 22 (ssh)
   ansible.builtin.iptables:
     chain: OUTPUT
@@ -61,3 +67,7 @@
     jump: ACCEPT
   with_items: "{{ maas_open_udp_ports }}"
   when: maas_open_udp_ports
+
+- name: Save iptables rules
+  ansible.builtin.shell: iptables-save > /etc/iptables/rules.v4
+  changed_when: false
