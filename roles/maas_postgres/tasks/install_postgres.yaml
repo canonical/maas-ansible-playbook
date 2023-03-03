@@ -82,10 +82,22 @@
   ansible.builtin.template:
     src: pgsql_check.j2
     dest: /opt/pgsql_check
-    mode: 0711
+    mode: 0755
     owner: root
     group: root
   when: maas_ha_postgres_enabled|bool
+
+- name: "Add pgsql_check_v4 service entry"
+  ansible.builtin.lineinfile:
+    dest: /etc/services
+    line: "pgsql_check_v4  {{ maas_pgsql_check_port|default(23267) }}/tcp                       # postgres healthcheck"
+  when: maas_postgres_ipv4 is defined
+
+- name: "Add pgsql_check_v6 service entry"
+  ansible.builtin.lineinfile:
+    dest: /etc/services
+    line: "pgsql_check_v6  {{ maas_pgsql_check_port|default(23267) }}/tcp                       # postgres healthcheck"
+  when: maas_postgres_ipv6 is defined
 
 - name: "Write pgsql_check xinetd config file"
   ansible.builtin.template:

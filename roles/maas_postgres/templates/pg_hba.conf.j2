@@ -31,10 +31,21 @@ local all postgres peer
   
   {% endfor -%}
 {% endif %}
-{% if maas_postgres_floating_ip is defined -%}
-host replication replicator {{ maas_postgres_floating_ip }}/{{ maas_postgres_floating_ip_prefix_len }} md5
+
+{% if maas_postgres_floating_ip is defined %}
 host replication replicator {{ maas_postgres_floating_ip }}/{{ 32 if maas_postgres_floating_ip|ansible.utils.ipv4 else 128 }} reject
-{% endif -%}
+{% endif %}
+
+{% for host in groups['maas_postgres'] %}
+{% if host != inventory_hostname %}
+{%- if ('ansible_default_ipv4' in hostvars[host]) and ('address' in hostvars[host]['ansible_default_ipv4']) -%}
+host replication replicator {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 md5
+{% endif %}
+{%- if ('ansible_default_ipv6' in hostvars[host]) and ('address' in hostvars[host]['ansible_default_ipv6']) -%}
+host replication replicator {{ hostvars[host]['ansible_default_ipv6']['address'] }}/128 md5
+{% endif %}
+{% endif %}
+{% endfor %}
 # don't allow replication of self
 host replication replicator {{ ansible_hostname }} reject
 host replication replicator {{ inventory_hostname }} reject

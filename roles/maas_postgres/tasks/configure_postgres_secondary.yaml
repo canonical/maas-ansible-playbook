@@ -13,6 +13,14 @@
     extra_ip: "{{ maas_postgres_floating_ip }}"
   when: (inventory_hostname == groups['maas_postgres'][0]) and (maas_postgres_floating_ip is defined)
 
+- name: "Ensure application_name Preserved"
+  community.postgresql.postgresql_set:
+    name: "primary_conninfo"
+    value: "{{ maas_postgres_primary_conninfo }}"
+  become: true
+  become_user: postgres
+  when: not (inventory_hostname == groups['maas_postgres'][0])
+
 - name: "Stop Postgres To Clear Out Data"
   ansible.builtin.systemd:
     name: "postgresql@{{ maas_postgres_version_number }}-main.service"
@@ -60,14 +68,6 @@
 - name: "Flush Handlers"
   ansible.builtin.meta: "flush_handlers"
 
-- name: "Ensure application_name Preserved"
-  community.postgresql.postgresql_set:
-    name: "primary_conninfo"
-    value: "{{ maas_postgres_primary_conninfo }}"
-  become: true
-  become_user: postgres
-  when: not (inventory_hostname == groups['maas_postgres'][0])
-
 - name: "Disable Postgres in systemd for pacemaker management"
   ansible.builtin.systemd:
     name: "postgresql@{{ maas_postgres_version_number }}-main.service"
@@ -77,3 +77,12 @@
   ansible.builtin.command: >
     ip addr del {{ maas_postgres_floating_ip }}/{{ maas_postgres_floating_ip_prefix_len }} dev {{ maas_postgres_floating_ip_iface }}
   when: (inventory_hostname == groups['maas_postgres'][0]) and (maas_postgres_floating_ip is defined)
+
+- name: "Disable auto-start"
+  ansible.builtin.copy:
+    dest: "{{ maas_postgres_config_dir }}start.conf"
+    content: "disabled"
+    mode: 0644
+    owner: postgres
+    group: postgres
+
