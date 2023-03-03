@@ -14,6 +14,12 @@
     repo: "ppa:maas/{{ maas_use_version }}"
   when: maas_installation_type | lower == 'deb'
 
+- name: Install Chrony
+  ansible.builtin.apt:
+    name: "chrony"
+    state: "{{ maas_deb_state | default('present') }}"
+    update_cache: true
+
 - name: Install MAAS Region Controller - Deb
   ansible.builtin.apt:
     name: "maas-region-api"
@@ -39,9 +45,28 @@
     --database-uri {{ maas_postgres_uri }}
   when: maas_installation_type | lower == 'snap' and maas_region_new_installation is defined
 
+- name: Wait For Postgres Primary To Be Elected
+  ansible.builtin.uri:
+    url: http://{{ item }}:{{ maas_pgsql_check_port|default(23267) }}
+    status_code:
+      - 200
+      - 204
+  register: pg_healthcheck
+  until: pg_healthcheck is not failed
+  retries: 5
+  delay: 2
+  loop: "{{ groups['maas_postgres'] }}"
+  loop_control:
+    index_var: idx
+
 - name: Migrate MAAS database
   ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
   changed_when: false
+  register: pg_migrate
+  until: pg_migrate is not failed
+  retries: 1
+  delay: 2
+  run_once: true
 
 # MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the reigond.conf write handles init
 - name: Initialise MAAS Controller - Deb
