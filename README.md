@@ -6,6 +6,15 @@ This playbook has been tested with Ansible version 5.10.0 and above. We recommen
 
 ## Install
 
+On systems running the latest Ubuntu LTS version (Jammy), run the following commands to install Ansible:
+
+```
+sudo apt-get install ansible
+ansible-galaxy collection install ansible.utils
+```
+
+Finally, download the playbook from Github using git
+
 ```
 git clone git@github.com:maas/maas-ansible-playbook
 ```
@@ -193,7 +202,7 @@ The following variables are only required when using HA Postgres:
 
 ```
 ansible-playbook -i ./hosts\
-    --extra-vars="maas_version=3.2 maas_postgres_password=example maas_installation_type=deb maas_url=http://example.com:5240/MAAS"\
+    --extra-vars="maas_version=3.3 maas_postgres_password=example maas_installation_type=deb maas_url=http://example.com:5240/MAAS"\
     ./site.yaml
 ```
 
@@ -216,6 +225,8 @@ ansible-playbook -i ./hosts \
 ```
 ansible-playbook -i ./hosts ./teardown.yaml
 ```
+
+> Note: this action teardowns only the services, the MAAS database is preserved in the `maas_postgres_*` nodes. You must remove these files manually before attempting to redeploy the stack.
 
 ### Backup the MAAS stack
 
