@@ -54,12 +54,18 @@
     group: postgres
     mode: 0644
   when: not (inventory_hostname == groups['maas_postgres'][0])
+  notify:
+    - "Start Postgres Service To Load New Configuration"
 
-- name: "Start Postgres in Hot Standby"
-  ansible.builtin.systemd:
-    name: "postgresql@{{ maas_postgres_version_number }}-main.service"
-    state: restarted
-    no_block: false
+- name: "Flush Handlers"
+  ansible.builtin.meta: "flush_handlers"
+
+- name: "Ensure application_name Preserved"
+  community.postgresql.postgresql_set:
+    name: "primary_conninfo"
+    value: "{{ maas_postgres_primary_conninfo }}"
+  become: true
+  become_user: postgres
   when: not (inventory_hostname == groups['maas_postgres'][0])
 
 - name: "Disable Postgres in systemd for pacemaker management"

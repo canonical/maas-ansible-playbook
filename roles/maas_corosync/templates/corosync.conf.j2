@@ -26,6 +26,7 @@ logging {
 nodelist {
 {% for pacemaker_host in groups['maas_corosync'] %}
     node {
+        name: {{ pacemaker_host }}
         ring0_addr: {{ hostvars[pacemaker_host]['ansible_default_ipv4']['address'] if 'ansible_default_ipv4' in hostvars[pacemaker_host] else hostvars[pacemaker_host]['ansible_default_ipv6']['address'] }}
         nodeid: {{ loop.index }}
     }
