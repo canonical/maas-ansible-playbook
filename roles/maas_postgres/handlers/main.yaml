@@ -11,3 +11,10 @@
     enabled: true
     state: started
     no_block: false
+
+- name: "Restart xinetd"
+  ansible.builtin.systemd:
+    name: "xinetd.service"
+    state: restarted
+    enabled: true
+  when: maas_ha_postgres_enabled|bool
