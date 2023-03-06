@@ -1,0 +1,34 @@
+{%- if maas_postgres_ipv4 -%}
+service pgsql_check_v4
+{
+    flags          = REUSE
+    socket_type    = stream
+    port           = {{ maas_pgsql_check_port|default(23267) }}
+    bind           = {{ maas_postgres_ipv4 }}
+    wait           = no
+    user           = nobody
+    server         = /opt/pgsql_check
+    log_on_failure += USERID
+    disable        = no
+    only_from      = {{ maas_postgres_v4_subnet }}
+    per_source     = UNLIMITED
+}
+{%- endif -%}
+
+
+{%- if maas_postgres_ipv6 is defined -%}
+service pgsql_check_v6
+{
+    flags          = REUSE
+    socket_type    = stream
+    port           = {{ maas_pgsql_check_port|default(23267) }}
+    bind           = {{ maas_postgres_ipv6 }}
+    wait           = no
+    user           = nobody
+    server         = /opt/pgsql_check
+    log_on_failure += USERID
+    disable        = no
+    only_from      = {{ maas_postgres_v6_subnet }}
+    per_source     = UNLIMITED
+}
+{%- endif -%}

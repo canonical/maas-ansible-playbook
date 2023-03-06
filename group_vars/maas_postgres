@@ -10,7 +10,8 @@ maas_postgres_bin_dir: "/usr/lib/postgresql/{{ maas_postgres_version_number }}/b
 maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
 
 maas_postgres_primary_address: ""
-maas_postgres_replication_user: "replicator"
+
+maas_postgres_primary_conninfo: "user={{ maas_postgres_replication_user }} password=\"{{ maas_postgres_replication_password }}\" host={{ maas_postgres_floating_ip }} port=5432 application_name={{ inventory_hostname }} sslmode=prefer sslcompression=0 sslsni=1 ssl_min_protocol_version=TLSv1.2 gssencmode=prefer krbsrvname=postgres target_session_attrs=any~"
 
 maas_postgres_data_dir: "/var/lib/postgresql/{{ maas_postgres_version_number }}/main/"
 maas_postgres_log_dir: "/var/log/postgresql/postgresql-{{ maas_postgres_version_number }}-main.log"
