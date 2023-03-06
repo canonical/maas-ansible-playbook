@@ -9,7 +9,7 @@
 
 - name: "Uninstall Postgres"
   ansible.builtin.apt:
-    name: "{{ maas_postgres_deb_name | default('postgresql-{{ maas_postgres_version_number }}') }}"
+    name: "{{ maas_postgres_deb_name | default('postgresql-' ~ maas_postgres_version_number) }}"
     state: absent
     purge: true
 
