@@ -13,6 +13,12 @@
     destination_port: 22
     jump: ACCEPT
 
+- name: Allow local traffic
+  ansible.builtin.iptables:
+    chain: INPUT
+    in_interface: lo
+    jump: ACCEPT
+
 - name: Allow incoming port 22
   ansible.builtin.iptables:
     chain: INPUT
