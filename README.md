@@ -91,7 +91,7 @@ all:
         proxy01.example.com:
     maas_postgres_proxy:
       hosts:
-        dbproxy01.example.com:
+        region01.example.com:
     maas_region_controller:
       hosts:
         region01.example.com:
@@ -106,9 +106,9 @@ all:
 
 Note: the Pacemaker role requires host-specifc variables that should be defined in the hosts file, they are as follows:
 
-- `maas_pacemaker_fencing_driver`: The Oacemaker STONITH fencing driver, defaults to `ipmilan`. This driver is used to forcefully remove a member from the Oacemaker cluster when it exhibits erroneous behavior. Pacemaker will list the available drivers with the following command: `stonith_admin --list-installed`
+- `maas_pacemaker_fencing_driver`: The Pacemaker STONITH fencing driver, defaults to `ipmilan`. This driver is used to forcefully remove a member from the Pacemaker cluster when it exhibits erroneous behavior. Pacemaker will list the available drivers with the following command: `stonith_admin --list-installed`
 
-- `maas_pacemaker_stonith_params`: The parameters specific to the fencing driver selected. These must be defined when using Oacemaker, to see the 
+- `maas_pacemaker_stonith_params`: The parameters specific to the fencing driver selected. These must be defined when using Pacemaker, to see the parameters of a given driver, run `stonith_admin --metadata --agent <driver>`
 
 ## Run
 
