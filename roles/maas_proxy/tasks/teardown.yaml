@@ -3,7 +3,6 @@
   ansible.builtin.apt:
     name: "haproxy"
     state: absent
-    update_cache: true
 
 - name: "Remove HAProxy Config"
   ansible.builtin.file:

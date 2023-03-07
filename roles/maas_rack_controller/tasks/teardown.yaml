@@ -10,6 +10,5 @@
     name:
       - "maas*"
       - "chrony"
-    update_cache: true
     purge: true
     state: absent
