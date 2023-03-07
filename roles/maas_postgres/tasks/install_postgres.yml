@@ -1,18 +1,11 @@
 ---
 - name: "Install psycopg2 For Configuration"
   ansible.builtin.apt:
-    name: python3-psycopg2
-    state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
-
-- name: "Install acl to become postgres user"
-  ansible.builtin.apt:
-    name: acl
-    state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
-
-- name: "Install Postgres"
-  ansible.builtin.apt:
-    name: "{{ maas_postgres_deb_name }}"
-    update_cache: true # update cache still if previous packages are already installed
+    name:
+      - "python3-psycopg2"
+      - "acl"
+      - "{{ maas_postgres_deb_name }}"
+    update_cache: true
     state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
 
 - name: "Write pg_hba.conf"

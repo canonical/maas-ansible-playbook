@@ -7,12 +7,9 @@
 
 - name: Uninstall MAAS - deb
   ansible.builtin.apt:
-    name: "maas*"
-    purge: true
-    state: absent
-
-- name: Uninstall MAAS - deb dependencies
-  ansible.builtin.apt:
-    name: "chrony"
+    name:
+      - "maas*"
+      - "chrony"
+    update_cache: true
     purge: true
     state: absent

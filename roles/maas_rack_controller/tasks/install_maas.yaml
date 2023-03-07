@@ -22,16 +22,13 @@
     group: maas
     state: present
 
-- name: Install Deb Dependency
+- name: Install MAAS Rack Controller - Deb
   ansible.builtin.apt:
-    name: chrony
-    state: present
-  when: (maas_installation_type | lower == 'deb')
-
-- name: Install MAAS Rack Controller
-  ansible.builtin.apt:
-    name: maas-rack-controller
+    name:
+      - "chrony"
+      - "maas-rack-controller"
     state: "{{ maas_deb_state | default('present') }}"
+    update_cache: true
   when: (maas_installation_type | lower == 'deb')
 
 - name: Initialise MAAS Rack Controller

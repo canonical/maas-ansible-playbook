@@ -11,6 +11,7 @@
     name: "maas*"
     purge: true
     state: absent
+    update_cache: true
 
 - name: Remove MAAS Files
   ansible.builtin.file:

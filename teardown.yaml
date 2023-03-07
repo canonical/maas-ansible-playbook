@@ -56,3 +56,4 @@
   - name: "Remove unused packages from the cache"
     ansible.builtin.apt:
       autoclean: true
+      update_cache: true
