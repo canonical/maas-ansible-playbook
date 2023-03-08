@@ -1,0 +1,49 @@
+---
+# Install grafana agents
+
+- name: Agent directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: "{{ 'directory' if o11y_enable|bool else 'absent' }}"
+    mode: 0755
+  loop: "{{ o11y_grafana_agent_dirs }}"
+
+- name: Install unzip
+  ansible.builtin.apt:
+    name: unzip
+    state: "present"
+    update_cache: true
+
+- name: Download and unzip grafana agent
+  ansible.builtin.unarchive:
+    src: "{{ grafana_agent_pkg }}"
+    dest: "{{ o11y_grafana_agent_dir }}"
+    remote_src: true
+  when: o11y_enable|bool
+
+- name: Remove grafana agent pkg
+  ansible.builtin.file:
+    path: "{{ o11y_grafana_agent_dir }}"
+    state: "absent"
+  when: not o11y_enable|bool
+
+- name: Make agent executable
+  ansible.builtin.file:
+    path: "{{ o11y_grafana_agent_dir }}/agent-linux-amd64"
+    mode: "a+x"
+  when: o11y_enable|bool
+
+- name: Agent configuration
+  ansible.builtin.template:
+    src: "grafana-agent.yaml.j2"
+    dest: "{{ o11y_grafana_agent_dir }}/agent.yaml"
+    mode: 0644
+  when: o11y_enable|bool
+
+- name: Set the grafana agent service status
+  ansible.builtin.service:
+    name: telemetry
+    args: "{{ o11y_grafana_agent_dir }}/agent-linux-amd64 -config.file={{ o11y_grafana_agent_dir }}/agent.yaml"
+    enabled: "{{ o11y_enable|bool }}"
+    state: "{{ 'reloaded' if o11y_enable|bool else 'stopped' }}"
+  when: ansible_facts.services['telemetry'] is defined

@@ -1,0 +1,12 @@
+- name: Set the TCP port of the Promtail Push API
+  ansible.builtin.command: maas {{ admin_username }} maas set-config name=promtail_port value={{ maas_promtail_port }}
+  when: o11y_loki_url|length > 0
+  changed_when: false
+
+- name: Enable syslog forwarding
+  ansible.builtin.command: maas {{ admin_username }} maas set-config name=promtail_enabled value=true
+  when: o11y_loki_url|length > 0
+
+- name: Enable Cluster metrics endpoint
+  ansible.builtin.command: maas {{ admin_username }} maas set-config name=prometheus_enabled value=true
+  when: o11y_prometheus_url|length > 0

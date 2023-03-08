@@ -5,7 +5,6 @@ maas_port: 5240             # The port MAAS uses to comunicate on
 maas_https_port: 5443       # The https port MAAS uses to comunicate on
 enable_tls: false           # Use TLS for MAAS communication
 vault_integration: false    # Use MAAS vault for secret storage
-install_metrics: false           # install metrics for the MAAS
 
 # MAAS Vault configuration
 vault_url: ""                 # The URL of the MAAS Vault
@@ -20,7 +19,26 @@ maas_snap_channel: "stable"     # if using snap, then the channel. ie: stable, b
 maas_deb_state: "present"       # if using deb, the state for install
 maas_state: "install"           # whether to install, or upgrade maas
 
-# grafana agent repo
+# O11y variables
+o11y_prometheus_url: ""
+o11y_loki_url: ""
+o11y_enabled_roles:
+  - maas_postgres_primary
+  - maas_postgres_secondary
+  - maas_region_controller
+  - maas_rack_controller
+
+o11y_enable: "{{ (o11y_prometheus_url|length > 0 or o11y_loki_url|length > 0) and (group_names|intersect(o11y_enabled_roles)|length>0) }}"
+
+o11y_grafana_agent_dir: "/opt/grafana-agent"
+o11y_grafana_agent_wal_dir: "/var/lib/grafana-agent/wal"
+o11y_grafana_agent_pos_dir: "/var/lib/grafana-agent/positions"
+
+o11y_grafana_agent_dirs:
+  - "{{ o11y_grafana_agent_dir }}"
+  - "{{ o11y_grafana_agent_wal_dir }}"
+  - "{{ o11y_grafana_agent_pos_dir }}"
+
 grafana_agent_pkg: https://github.com/grafana/agent/releases/download/v0.22.0/agent-linux-amd64.zip
 
 maas_proxy_postgres_proxy_enabled: false
@@ -47,8 +65,6 @@ maas_restore_config_path: "{{ '/etc/maas' if maas_install_deb | bool else '' }}"
 maas_restore_runtime_path: "{{ '/var/lib/maas' if maas_install_deb | bool else '' }}"
 
 maas_secret_file: "{{ '/var/snap/maas/common' if  maas_installation_type | lower == 'snap' else '/var/lib' }}/maas/secret"
-
-maas_installmetric_file: "{{ '/var/snap/maas/common' if maas_installation_type | lower == 'snap' else '/var/lib/maas' }}/.ansible"
 
 proxy_env:
 

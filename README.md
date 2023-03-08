@@ -125,9 +125,6 @@ There are additional optional variables that can be passed to the playbooks:
 - **maas_proxy_postgres_proxy_enabled**: Use postgres proxy uri\
   Default: `false`
 
-- **install_metrics**: Whether MAAS should install metrics\
-  Default: `false`
-
 - **enable_tls**: Whether MAAS should enable TLS\
   Default: `false` (only valid for MAAS >= 3.2)
 

@@ -33,6 +33,7 @@
 - hosts: maas_postgres_primary
   roles:
     - role: maas_postgres_primary
+    - role: o11y_agent
   become: true
   gather_facts: true
   tags:
@@ -43,6 +44,7 @@
 - hosts: maas_postgres_secondary
   roles:
     - role: maas_postgres_secondary
+    - role: o11y_agent
   become: true
   gather_facts: true
   tags:
@@ -64,6 +66,7 @@
 - hosts: maas_region_controller
   roles:
     - role: maas_region_controller
+    - role: o11y_agent
   become: true
   gather_facts: true
   tags:
@@ -74,6 +77,7 @@
 - hosts: maas_rack_controller
   roles:
     - role: maas_rack_controller
+    - role: o11y_agent
   become: true
   gather_facts: true
   tags:

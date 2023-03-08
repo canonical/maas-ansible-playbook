@@ -12,6 +12,8 @@ admin_id: "admin"
 maas_proxy_port: "{{ 5240 if 'maas_region_controller' not in group_names else 5050 }}"
 maas_proxy_postgres_port: "{{ 5243 if 'maas_postgres' not in group_names else 5051 }}"
 
+maas_promtail_port: 5238
+maas_log_dir: "{{ '/var/log/maas' if maas_install_deb|bool else '/var/snap/maas/common/log' }}"
 
 maas_open_tcp_ports: 
 - 53 			# dns
@@ -25,6 +27,7 @@ maas_open_tcp_ports:
 - 8000
 - "{{ maas_proxy_port if 'maas_proxy' in group_names else (false) }}"
 - "{{ maas_proxy_postgres_port if 'maas_proxy' in group_names else (false) }}"
+- "{{ maas_promtail_port if o11y_enable|bool else (false) }}"
 
 maas_open_udp_ports:
 - 53 			# dns

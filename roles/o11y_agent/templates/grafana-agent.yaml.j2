@@ -1,0 +1,160 @@
+server:
+  log_level: info
+
+{% if o11y_prometheus_url|length > 0 %}
+metrics:
+  wal_directory: {{ o11y_grafana_agent_wal_dir }}
+  global:
+    scrape_interval: 30s
+    external_labels:
+      host: {{ ansible_hostname }}
+{% if group_names|intersect(['maas_region_controller', 'maas_rack_controller']) %}
+      maas_az: {{ maas_availability_zone | default('default') }}
+      maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+      maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+{% endif %}
+    remote_write:
+      - url: {{o11y_prometheus_url}}
+        name: prom-export
+  configs:
+{% if group_names|intersect(['maas_region_controller', 'maas_rack_controller']) %}
+    - name: 'maas'
+      scrape_configs:
+        - job_name: 'maas-metrics'
+          static_configs:
+            - targets: ['{{ ansible_hostname }}:5239']
+{% if 'maas_region_controller' in group_names %}
+        - job_name: 'maas-cluster-metrics'
+          static_configs:
+            - targets: ['{{ ansible_hostname }}:5240']
+          metrics_path: '/MAAS/metrics'
+{% endif %}
+{% endif %}
+{% endif %}
+
+{% if o11y_loki_url|length > 0 %}
+logs:
+  positions_directory: {{ o11y_grafana_agent_pos_dir }}
+  configs:
+{% if group_names|intersect(['maas_region_controller', 'maas_rack_controller']) %}
+    - name: 'maas'
+      clients:
+        - url: {{ o11y_loki_url }}
+      scrape_configs:
+        - job_name: maas-audit
+          syslog:
+            listen_address: localhost:{{ maas_promtail_port }}
+            labels:
+              job: "maas-audit"
+              maas_az: {{ maas_availability_zone | default('default') }}
+              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              maas_module: "audit"
+          relabel_configs:
+            - source_labels: ['__syslog_message_hostname']
+              target_label: 'host'
+            - source_labels: ['__syslog_message_app_name']
+              target_label: 'maas_module'
+          pipeline_stages:
+            - regex:
+                expression: "^(?s) \\[(?P<severity>\\S+?)\\] ((?P<machine>\\S+): )?(?P<content>.*)$"
+            - output:
+                source: content
+            - labels:
+                severity:
+                machine:
+
+        - job_name: maas-console
+          static_configs:
+            - labels:
+                __path__: {{ maas_log_dir }}/{regiond,rackd}.log
+                host: {{ ansible_hostname }}
+                maas_az: {{ maas_availability_zone | default('default') }}
+                maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+                maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+                job: "maas-console"
+          pipeline_stages:
+            - regex:
+                expression: "^(?s)(?P<time>.+?) (?P<maas_module>\\S+): \\[(?P<severity>\\S+)\\] (?P<content>.*)$"
+            - timestamp:
+                source: time
+                format: "2006-01-02 15:04:05"
+            - labels:
+                maas_module:
+                severity:
+            - output:
+                source: content
+            - match:
+                selector: '{maas_module="regiond"}'
+                stages:
+                  - regex:
+                      expression: "^(?P<remote_addr>[\\w\\.]+) (?P<method>\\S+) (?P<request>\\S+) (?P<protocol>\\S+) --> (?P<status>\\d+).*$"
+                  - labels:
+                      remote_addr:
+                      method:
+                      status:
+
+{% if 'maas_rack_controller' in group_names %}
+        - job_name: maas-dhcpd
+          static_configs:
+            - labels:
+                __path__: {{ maas_log_dir }}/dhcpd*.log
+                host: {{ ansible_hostname }}
+                maas_az: {{ maas_availability_zone | default('default') }}
+                maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+                maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+                job: "maas-dhcpd"
+{% endif %}
+
+        - job_name: maas-metadata
+          static_configs:
+            - labels:
+                __path__: {{ maas_log_dir }}/http/access.log
+                host: {{ ansible_hostname }}
+                maas_az: {{ maas_availability_zone | default('default') }}
+                maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+                maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+                job: "maas-metadata"
+          pipeline_stages:
+            - regex:
+                expression: "^(?s)(?P<ip>\\S+) (?P<remote_log_name>\\S+) (?P<userid>\\S+) \\[(?P<date>.+?)\\] \"(?P<request_method>\\S+) (?P<path>\\S+) HTTP/(?P<request_version>\\S+)\" (?P<status>\\d+) (?P<length>\\d+) \"(?P<referrer>\\S+)\" \"(?P<user_agent>\\S+)\"$"
+            - timestamp:
+                source: date
+                format: "02/Jan/2006:15:04:05 -0700"
+            - labels:
+                method:
+                protocol:
+                status:
+                http_user_agent:
+
+        - job_name: maas-named
+          static_configs:
+            - labels:
+                __path__: {{ maas_log_dir }}/named.log
+                host: {{ ansible_hostname }}
+                maas_az: {{ maas_availability_zone | default('default') }}
+                maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+                maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+                job: "maas-named"
+
+        - job_name: maas-ntpd
+          static_configs:
+            - labels:
+                __path__: {{ maas_log_dir }}/chrony.log
+                host: {{ ansible_hostname }}
+                maas_az: {{ maas_availability_zone | default('default') }}
+                maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+                maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+                job: "maas-ntpd"
+
+        - job_name: maas-proxy
+          static_configs:
+            - labels:
+                __path__: {{ maas_log_dir }}/proxy.log
+                host: {{ ansible_hostname }}
+                maas_az: {{ maas_availability_zone | default('default') }}
+                maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+                maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+                job: "maas-proxy"
+{% endif %}
+{% endif %}
