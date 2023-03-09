@@ -99,3 +99,9 @@
   delegate_facts: true
   loop: "{{ groups['maas_rack_controller'] }}"
   when: ('maas_rack_controller' not in group_names)
+
+- name: Create Ansible installation metric file
+  ansible.builtin.file:
+    path: "{{ maas_installmetric_file }}"
+    state: touch
+    mode: 0644
