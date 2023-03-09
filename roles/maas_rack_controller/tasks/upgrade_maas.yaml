@@ -15,4 +15,5 @@
       - "maas-rack-controller"
     state: latest
     update_cache: true
+    cache_valid_time: 3600
   when: (maas_installation_type | lower == 'deb')

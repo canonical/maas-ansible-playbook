@@ -10,9 +10,12 @@
 
 - name: Update MAAS - Deb
   ansible.builtin.apt:
-    name: maas-region-api
+    name:
+      - "chrony"
+      - "maas-region-api"
     state: latest
     update_cache: true
+    cache_valid_time: 3600
   when: maas_installation_type | lower == 'deb' and '"maas_rack_controller" not in group_names'
 
 - name: Migrate MAAS database

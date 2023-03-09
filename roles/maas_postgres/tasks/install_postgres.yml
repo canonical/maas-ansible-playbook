@@ -6,6 +6,7 @@
       - "acl"
       - "{{ maas_postgres_deb_name }}"
     update_cache: true
+    cache_valid_time: 3600
     state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
 
 - name: "Write pg_hba.conf"

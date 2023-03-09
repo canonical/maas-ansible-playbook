@@ -29,6 +29,7 @@
       - "maas-rack-controller"
     state: "{{ maas_deb_state | default('present') }}"
     update_cache: true
+    cache_valid_time: 3600
   when: (maas_installation_type | lower == 'deb')
 
 - name: Initialise MAAS Rack Controller
