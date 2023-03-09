@@ -1,8 +1,8 @@
 # Global variable file for Ansible playbooks
 
 # Standard MAAS Variables
-maas_port: 5240             # The port MAAS uses to comunicate on
-maas_https_port: 5443       # The https port MAAS uses to comunicate on
+maas_port: 5240             # The port MAAS uses to communicate on
+maas_https_port: 5443       # The https port MAAS uses to communicate on
 enable_tls: false           # Use TLS for MAAS communication
 vault_integration: false    # Use MAAS vault for secret storage
 
