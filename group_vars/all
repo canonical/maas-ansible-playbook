@@ -20,6 +20,8 @@ maas_deb_state: "present"       # if using deb, the state for install
 maas_state: "install"           # whether to install, or upgrade maas
 
 # O11y variables
+o11y_enable: false
+
 o11y_prometheus_url: ""
 o11y_loki_url: ""
 o11y_enabled_roles:
@@ -27,8 +29,6 @@ o11y_enabled_roles:
   - maas_postgres_secondary
   - maas_region_controller
   - maas_rack_controller
-
-o11y_enable: "{{ (o11y_prometheus_url|length > 0 or o11y_loki_url|length > 0) and (group_names|intersect(o11y_enabled_roles)|length>0) }}"
 
 o11y_grafana_agent_dir: "/opt/grafana-agent"
 o11y_grafana_agent_wal_dir: "/var/lib/grafana-agent/wal"

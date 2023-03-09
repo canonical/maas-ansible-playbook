@@ -44,7 +44,7 @@
 
 - name: setup o11y
   ansible.builtin.import_tasks: o11y.yaml
-  when: o11y_enable|bool
+  when: o11y_enable
 
 - name: Use MAAS Vault
   ansible.builtin.include_role:

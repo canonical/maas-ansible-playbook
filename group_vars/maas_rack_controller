@@ -13,7 +13,7 @@ maas_open_tcp_ports:
 - 5248		# rack http port
 - 3218
 - 8000
-- "{{ maas_promtail_port if o11y_enable|bool else (false) }}"
+- "{{ maas_promtail_port if o11y_enable else (false) }}"
 
 maas_open_udp_ports:
 - 53 		# dns

@@ -101,7 +101,6 @@ This playbook requires a user to set the following set of variables:
 - **maas_installation_type**: The intended type of MAAS installation.\
   Possible values are: `'deb'` or `'snap'`
 
-
 - **maas_url**: The MAAS URL where MAAS will be accessed and which rack controllers should use for registering with region controllers.\
   Example: `'http://proxy01.example.com:5240/MAAS'`
 
@@ -148,6 +147,17 @@ There are additional optional variables that can be passed to the playbooks:
 
 - **https_proxy**: The HTTPS Proxy to use\
   Default: proxy not used
+
+- ### Observability
+
+  - **o11y_enable**: Whether Observability features should be enabled\
+    Default: `false`
+  - **o11y_prometheus_url**: Prometheus [Remote Write Receiver](https://prometheus.io/docs/prometheus/latest/feature_flags/#remote-write-receiver) endpoint URL\
+    Default: undefined
+  - **o11y_loki_url**: Loki endpoint URL\
+    Default: undefined
+
+When the Observability features are enabled, at least one of the endpoints MUST be defined.
 
 ### Deploy the MAAS stack
 
