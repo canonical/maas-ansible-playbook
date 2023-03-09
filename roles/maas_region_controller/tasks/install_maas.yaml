@@ -16,7 +16,9 @@
 
 - name: Install MAAS Region Controller - Deb
   ansible.builtin.apt:
-    name: "maas-region-api"
+    name:
+      - "chrony"
+      - "maas-region-api"
     state: "{{ maas_deb_state | default('present') }}"
     update_cache: true
   register: maas_region_new_installation
