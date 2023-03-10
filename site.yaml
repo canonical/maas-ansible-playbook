@@ -29,7 +29,7 @@
       ansible.builtin.debug:
         msg: "Playbooks using proxy settings: {{ proxy_env }}"
       with_dict: "{{ proxy_env }}"
-    
+
     - name: "Ensure dist is up to date"
       ansible.builtin.apt:
         upgrade: "dist"
