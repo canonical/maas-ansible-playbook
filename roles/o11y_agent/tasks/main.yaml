@@ -47,10 +47,39 @@
     mode: 0644
   when: o11y_enable
 
+- name: Creating a service file
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/telemetry.service
+    mode: 0644
+    content: |
+      [Unit]
+      Description=Grafana-agent Service
+      Requires=network.target
+      After=network.target
+      [Service]
+      Type=simple
+      ExecStart={{ o11y_grafana_agent_dir }}/agent-linux-amd64 -config.file={{ o11y_grafana_agent_dir }}/agent.yaml
+      Restart=on-abnormal
+      [Install]
+      WantedBy=multi-user.target
+  when: o11y_enable
+
+- name: Reload the SystemD to re-read configurations
+  ansible.builtin.systemd:
+    daemon-reload: true
+
+- name: "Collect facts about system services"
+  ansible.builtin.service_facts:
+
 - name: Set the grafana agent service status
   ansible.builtin.service:
     name: telemetry
-    args: "{{ o11y_grafana_agent_dir }}/agent-linux-amd64 -config.file={{ o11y_grafana_agent_dir }}/agent.yaml"
     enabled: "{{ o11y_enable }}"
-    state: "{{ 'reloaded' if o11y_enable else 'stopped' }}"
-  when: ansible_facts.services['telemetry'] is defined
+    state: "{{ 'started' if o11y_enable else 'stopped' }}"
+  when: ansible_facts.services['telemetry.service'] is defined
+
+- name: Remove grafana agent service
+  ansible.builtin.file:
+    path: /etc/systemd/system/telemetry.service
+    state: "absent"
+  when: not o11y_enable
