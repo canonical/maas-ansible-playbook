@@ -24,6 +24,8 @@ o11y_enable: false
 
 o11y_prometheus_url: ""
 o11y_loki_url: ""
+o11y_prometheus_alert_repos: "https://github.com/canonical/maas-prometheus-alert-rules.git"
+o11y_loki_alert_repos: "https://github.com/canonical/maas-loki-alert-rules.git"
 o11y_enabled_roles:
   - maas_postgres_primary
   - maas_postgres_secondary

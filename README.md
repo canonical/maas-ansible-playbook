@@ -212,3 +212,11 @@ For an already existing MAAS installation, a new admin user can be created. The 
 ```
 ansible-playbook -i ./hosts --extra-vars="user_name=newuser user_pwd=newpwd user_email=user@email.com user_ssh=lp:id" ./createadmin.yaml
 ```
+
+### Export Observability alert rules
+
+MAAS has a curated collection of alert rules for Prometheus and Loki. You can export these rules using the following command, where `o11y_alertrules_dest` is the directory where the files should me placed.
+
+```
+ansible-playbook --extra-vars="o11y_alertrules_dest=/tmp" ./alertrules.yaml
+```
