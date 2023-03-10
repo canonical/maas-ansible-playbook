@@ -29,12 +29,6 @@
       name: maas_rack_controller
       tasks_from: teardown
 
-  - name: "Remove metrics"
-    ansible.builtin.include_role:
-      name: common
-      tasks_from: metrics
-    when: "'telemetry' in ansible_facts.services"
-
   - name: "Uninstall postgres"
     ansible.builtin.include_role:
       name: maas_postgres

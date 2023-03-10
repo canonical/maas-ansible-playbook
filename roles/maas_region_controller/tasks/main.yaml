@@ -21,8 +21,9 @@
 
 - name: Determine MAAS installation status
   ansible.builtin.set_fact:
-    maas_installed: "{{ (maas_installation_type | lower == 'snap' and 'maas' in snaps_installed.stdout.split('\n') )
-                      or (maas_installation_type | lower == 'deb' and maas_package_name in ansible_facts.packages) }}"
+    maas_installed:
+      "{{ (maas_installation_type | lower == 'snap' and 'maas' in snaps_installed.stdout.split('\n') )
+      or (maas_installation_type | lower == 'deb' and maas_package_name in ansible_facts.packages) }}"
 
 - name: Install MAAS Region
   ansible.builtin.import_tasks: install_maas.yaml
@@ -32,11 +33,18 @@
   ansible.builtin.import_tasks: update_maas.yaml
   when: (maas_installed)
 
-- name: Install MAAS metrics
-  ansible.builtin.include_role:
-    name: common
-    tasks_from: metrics
-  when: install_metrics is defined and install_metrics
+- name: "Get admin user API key"
+  ansible.builtin.command: maas apikey --username {{ admin_username }}
+  register: maas_admin_api_key
+  changed_when: false
+
+- name: "Login in MAAS"
+  ansible.builtin.command: maas login {{ admin_username }} {{ maas_url }} {{ maas_admin_api_key.stdout }}
+  changed_when: false
+
+- name: setup o11y
+  ansible.builtin.import_tasks: o11y.yaml
+  when: o11y_enable
 
 - name: Use MAAS Vault
   ansible.builtin.include_role:
