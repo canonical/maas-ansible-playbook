@@ -47,9 +47,8 @@
   # TLS is available only in MAAS 3.2 or higher
   when: maas_version is version("3.2", '>=') and enable_tls
 
-- name: Create metrics file
+- name: Create Ansible installation metric file
   ansible.builtin.file:
     path: "{{ maas_installmetric_file }}"
     state: touch
     mode: 0644
-  when: install_metrics

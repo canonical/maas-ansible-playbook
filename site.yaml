@@ -20,6 +20,14 @@
         that:
           - maas_version is regex('\d+\.\d+(\.\d+)?')
 
+    - name: "Ensure o11y can be enabled"
+      ansible.builtin.assert:
+        quiet: true
+        fail_msg: "Prometheus or Loki endpoints must be defined"
+        that:
+          - (o11y_prometheus_url|length > 0 or o11y_loki_url|length > 0)
+      when: o11y_enable
+
     - name: "Define proxy environment if proxies given"
       ansible.builtin.set_fact:
         proxy_env: "{{ proxy_env | combine({'http_proxy' : http_proxy | d(omit)}) |
@@ -38,6 +46,7 @@
 - hosts: maas_postgres_primary
   roles:
     - role: maas_postgres_primary
+    - role: o11y_agent
   become: true
   gather_facts: true
   tags:
@@ -48,6 +57,7 @@
 - hosts: maas_postgres_secondary
   roles:
     - role: maas_postgres_secondary
+    - role: o11y_agent
   become: true
   gather_facts: true
   tags:
@@ -69,6 +79,7 @@
 - hosts: maas_region_controller
   roles:
     - role: maas_region_controller
+    - role: o11y_agent
   become: true
   gather_facts: true
   tags:
@@ -79,6 +90,7 @@
 - hosts: maas_rack_controller
   roles:
     - role: maas_rack_controller
+    - role: o11y_agent
   become: true
   gather_facts: true
   tags:

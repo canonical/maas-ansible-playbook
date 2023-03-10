@@ -47,16 +47,6 @@
     destination_port: 53
     jump: ACCEPT
 
-- name: Set policy for INPUT chain to drop (otherwise)
-  ansible.builtin.iptables:
-    chain: INPUT
-    policy: DROP
-
-- name: Set policy for FORWARD chain to drop
-  ansible.builtin.iptables:
-    chain: FORWARD
-    policy: DROP
-
 - name: Open tcp ports
   ansible.builtin.iptables:
     chain: INPUT
@@ -74,6 +64,16 @@
     jump: ACCEPT
   with_items: "{{ maas_open_udp_ports }}"
   when: maas_open_udp_ports
+
+- name: Set policy for INPUT chain to drop (otherwise)
+  ansible.builtin.iptables:
+    chain: INPUT
+    policy: DROP
+
+- name: Set policy for FORWARD chain to drop
+  ansible.builtin.iptables:
+    chain: FORWARD
+    policy: DROP
 
 - name: Save iptables rules
   ansible.builtin.shell: iptables-save > /etc/iptables/rules.v4
