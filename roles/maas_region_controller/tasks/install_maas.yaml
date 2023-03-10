@@ -21,6 +21,7 @@
     state: "{{ maas_deb_state | default('present') }}"
     update_cache: true
     upgrade: dist
+    upgrade: dist
     cache_valid_time: 3600
   register: maas_region_new_installation
   when: (maas_installation_type | lower == 'deb')
