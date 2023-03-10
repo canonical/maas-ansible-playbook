@@ -47,6 +47,16 @@
       tasks_from: teardown
     # when: "'haproxy' in ansible_facts.packages"
 
+  - name: "Uninstall o11y"
+    ansible.builtin.include_role:
+      name: o11y_agent
+      tasks_from: teardown
+    when: group_names|intersect(o11y_enabled_roles)
+
   - name: "Remove unused packages from the cache"
     ansible.builtin.apt:
       autoclean: true
+
+  - name: Reload the SystemD to re-read configurations
+    ansible.builtin.systemd:
+      daemon-reload: true
