@@ -1,4 +1,4 @@
-{%- if maas_postgres_ipv4 -%}
+{%- if (maas_postgres_ipv4 is defined) and (maas_postgres_ipv4 != "127.0.0.1") -%}
 service pgsql_check_v4
 {
     flags          = REUSE
@@ -9,14 +9,14 @@ service pgsql_check_v4
     user           = nobody
     server         = /opt/pgsql_check
     log_on_failure += USERID
+    only_from      ={% for host in groups["maas_postgres_proxy"] %} {{ hostvars[host]['ansible_default_ipv4']['address'] if 'ansible_default_ipv4' in hostvars[host] else ''}}{% endfor %}
     disable        = no
-    only_from      = {{ maas_postgres_v4_subnet }}
     per_source     = UNLIMITED
 }
-{%- endif -%}
+{% endif %}
 
 
-{%- if maas_postgres_ipv6 is defined -%}
+{% if (maas_postgres_ipv6 is defined) and (maas_postgres_ipv6 != "::1") %}
 service pgsql_check_v6
 {
     flags          = REUSE
@@ -27,8 +27,8 @@ service pgsql_check_v6
     user           = nobody
     server         = /opt/pgsql_check
     log_on_failure += USERID
+    only_from      ={% for host in groups["maas_postgres_proxy"] %} {{ hostvars[host]['ansible_default_ipv6']['address'] if 'ansible_default_ipv6' in hostvars[host] else ''}}{% endfor %}
     disable        = no
-    only_from      = {{ maas_postgres_v6_subnet }}
     per_source     = UNLIMITED
 }
 {%- endif -%}

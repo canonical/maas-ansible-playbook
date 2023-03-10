@@ -100,5 +100,6 @@
     maas_open_tcp_ports:
       - 5432
       - 2224
+      - "{{ maas_pgsql_check_port|default(23267) }}"
     maas_open_udp_ports:
       - 5405
