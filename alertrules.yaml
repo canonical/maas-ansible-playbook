@@ -1,0 +1,53 @@
+---
+# Downloads Prometheus and Loki alert rules
+
+- name: "Create Prometheus and Loki alert rules bundle"
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: "Ensure required variables have been defined"
+      ansible.builtin.assert:
+        quiet: true
+        fail_msg: "Required variable has not been defined"
+        that:
+          - o11y_prometheus_alert_repos is defined
+          - o11y_loki_alert_repos is defined
+          - o11y_alertrules_dest is defined
+
+    - name: "Install dependencies"
+      ansible.builtin.pip:
+        name:
+          - "pyyaml"
+
+    - name: "Fetch Prometheus alert rules"
+      ansible.builtin.git:
+        repo: "{{ o11y_prometheus_alert_repos }}"
+        dest: "maas-prometheus-alert-rules"
+        version: HEAD # noqa git-latest
+
+    - name: "Bundle Prometheus rules"
+      ansible.builtin.make:
+        chdir: "maas-prometheus-alert-rules"
+        target: groups
+
+    - name: "Fetch Loki alert rules"
+      ansible.builtin.git:
+        repo: "{{ o11y_loki_alert_repos }}"
+        dest: "maas-loki-alert-rules"
+        version: HEAD # noqa git-latest
+
+    - name: "Bundle Loki rules"
+      ansible.builtin.make:
+        chdir: "maas-loki-alert-rules"
+        target: groups
+
+    - name: "Move files"
+      ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: 0644
+      loop:
+        - src: maas-loki-alert-rules/rules/bundle.yml
+          dest: "{{ o11y_alertrules_dest }}/loki-alert-rules.yml"
+        - src: maas-prometheus-alert-rules/group.yml
+          dest: "{{ o11y_alertrules_dest }}/prometheus-alert-rules.yml"

@@ -167,6 +167,20 @@ ansible-playbook -i ./hosts\
     ./site.yaml
 ```
 
+### Deploy the MAAS stack with Observability enabled
+
+```
+ansible-playbook -i ./hosts \
+    --extra-vars="maas_version=3.3 \
+        maas_postgres_password=example \
+        maas_installation_type=snap \
+        maas_url=http://example.com:5240/MAAS \
+        o11y_enable=true \
+        o11y_prometheus_url=http://prometheus-server:9090/api/v1/write \
+        o11y_loki_url=http://loki-server:3100/loki/api/v1/push" \
+    ./site.yaml
+```
+
 ### Teardown the MAAS stack
 
 ```
@@ -197,4 +211,12 @@ For an already existing MAAS installation, a new admin user can be created. The 
 
 ```
 ansible-playbook -i ./hosts --extra-vars="user_name=newuser user_pwd=newpwd user_email=user@email.com user_ssh=lp:id" ./createadmin.yaml
+```
+
+### Export Observability alert rules
+
+MAAS has a curated collection of alert rules for Prometheus and Loki. You can export these rules using the following command, where `o11y_alertrules_dest` is the directory where the files should me placed.
+
+```
+ansible-playbook --extra-vars="o11y_alertrules_dest=/tmp" ./alertrules.yaml
 ```
