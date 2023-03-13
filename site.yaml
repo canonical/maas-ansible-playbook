@@ -38,6 +38,13 @@
         msg: "Playbooks using proxy settings: {{ proxy_env }}"
       with_dict: "{{ proxy_env }}"
 
+    - name: "Ensure dist is up to date"
+      ansible.builtin.apt:
+        upgrade: "dist"
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
+
 - hosts: maas_postgres_primary
   roles:
     - role: maas_postgres_primary

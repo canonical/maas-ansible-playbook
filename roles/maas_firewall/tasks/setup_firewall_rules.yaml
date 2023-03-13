@@ -5,6 +5,7 @@
     name: "iptables-persistent"
     state: present
     update_cache: true
+    cache_valid_time: 3600
 
 - name: Allow outgoing connection port 22 (ssh)
   ansible.builtin.iptables:
