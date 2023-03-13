@@ -7,7 +7,7 @@
   ansible.builtin.set_fact:
     maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
 
-- name: "Uninstall Postgres"
+- name: "Uninstall PostgreSQL and configuration dependencies"
   ansible.builtin.apt:
     name:
       - "{{ maas_postgres_deb_name | default('postgresql-' ~ maas_postgres_version_number) }}"

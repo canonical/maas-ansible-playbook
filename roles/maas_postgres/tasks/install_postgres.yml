@@ -1,5 +1,5 @@
 ---
-- name: "Install dependencies for PostgreSQL configuration"
+- name: "Install PostgreSQL and configuration dependencies"
   ansible.builtin.apt:
     name:
       - "python3-psycopg2"

@@ -10,7 +10,6 @@
   ansible.builtin.apt:
     name:
       - "maas*"
-      - "chrony"
     purge: true
     state: absent
 

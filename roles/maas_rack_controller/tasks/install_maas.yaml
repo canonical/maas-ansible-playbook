@@ -25,7 +25,6 @@
 - name: Install MAAS Rack Controller - Deb
   ansible.builtin.apt:
     name:
-      - "chrony"
       - "maas-rack-controller"
     state: "{{ maas_deb_state | default('present') }}"
     update_cache: true

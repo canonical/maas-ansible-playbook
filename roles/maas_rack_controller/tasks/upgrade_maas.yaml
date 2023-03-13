@@ -11,7 +11,6 @@
 - name: Update MAAS Rack Controller - Deb
   ansible.builtin.apt:
     name:
-      - "chrony"
       - "maas-rack-controller"
     state: latest
     update_cache: true
