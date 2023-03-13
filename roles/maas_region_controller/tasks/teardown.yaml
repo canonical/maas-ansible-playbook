@@ -8,7 +8,7 @@
 
 - name: Uninstall MAAS - Deb
   ansible.builtin.apt:
-    name: "maas*"
+    name: "maas-region-api"
     purge: true
     state: absent
 

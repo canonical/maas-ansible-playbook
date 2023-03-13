@@ -7,7 +7,7 @@
 
 - name: Uninstall MAAS - deb
   ansible.builtin.apt:
-    name: "maas*"
+    name: "maas-rack-controller"
     purge: true
     state: absent
 
