@@ -7,12 +7,9 @@
 
 - name: Uninstall MAAS - deb
   ansible.builtin.apt:
-    name: "maas-rack-controller"
+    name:
+     - "maas-rack-controller"
     purge: true
     state: absent
-
-- name: Uninstall MAAS - deb dependencies
-  ansible.builtin.apt:
-    name: "chrony"
     purge: true
     state: absent

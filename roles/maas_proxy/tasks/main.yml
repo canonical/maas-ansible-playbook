@@ -1,7 +1,9 @@
 ---
 - name: "Install HAProxy"
   ansible.builtin.apt:
-    name: haproxy
+    name: "haproxy"
+    update_cache: true
+    cache_valid_time: 3600
     state: "{{ 'present' if maas_proxy_state | lower == 'install' else maas_proxy_state }}"
 
 - name: "Write HAProxy Config"
