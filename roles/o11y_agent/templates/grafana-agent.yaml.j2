@@ -17,11 +17,6 @@ metrics:
       - url: {{o11y_prometheus_url}}
         name: prom-export
   configs:
-{% if 'maas_postgres' in group_names %}
-    - job_name: 'database_metrics'
-      static_configs:
-        - targets: ['{{ inventory_hostname }}:9187']
-{% endif %}
 {% if group_names|intersect(['maas_region_controller', 'maas_rack_controller']) %}
     - name: 'maas'
       scrape_configs:
@@ -34,6 +29,13 @@ metrics:
             - targets: ['{{ ansible_hostname }}:5240']
           metrics_path: '/MAAS/metrics'
 {% endif %}
+{% endif %}
+{% if 'maas_postgres' in group_names %}
+    - name: 'postgres'
+      scrape_configs:
+        - job_name: 'database-metrics'
+          static_configs:
+            - targets: ['{{ ansible_hostname }}:9187']
 {% endif %}
 {% endif %}
 
