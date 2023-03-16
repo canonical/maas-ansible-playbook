@@ -41,8 +41,7 @@
 - name: "Login in MAAS"
   ansible.builtin.command: maas login {{ admin_username }} {{ maas_url }} {{ maas_admin_api_key.stdout }}
   environment:
-    http_proxy: ""
-    https_proxy: ""
+    no_proxy: localhost
   changed_when: false
 
 - name: setup o11y
