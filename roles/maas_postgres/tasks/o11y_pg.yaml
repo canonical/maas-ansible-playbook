@@ -4,15 +4,16 @@
     path: "{{ o11y_postgres_exporter_dir }}"
     state: "{{ 'directory' if (o11y_enable and 'maas_postgres' in group_names) else 'absent' }}"
     mode: 0755
+  changed_when: false
 
-- name: "Print architecture"
+- name: "Discover host architecture"
   ansible.builtin.command: dpkg --print-architecture
-  register: arch_output
+  register: ar_out
 
 - name: "Set arch facts"
-  ansible.builtin.set_fact: 
-    arch: "{{ arch_output.stdout }}"
-    pg_exp_pkg: "https://github.com/prometheus-community/postgres_exporter/releases/download/v0.11.1/postgres_exporter-0.11.1.linux-{{arch_output.stdout}}.tar.gz"
+  ansible.builtin.set_fact:
+    arch: "{{ ar_out.stdout }}"
+    pg_exp_pkg: "https://github.com/prometheus-community/postgres_exporter/releases/download/v0.11.1/postgres_exporter-0.11.1.linux-{{ ar_out.stdout }}.tar.gz"
 
 - name: "Download and unzip latest postgres-exporter release"
   ansible.builtin.unarchive:
@@ -37,7 +38,7 @@
       [Service]
       Type=simple
       EnvironmentFile={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{arch}}/postgres_exporter.env
-      ExecStart={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{arch}}/postgres_exporter 
+      ExecStart={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{arch}}/postgres_exporter
       Restart=on-abnormal
       [Install]
       WantedBy=multi-user.target
