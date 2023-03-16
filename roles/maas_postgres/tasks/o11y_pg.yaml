@@ -9,6 +9,7 @@
 - name: "Discover host architecture"
   ansible.builtin.command: dpkg --print-architecture
   register: ar_out
+  changed_when: false
 
 - name: "Set arch facts"
   ansible.builtin.set_fact:
