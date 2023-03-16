@@ -6,16 +6,6 @@
     mode: 0755
   changed_when: false
 
-- name: "Discover host architecture"
-  ansible.builtin.command: dpkg --print-architecture
-  register: ar_out
-  changed_when: false
-
-- name: "Set arch facts"
-  ansible.builtin.set_fact:
-    arch: "{{ ar_out.stdout }}"
-    pg_exp_pkg: "https://github.com/prometheus-community/postgres_exporter/releases/download/v0.11.1/postgres_exporter-0.11.1.linux-{{ ar_out.stdout }}.tar.gz"
-
 - name: "Download and unzip latest postgres-exporter release"
   ansible.builtin.unarchive:
     src: "{{ pg_exp_pkg }}"
@@ -24,12 +14,12 @@
 
 - name: "Set env variable for data source"
   ansible.builtin.copy:
-    dest: "{{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{arch}}/postgres_exporter.env"
+    dest: "{{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}/postgres_exporter.env"
     content: DATA_SOURCE_NAME="postgresql://{{ maas_postgres_user }}:{{ maas_postgres_password }}@{{ inventory_hostname }}:5432/?sslmode=disable"
 
 - name: "Create a service file"
   ansible.builtin.copy:
-    dest: /etc/systemd/system/pg-exporter.service
+    dest: /etc/systemd/system/postgres_exporter.service
     mode: 0644
     content: |
       [Unit]
@@ -38,8 +28,8 @@
       After=network.target
       [Service]
       Type=simple
-      EnvironmentFile={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{arch}}/postgres_exporter.env
-      ExecStart={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{arch}}/postgres_exporter
+      EnvironmentFile={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}/postgres_exporter.env
+      ExecStart={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}/postgres_exporter
       Restart=on-abnormal
       [Install]
       WantedBy=multi-user.target

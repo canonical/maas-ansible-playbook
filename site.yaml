@@ -45,6 +45,15 @@
         cache_valid_time: 3600
       become: true
 
+    - name: "Discover host architecture"
+      ansible.builtin.command: dpkg --print-architecture
+      register: arch_out
+      changed_when: false
+
+    - name: "Set architechture facts"
+      ansible.builtin.set_fact:
+        ubuntu_arch: "{{ arch_out.stdout }}"
+
 - hosts: maas_postgres_primary
   roles:
     - role: maas_postgres_primary

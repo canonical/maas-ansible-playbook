@@ -164,4 +164,17 @@ logs:
                 maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
                 job: "maas-proxy"
 {% endif %}
+{% if 'maas_postgres' in group_names %}
+    - name: 'postgres'
+      clients:
+        - url: {{ o11y_loki_url }}
+      scrape_configs:
+        - job_name: database-logs
+          static_configs:
+            - labels:
+                __path__: {{ maas_postgres_log_dir }}
+                host: {{ ansible_hostname }}
+                job: "database-logs"
 {% endif %}
+{% endif %}
+
