@@ -22,5 +22,3 @@ maas_open_tcp_ports:
 - "{{ 9187 if o11y_enable else (false) }}"
 
 maas_open_udp_ports:
-
-postgres_exporter_pkg: https://github.com/prometheus-community/postgres_exporter/releases/download/v0.11.1/postgres_exporter-0.11.1.linux-amd64.tar.gz
