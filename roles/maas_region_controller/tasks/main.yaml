@@ -43,8 +43,8 @@
   changed_when: false
   register: logged_in
   until: logged_in is not failed
-  retries: 1
-  delay: 2
+  retries: 2
+  delay: 5
 
 - name: setup o11y
   ansible.builtin.import_tasks: o11y.yaml
