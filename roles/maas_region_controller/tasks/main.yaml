@@ -41,6 +41,10 @@
 - name: "Login in MAAS"
   ansible.builtin.command: maas login {{ admin_username }} {{ maas_url }} {{ maas_admin_api_key.stdout }}
   changed_when: false
+  register: logged_in
+  until: logged_in is not failed
+  retries: 1
+  delay: 2
 
 - name: setup o11y
   ansible.builtin.import_tasks: o11y.yaml
