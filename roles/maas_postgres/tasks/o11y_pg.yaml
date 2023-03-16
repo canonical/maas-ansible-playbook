@@ -56,12 +56,3 @@
     enabled: "{{ o11y_enable }}"
     state: "{{ 'started' if o11y_enable else 'stopped' }}"
   when: ansible_facts.services['pg-exporter.service'] is defined
-
-# - name: "Check data source name"
-#   ansible.builtin.debug:
-#     msg: "postgresql://{{ maas_postgres_user }}:{{ maas_postgres_password }}@{{ inventory_hostname }}:5432/?sslmode=disable"
-#   environment:
-#     DATA_SOURCE_NAME: "postgresql://{{ maas_postgres_user }}:{{ maas_postgres_password }}@{{ inventory_hostname }}:5432/?sslmode=disable"
-
-#- name: "Set data source name"
-
