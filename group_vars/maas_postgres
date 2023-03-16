@@ -74,3 +74,5 @@ maas_postgres_hba_entries:
       user: "{{ maas_postgres_replication_user }}"
       address: "{{ maas_postgres_v6_subnet }}"
       method: 'md5'
+
+is_current_primary_postgres: "{{ maas_postgres_floating_ip in ansible_all_ipv4_addresses or maas_postgres_floating_ip in ansible_all_ipv6_addresses }}"
