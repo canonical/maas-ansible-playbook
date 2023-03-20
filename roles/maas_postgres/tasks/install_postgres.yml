@@ -37,7 +37,3 @@
     owner: "{{ maas_postgres_user }}"
   become: true
   become_user: postgres
-
-- name: Setup o11y
-  ansible.builtin.import_tasks: o11y_pg.yaml
-  when: o11y_enable

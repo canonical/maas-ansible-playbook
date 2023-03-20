@@ -9,6 +9,12 @@
   ansible.builtin.import_tasks:
     configure_postgres_secondary.yaml
 
+- name: "Setup o11y"
+  ansible.builtin.include_role:
+    name: maas_postgres
+    tasks_from: o11y_pg
+  when: o11y_enable
+
 - name: "Setup firewall"
   ansible.builtin.include_role:
     name: maas_firewall

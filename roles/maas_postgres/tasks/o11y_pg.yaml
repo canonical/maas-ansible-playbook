@@ -14,8 +14,10 @@
 
 - name: "Set env variable for data source"
   ansible.builtin.copy:
+    mode: 0644
     dest: "{{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}/postgres_exporter.env"
-    content: DATA_SOURCE_NAME="postgresql://{{ maas_postgres_user }}:{{ maas_postgres_password }}@{{ inventory_hostname }}:5432/?sslmode=disable"
+    content: |
+      DATA_SOURCE_NAME="postgresql://{{ maas_postgres_user }}:{{ maas_postgres_password }}@{{ inventory_hostname }}:5432/?sslmode=disable"
 
 - name: "Create a service file"
   ansible.builtin.copy:
@@ -23,14 +25,16 @@
     mode: 0644
     content: |
       [Unit]
-      Description=postgres-exporter service
-      Requires=network.target
-      After=network.target
+      Description=Postgres Exporter service
+      Requires=postgresql@{{ maas_postgres_version_number }}-main.service
+      After=postgresql@{{ maas_postgres_version_number }}-main.service
       [Service]
+      User=postgres
+      Group=postgres
       Type=simple
       EnvironmentFile={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}/postgres_exporter.env
       ExecStart={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}/postgres_exporter
-      Restart=on-abnormal
+      Restart=always
       [Install]
       WantedBy=multi-user.target
   when: o11y_enable
@@ -44,7 +48,7 @@
 
 - name: "Set the pg-exporter agent service status"
   ansible.builtin.service:
-    name: pg-exporter
+    name: postgres_exporter
     enabled: "{{ o11y_enable }}"
     state: "{{ 'started' if o11y_enable else 'stopped' }}"
-  when: ansible_facts.services['pg-exporter.service'] is defined
+  when: ansible_facts.services['postgres_exporter.service'] is defined

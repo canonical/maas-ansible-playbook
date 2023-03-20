@@ -5,58 +5,57 @@
   become: true
   gather_facts: true
   tasks:
+    - name: "Collect facts about installed packages"
+      ansible.builtin.package_facts:
+        manager: auto
+        strategy: all
 
-  - name: "Collect facts about installed packages"
-    ansible.builtin.package_facts:
-      manager: auto
-      strategy: all
+    - name: "Collect facts about system services"
+      ansible.builtin.service_facts:
 
-  - name: "Collect facts about system services"
-    ansible.builtin.service_facts:
+    - name: "Remove iptables rules"
+      ansible.builtin.include_role:
+        name: maas_firewall
+        tasks_from: teardown
 
-  - name: "Remove iptables rules"
-    ansible.builtin.include_role:
-      name: maas_firewall
-      tasks_from: teardown
+    - name: "Uninstall MAAS region"
+      ansible.builtin.include_role:
+        name: "maas_region_controller"
+        tasks_from: teardown
 
-  - name: "Uninstall MAAS region"
-    ansible.builtin.include_role:
-      name: "maas_region_controller"
-      tasks_from: teardown
+    - name: "Uninstall MAAS rack"
+      ansible.builtin.include_role:
+        name: maas_rack_controller
+        tasks_from: teardown
 
-  - name: "Uninstall MAAS rack"
-    ansible.builtin.include_role:
-      name: maas_rack_controller
-      tasks_from: teardown
+    - name: "Uninstall postgres"
+      ansible.builtin.include_role:
+        name: maas_postgres
+        tasks_from: teardown
+      # when: "'postgres' in ansible_facts.packages"
 
-  - name: "Uninstall postgres"
-    ansible.builtin.include_role:
-      name: maas_postgres
-      tasks_from: teardown
-    # when: "'postgres' in ansible_facts.packages"
+    - name: "Uninstall postgres secondary"
+      ansible.builtin.include_role:
+        name: maas_postgres_secondary
+        tasks_from: teardown
+      # when: "'postgres' in ansible_facts.packages"
 
-  - name: "Uninstall postgres secondary"
-    ansible.builtin.include_role:
-      name: maas_postgres_secondary
-      tasks_from: teardown
-    # when: "'postgres' in ansible_facts.packages"
+    - name: "Uninstall HAProxy"
+      ansible.builtin.include_role:
+        name: maas_proxy
+        tasks_from: teardown
+      # when: "'haproxy' in ansible_facts.packages"
 
-  - name: "Uninstall HAProxy"
-    ansible.builtin.include_role:
-      name: maas_proxy
-      tasks_from: teardown
-    # when: "'haproxy' in ansible_facts.packages"
+    - name: "Uninstall o11y"
+      ansible.builtin.include_role:
+        name: o11y_agent
+        tasks_from: teardown
+      when: group_names|intersect(o11y_enabled_roles)
 
-  - name: "Uninstall o11y"
-    ansible.builtin.include_role:
-      name: o11y_agent
-      tasks_from: teardown
-    when: group_names|intersect(o11y_enabled_roles)
+    - name: "Remove unused packages from the cache"
+      ansible.builtin.apt:
+        autoclean: true
 
-  - name: "Remove unused packages from the cache"
-    ansible.builtin.apt:
-      autoclean: true
-
-  - name: Reload the SystemD to re-read configurations
-    ansible.builtin.systemd:
-      daemon-reload: true
+    - name: Reload the SystemD to re-read configurations
+      ansible.builtin.systemd:
+        daemon-reload: true
