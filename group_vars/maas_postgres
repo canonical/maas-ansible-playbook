@@ -13,11 +13,13 @@ maas_postgres_primary_address: ""
 maas_postgres_replication_user: "replicator"
 
 maas_postgres_data_dir: "/var/lib/postgresql/{{ maas_postgres_version_number }}/main/"
+maas_postgres_log_dir: "/var/log/postgresql/postgresql-{{ maas_postgres_version_number }}-main.log"
 
 maas_postgres_replication_slot: "maas_replication"
 maas_postgres_ssl_enabled: true
 
 maas_open_tcp_ports: 
 - 5432
+- "{{ 9187 if o11y_enable else (false) }}"
 
 maas_open_udp_ports:

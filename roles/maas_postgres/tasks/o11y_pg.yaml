@@ -1,0 +1,54 @@
+---
+- name: "Create postgres-exporter directory"
+  ansible.builtin.file:
+    path: "{{ o11y_postgres_exporter_dir }}"
+    state: "{{ 'directory' if (o11y_enable and 'maas_postgres' in group_names) else 'absent' }}"
+    mode: 0755
+  changed_when: false
+
+- name: "Download and unzip latest postgres-exporter release"
+  ansible.builtin.unarchive:
+    src: "{{ pg_exp_pkg }}"
+    dest: "{{ o11y_postgres_exporter_dir }}"
+    remote_src: true
+
+- name: "Set env variable for data source"
+  ansible.builtin.copy:
+    mode: 0644
+    dest: "{{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}/postgres_exporter.env"
+    content: |
+      DATA_SOURCE_NAME="postgresql://{{ maas_postgres_user }}:{{ maas_postgres_password }}@{{ inventory_hostname }}:5432/?sslmode=disable"
+
+- name: "Create a service file"
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/postgres_exporter.service
+    mode: 0644
+    content: |
+      [Unit]
+      Description=Postgres Exporter service
+      Requires=postgresql@{{ maas_postgres_version_number }}-main.service
+      After=postgresql@{{ maas_postgres_version_number }}-main.service
+      [Service]
+      User=postgres
+      Group=postgres
+      Type=simple
+      EnvironmentFile={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}/postgres_exporter.env
+      ExecStart={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}/postgres_exporter
+      Restart=always
+      [Install]
+      WantedBy=multi-user.target
+  when: o11y_enable
+
+- name: "Reload systemd to re-read configurations"
+  ansible.builtin.systemd:
+    daemon-reload: true
+
+- name: "Collect facts about system services"
+  ansible.builtin.service_facts:
+
+- name: "Set the pg-exporter agent service status"
+  ansible.builtin.service:
+    name: postgres_exporter
+    enabled: "{{ o11y_enable }}"
+    state: "{{ 'started' if o11y_enable else 'stopped' }}"
+  when: ansible_facts.services['postgres_exporter.service'] is defined
