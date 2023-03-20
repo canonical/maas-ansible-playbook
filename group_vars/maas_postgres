@@ -18,11 +18,8 @@ maas_postgres_log_dir: "/var/log/postgresql/postgresql-{{ maas_postgres_version_
 maas_postgres_replication_slot: "maas_replication"
 maas_postgres_ssl_enabled: true
 
-maas_promtail_port: 5238
-
 maas_open_tcp_ports: 
 - 5432
 - "{{ 9187 if o11y_enable else (false) }}"
-- "{{ maas_promtail_port if o11y_enable else (false) }}"
 
 maas_open_udp_ports:
