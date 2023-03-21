@@ -1,0 +1,6 @@
+---
+- name: "Uninstall HAProxy"
+  ansible.builtin.apt:
+    name: haproxy
+    state: absent
+    purge: true

@@ -13,5 +13,6 @@
       - "{{ maas_postgres_deb_name | default('postgresql-' ~ maas_postgres_version_number) }}"
       - "acl"
       - "python3-psycopg2"
+      - "xinetd"
     state: absent
     purge: true

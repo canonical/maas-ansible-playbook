@@ -1,0 +1,6 @@
+---
+- name: "Uninstall Corosync"
+  ansible.builtin.apt:
+    name: "corosync"
+    state: absent
+    purge: true
