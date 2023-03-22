@@ -5,6 +5,10 @@
       {{ maas_postgres_floating_ip }}/{{ maas_postgres_floating_ip_prefix_len }}\
       dev {{ maas_postgres_floating_ip_iface }}
   when: (inventory_hostname == groups['maas_postgres'][0]) and (maas_postgres_floating_ip is defined)
+  register: ip_addr_result
+  failed_when:
+    - ip_addr_result.rc != 0
+    - '"RTNETLINK answers: File exists" not in ip_addr_result.stderr'
 
 - name: "Add floating IP to postgres' bind addresses"
   ansible.builtin.include_tasks:
