@@ -1,0 +1,15 @@
+#!/bin/bash
+set -ex
+
+CIB=$(tempfile)
+trap "rm -f -- '${CIB}'" EXIT
+pcs cluster cib ${CIB}
+
+pcs -f ${CIB} stonith delete {{ maas_pacemaker_fence_name }}_dummy || true
+pcs -f ${CIB} \
+        stonith create {{ maas_pacemaker_fence_name }}_dummy \
+        fence_dummy \
+        pcmk_host_check='static-list' \
+        pcmk_host_list="{{ groups['maas_pacemaker'] | join(' ')}}"
+
+pcs cluster cib-push scope=configuration ${CIB}

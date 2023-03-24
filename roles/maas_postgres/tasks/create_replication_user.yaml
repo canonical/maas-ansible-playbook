@@ -9,11 +9,12 @@
   become: true
   become_user: postgres
 
-- name: "Create Replication Slot"
+- name: "Create Replication Slots"
   community.postgresql.postgresql_slot:
-    name: "{{ maas_postgres_replication_slot }}"
-    db: "maasdb"
+    name: "{{ maas_postgres_replication_slot ~ '_' ~ item|regex_replace('[^A-Za-z0-9_]', '_') }}"
+    db: "{{ maas_postgres_database }}"
     state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
   become: true
   become_user: postgres
   register: maas_postgres_enable_sync
+  loop: "{{ groups['maas_postgres'] }}"

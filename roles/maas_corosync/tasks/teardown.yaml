@@ -4,3 +4,4 @@
     name: "corosync"
     state: absent
     purge: true
+    autoremove: true

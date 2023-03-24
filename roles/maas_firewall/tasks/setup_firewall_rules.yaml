@@ -65,6 +65,22 @@
   with_items: "{{ maas_open_udp_ports }}"
   when: maas_open_udp_ports
 
+- name: Log UDP dropped packages
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: udp
+    log_prefix: "ipt denied: "
+    log_level: debug
+    jump: LOG
+
+- name: Log TCP dropped packages
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    log_prefix: "ipt denied: "
+    log_level: debug
+    jump: LOG
+
 - name: Set policy for INPUT chain to drop (otherwise)
   ansible.builtin.iptables:
     chain: INPUT

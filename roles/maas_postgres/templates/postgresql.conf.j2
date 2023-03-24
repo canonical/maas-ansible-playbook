@@ -54,7 +54,7 @@ external_pid_file = '/var/run/postgresql/{{ maas_postgres_version_number }}-main
 #------------------------------------------------------------------------------
 
 # - Connection Settings -
-{% if maas_postgres_primary_listen_all_ifaces|default(false) %}
+{% if maas_postgres_primary_listen_all_ifaces|default(false) or maas_ha_postgres_enabled|bool %}
 listen_addresses = '*'
 {% else %}
 listen_addresses = '{%- if extra_ip is defined -%}{{ extra_ip }}, {% endif -%}{%- if maas_postgres_ipv4 is defined -%}{{ maas_postgres_ipv4 }}, {% endif -%}{%- if maas_postgres_ipv6 is defined -%}{{ maas_postgres_ipv6 }}, {% endif -%}localhost'         # what IP address(es) to listen on;
@@ -66,6 +66,7 @@ port = 5432                             # (change requires restart)
 max_connections = 100                   # (change requires restart)
 #superuser_reserved_connections = 3     # (change requires restart)
 unix_socket_directories = '/var/run/postgresql' # comma-separated list of directories
+                                        # (change requires restart)
 #unix_socket_group = ''                 # (change requires restart)
 #unix_socket_permissions = 0777         # begin with 0 to use octal notation
                                         # (change requires restart)
@@ -203,7 +204,7 @@ dynamic_shared_memory_type = posix      # the default is the first option
 # - Settings -
 
 {% if maas_ha_postgres_enabled|bool %}
-wal_level = replica                    # minimal, replica, or logical
+wal_level = replica                     # minimal, replica, or logical
 {% endif %}
                                         # (change requires restart)
 #fsync = on                             # flush data to disk for crash safety
@@ -219,8 +220,10 @@ wal_level = replica                    # minimal, replica, or logical
                                         #   fsync_writethrough
                                         #   open_sync
 #full_page_writes = on                  # recover from partial page writes
-#wal_log_hints = off                    # also do full page writes of non-critical updates
+{% if maas_ha_postgres_enabled|bool %}
+wal_log_hints = on                      # also do full page writes of non-critical updates
                                         # (change requires restart)
+{% endif %}
 #wal_compression = off                  # enable compression of full-page writes
 #wal_init_zero = on                     # zero-fill new WAL files
 #wal_recycle = on                       # recycle WAL files
@@ -239,7 +242,7 @@ wal_level = replica                    # minimal, replica, or logical
 #checkpoint_completion_target = 0.9     # checkpoint target duration, 0.0 - 1.0
 #checkpoint_flush_after = 256kB         # measured in pages, 0 disables
 #checkpoint_warning = 30s               # 0 disables
-max_wal_size = 1GB
+max_wal_size = 2GB
 min_wal_size = 80MB
 
 # - Archiving -
@@ -269,7 +272,7 @@ min_wal_size = 80MB
 # Set these only when performing a targeted recovery.
 
 {% if maas_ha_postgres_enabled|bool %}
-recovery_target = 'immediate'           # 'immediate' to end recovery as soon as a
+#recovery_target = ''		# 'immediate' to end recovery as soon as a
                                 # consistent state is reached
                                 # (change requires restart)
 #recovery_target_name = ''      # the named restore point to which recovery will proceed
@@ -299,10 +302,10 @@ recovery_target_timeline = 'latest'    # 'current', 'latest', or timeline ID
 # Set these on the primary and on any standby that will send replication data.
 
 {% if maas_ha_postgres_enabled|bool %}
-max_wal_senders = 10           # max number of walsender processes
+max_wal_senders = {{ groups['maas_postgres']|length + 10 }}           # max number of walsender processes
 {% endif %}
                                 # (change requires restart)
-#max_replication_slots = 10     # max number of replication slots
+max_replication_slots = {{ groups['maas_postgres']|length + 10 }}     # max number of replication slots
                                 # (change requires restart)
 #wal_keep_size = 0              # in megabytes; 0 disables
 #max_slot_wal_keep_size = -1    # in megabytes; -1 disables
@@ -310,18 +313,28 @@ max_wal_senders = 10           # max number of walsender processes
 #track_commit_timestamp = off   # collect timestamp of transaction commit
                                 # (change requires restart)
 
+# - Primary Server -
+
+# These settings are ignored on a standby server.
+
+#synchronous_standby_names = '' # standby servers that provide sync rep
+                                # method to choose sync standbys, number of sync standbys,
+                                # and comma-separated list of application_name
+                                # from standby(s); '*' = all
+#vacuum_defer_cleanup_age = 0   # number of xacts by which cleanup is delayed
+
 # - Standby Servers -
 
 # These settings are ignored on a primary server.
 
 {% if maas_ha_postgres_enabled|bool %}
 primary_conninfo = '{{ maas_postgres_primary_conninfo }}'                  # connection string to sending server
-primary_slot_name = '{{ maas_postgres_replication_slot }}'                 # replication slot on sending server
-#promote_trigger_file = '{{ maas_postgres_trigger_file }}'              # file name whose presence ends recovery
-hot_standby = 'on'                       # "off" disallows queries during recovery
+primary_slot_name = '{{ maas_postgres_replication_slot ~ "_" ~ inventory_hostname|regex_replace('[^A-Za-z0-9_]', '_') }}'                 # replication slot on sending server
+#promote_trigger_file = ''              # file name whose presence ends recovery
+hot_standby = 'on'                      # "off" disallows queries during recovery
 hot_standby_feedback = 'on'
 {% else %}
-hot_standby = 'off'                       # "off" disallows queries during recovery
+hot_standby = 'off'                     # "off" disallows queries during recovery
 {% endif %}
                                         # (change requires restart)
 #max_standby_archive_delay = 30s        # max delay before canceling queries
@@ -473,6 +486,7 @@ log_filename = 'postgresql.log'        # log file name pattern,
 # This is only relevant when logging to eventlog (Windows):
 # (change requires restart)
 #event_source = 'PostgreSQL'
+
 # - When to Log -
 
 #log_min_messages = warning             # values in order of decreasing detail:
@@ -524,6 +538,7 @@ log_filename = 'postgresql.log'        # log file name pattern,
                                         # statements from all transactions, 0.0 never logs
 
 # - What to Log -
+
 #debug_print_parse = off
 #debug_print_rewritten = off
 #debug_print_plan = off
@@ -564,7 +579,7 @@ log_filename = 'postgresql.log'        # log file name pattern,
                                         #   %% = '%'
                                         # e.g. '<%u%%%d> '
 #log_lock_waits = off                   # log lock waits >= deadlock_timeout
-#log_recovery_conflict_waits = off      # log standby recovery conflict waits
+log_recovery_conflict_waits = on      # log standby recovery conflict waits
                                         # >= deadlock_timeout
 #log_parameter_max_length = -1          # when logging statements, limit logged
                                         # bind-parameter values to N bytes;
@@ -679,7 +694,6 @@ log_timezone = 'Etc/UTC'
 #idle_in_transaction_session_timeout = 0        # in milliseconds, 0 is disabled
 #idle_session_timeout = 0               # in milliseconds, 0 is disabled
 #vacuum_freeze_table_age = 150000000
-
 #vacuum_freeze_min_age = 50000000
 #vacuum_failsafe_age = 1600000000
 #vacuum_multixact_freeze_table_age = 150000000
@@ -730,6 +744,7 @@ default_text_search_config = 'pg_catalog.english'
 #extension_destdir = ''                 # prepend path when loading extensions
                                         # and shared objects (added by Debian)
 #gin_fuzzy_search_limit = 0
+
 
 #------------------------------------------------------------------------------
 # LOCK MANAGEMENT
@@ -785,7 +800,7 @@ default_text_search_config = 'pg_catalog.english'
 # default postgresql.conf.  Note that these are directives, not variable
 # assignments, so they can usefully be given more than once.
 
-#include_dir = '...'                    # include files ending in '.conf' from
+include_dir = 'conf.d'                  # include files ending in '.conf' from
                                         # a directory, e.g., 'conf.d'
 #include_if_exists = '...'              # include file only if it exists
 #include = '...'                        # include file

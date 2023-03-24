@@ -1,0 +1,14 @@
+#!/bin/bash
+set -ex
+
+CIB=$(tempfile)
+trap "rm -f -- '${CIB}'" EXIT
+pcs cluster cib ${CIB}
+
+pcs -f ${CIB} stonith delete {{ maas_pacemaker_fence_name }}_{{ ansible_hostname }} || true
+pcs -f ${CIB} \
+        stonith create {{ maas_pacemaker_fence_name }}_{{ ansible_hostname }}\
+        {{ maas_pacemaker_fencing_driver }}
+        {%- for key, value in maas_pacemaker_stonith_params.items() %} {{ key }}={{ value }}{%- endfor %}
+
+pcs cluster cib-push scope=configuration ${CIB}

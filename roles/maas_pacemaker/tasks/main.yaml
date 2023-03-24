@@ -9,6 +9,7 @@
     - pcs
     - fence-agents
     - resource-agents-paf
+    - "{{ 'fence-virt' if maas_pacemaker_fencing_driver|lower == 'fence_xvm' else (false) }}"
   register: install_pacemaker
   notify: "Ensure Pacemaker is started"
 
@@ -54,7 +55,9 @@
 - name: "Override /etc/hosts for External Address"
   ansible.builtin.lineinfile:
     dest: /etc/hosts
-    line: "{{ maas_pacemaker_self_address }} {{ inventory_hostname }}"
+    line: "{{ hostvars[item]['ansible_default_ipv4']['address'] if 'ansible_default_ipv4' in hostvars[item] \
+          else hostvars[item]['ansible_default_ipv6']['address'] }} {{ item }}"
+  loop: "{{ groups['maas_pacemaker'] }}"
 
 - name: "Auth cluster"
   ansible.builtin.shell:
@@ -66,12 +69,42 @@
   retries: 3
   delay: 2
 
+- name: "create XVM key dir"
+  ansible.builtin.file:
+    state: "directory"
+    path: /etc/cluster
+    mode: 0750
+  when: maas_fence_xvm_key_file is defined
+
+- name: "set XVM key"
+  ansible.builtin.copy:
+    dest: "/etc/cluster/fence_xvm.key"
+    mode: 0640
+    src: "{{ maas_fence_xvm_key_file }}"
+  when: maas_fence_xvm_key_file is defined
+
+- name: "Add Fencing Configuration Script"
+  ansible.builtin.template:
+    src: "{{ maas_pacemaker_fencing_driver|lower ~ '.sh.j2' }}"
+    dest: /tmp/configure_fencing.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Configure Fencing"
+  ansible.builtin.command:
+    cmd: "/tmp/configure_fencing.sh"
+  changed_when: true
+  run_once: true
+
 - name: "Check if fencing is configured"
   ansible.builtin.shell:
     cmd: "set -o pipefail; pcs stonith status | tee {{ maas_pacemaker_tmp_status }}"
     creates: "{{ maas_pacemaker_tmp_status }}"
     executable: /bin/bash
   register: pacemaker_stonith_status
+  failed_when:
+    - '"NO stonith devices configured" in pacemaker_stonith_status.stdout'
 
 - name: "Add Pacemaker Configuration Script"
   ansible.builtin.template:
@@ -81,15 +114,10 @@
     group: root
     mode: 0755
 
-- name: "Dump CIB file"
-  ansible.builtin.command:
-    cmd: "pcs cluster cib {{ maas_pacemaker_tmp_cib }}"
-    creates: "{{ maas_pacemaker_tmp_cib }}"
-
 - name: "Configure Pacemaker Resources"
   ansible.builtin.command:
     cmd: "/tmp/configure_pacemaker.sh"
-    removes: "{{ maas_pacemaker_tmp_cib }}"
+  changed_when: true
   run_once: true
 
 - name: "Setup firewall"
@@ -101,5 +129,7 @@
       - 5432
       - 2224
       - "{{ maas_pgsql_check_port|default(23267) }}"
+      - "{{ 1229 if maas_pacemaker_fencing_driver|lower == 'fence_xvm' else (false) }}"
     maas_open_udp_ports:
       - 5405
+      - "{{ 1229 if maas_pacemaker_fencing_driver|lower == 'fence_xvm' else (false) }}"

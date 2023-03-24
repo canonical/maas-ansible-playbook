@@ -9,7 +9,6 @@ service pgsql_check_v4
     user           = nobody
     server         = /opt/pgsql_check
     log_on_failure += USERID
-    only_from      ={% for host in groups["maas_postgres_proxy"] %} {{ hostvars[host]['ansible_default_ipv4']['address'] if 'ansible_default_ipv4' in hostvars[host] else ''}}{% endfor %}
     disable        = no
     per_source     = UNLIMITED
 }
@@ -27,7 +26,6 @@ service pgsql_check_v6
     user           = nobody
     server         = /opt/pgsql_check
     log_on_failure += USERID
-    only_from      ={% for host in groups["maas_postgres_proxy"] %} {{ hostvars[host]['ansible_default_ipv6']['address'] if 'ansible_default_ipv6' in hostvars[host] else ''}}{% endfor %}
     disable        = no
     per_source     = UNLIMITED
 }
