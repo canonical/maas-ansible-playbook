@@ -1,0 +1,15 @@
+#!/bin/bash
+set -ex
+
+CIB=$(tempfile)
+trap "rm -f -- '${CIB}'" EXIT
+pcs cluster cib ${CIB}
+
+{% for host in groups['maas_pacemaker'] %}
+pcs -f ${CIB} stonith delete {{ maas_pacemaker_fence_name }}_{{ host }} || true
+pcs -f ${CIB} stonith create {{ maas_pacemaker_fence_name }}_{{ host }} \
+        fence_xvm port="{{ host }}" pcmk_host_list="{{ host }}" pcmk_host_check="static-list"
+# pcs -f ${CIB} constraint location {{ maas_pacemaker_fence_name }}_{{ host }} avoids {{ host }}=INFINITY
+{% endfor %}
+
+pcs cluster cib-push scope=configuration ${CIB}
