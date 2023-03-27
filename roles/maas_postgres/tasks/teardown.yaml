@@ -7,11 +7,20 @@
   ansible.builtin.set_fact:
     maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
 
+- name: "Remove PostgreSQL artifacts"
+  ansible.builtin.file:
+    state: absent
+    name: "{{ item }}"
+  with_items:
+    - /opt/pgsql_check
+    - /etc/xinetd.d/pgsql_check
+
 - name: "Uninstall PostgreSQL and configuration dependencies"
   ansible.builtin.apt:
     name:
       - "{{ maas_postgres_deb_name | default('postgresql-' ~ maas_postgres_version_number) }}"
       - "acl"
       - "python3-psycopg2"
+      - "xinetd"
     state: absent
     purge: true
