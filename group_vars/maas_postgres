@@ -25,7 +25,6 @@ maas_open_tcp_ports:
 
 maas_open_udp_ports: []
 
-maas_postgres_trigger_file: "/tmp/promotedb"
 
 maas_postgres_ipv4: "{{ ansible_default_ipv4['address'] if 'address' in ansible_default_ipv4 else '127.0.0.1' }}"
 maas_postgres_ipv6: "{{ ansible_default_ipv6['address'] if 'address' in ansible_default_ipv6 else '::1' }}"
