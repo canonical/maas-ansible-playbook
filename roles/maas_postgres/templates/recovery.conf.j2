@@ -1,3 +1,0 @@
-standby_mode=on
-primary_conninfo='postgresql://{{ maas_postgres_replication_user }}:{{ maas_postgres_replication_password }}@{{ maas_postgres_ipv4 if maas_postgres_ipv4 else maas_postgres_ipv6 }}/'
-recovery_target_timeline='latest'
