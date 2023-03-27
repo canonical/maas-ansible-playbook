@@ -72,6 +72,8 @@
     creates: "{{ maas_pacemaker_tmp_status }}"
     executable: /bin/bash
   register: pacemaker_stonith_status
+  failed_when:
+    - '"NO stonith devices configured" in pacemaker_stonith_status.stdout'
 
 - name: "Add Pacemaker Configuration Script"
   ansible.builtin.template:
