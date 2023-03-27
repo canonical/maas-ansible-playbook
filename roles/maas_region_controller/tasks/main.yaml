@@ -44,7 +44,11 @@
     http_proxy: ""
     https_proxy: ""
     no_proxy: "localhost,hostvars[inventory_hostname]['ansible_env'].SSH_CONNECTION.split(' ')[2]"
-  changed_when: false
+  changed_when: true
+  register: login
+  until: login is not failed
+  retries: 5
+  delay: 2
 
 - name: setup o11y
   ansible.builtin.import_tasks: o11y.yaml
