@@ -25,6 +25,7 @@ maas_open_tcp_ports:
 
 maas_open_udp_ports: []
 
+maas_postgres_hash: "{{ 'md5' if maas_postgres_version_number|int <= 12 else 'scram-sha-256' }}"
 
 maas_postgres_ipv4: "{{ ansible_default_ipv4['address'] if 'address' in ansible_default_ipv4 else '127.0.0.1' }}"
 maas_postgres_ipv6: "{{ ansible_default_ipv6['address'] if 'address' in ansible_default_ipv6 else '::1' }}"
@@ -47,31 +48,21 @@ maas_postgres_hba_entries:
       database: 'all'
       user: 'all'
       address: '127.0.0.1/32'
-      method: 'md5'
+      method: '{{ maas_postgres_hash }}'
     - type: 'host'
       database: 'all'
       user: 'all'
       address: '::1/128'
-      method: 'md5'
+      method: '{{ maas_postgres_hash }}'
   ipv4:
     - type: 'host'
-      database: 'maasdb'
+      database: '{{ maas_postgres_database }}'
       user: 'maas'
       address: "{{ maas_postgres_v4_subnet }}" 
-      method: 'md5'
-    - type: 'host'
-      database: 'replication'
-      user: "{{ maas_postgres_replication_user }}"
-      address: "{{ maas_postgres_v4_subnet }}"
-      method: 'md5'
+      method: '{{ maas_postgres_hash }}'
   ipv6:
     - type: 'host'
-      database: 'maasdb'
+      database: '{{ maas_postgres_database }}'
       user: 'maas'
       address: "{{ maas_postgres_v6_subnet }}"
-      method: 'md5'
-    - type: 'host'
-      database: 'replication'
-      user: "{{ maas_postgres_replication_user }}"
-      address: "{{ maas_postgres_v6_subnet }}"
-      method: 'md5'
+      method: '{{ maas_postgres_hash }}'
