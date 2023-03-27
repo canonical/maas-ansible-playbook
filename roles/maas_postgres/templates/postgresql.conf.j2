@@ -316,7 +316,7 @@ max_wal_senders = 10           # max number of walsender processes
 
 {% if maas_ha_postgres_enabled|bool %}
 primary_conninfo = '{{ maas_postgres_primary_conninfo }}'                  # connection string to sending server
-primary_slot_name = '{{ maas_postgres_replication_slot }}'                 # replication slot on sending server
+primary_slot_name = '{{ maas_postgres_replication_slot ~ "_" ~ inventory_hostname|regex_replace('[^A-Za-z0-9_]', '_') }}'                 # replication slot on sending server
 #promote_trigger_file = '{{ maas_postgres_trigger_file }}'              # file name whose presence ends recovery
 hot_standby = 'on'                       # "off" disallows queries during recovery
 hot_standby_feedback = 'on'
