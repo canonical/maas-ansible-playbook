@@ -51,8 +51,9 @@
   ansible.builtin.expect:
     command: >
       pg_basebackup -h {{ maas_postgres_floating_ip }}
-      -U {{ maas_postgres_replication_user }} -P
+      -U {{ maas_postgres_replication_user }}
       -p 5432 -D {{ maas_postgres_data_dir }} -Fp -Xs -R
+      -S {{ maas_postgres_replication_slot ~ "_" ~ inventory_hostname|regex_replace('[^A-Za-z0-9_]', '_') }}
     responses:
       '(?i)password': "{{ maas_postgres_replication_password }}"
   when: not (inventory_hostname == groups['maas_postgres'][0])
