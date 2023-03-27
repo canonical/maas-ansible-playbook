@@ -4,10 +4,13 @@ pcs cluster cib {{ maas_pacemaker_tmp_cib }}\
     && stat {{ maas_pacemaker_tmp_cib }}\
     && pcs -f {{ maas_pacemaker_tmp_cib }} resource defaults update migration-threshold=5\
     && pcs -f {{ maas_pacemaker_tmp_cib }} resource defaults update resource-stickiness=10\
+    {% for host in groups['maas_pacemaker'] %}
     && pcs -f {{ maas_pacemaker_tmp_cib }}\
-        stonith create {{ maas_pacemaker_fence_name }}_{{ ansible_hostname }}\
-        {{ maas_pacemaker_fencing_driver }}
-        {%- for key, value in maas_pacemaker_stonith_params.items() %} {{ key }}={{ value }}{%- endfor -%}\
+        stonith create {{ maas_pacemaker_fence_name }}_{{ host }}\
+        {{ hostvars[host]['maas_pacemaker_fencing_driver'] }}
+        {%- for key, value in hostvars[host]['maas_pacemaker_stonith_params'].items() %} {{ key }}={{ value }}{%- endfor -%}\
+    && pcs -f {{ maas_pacemaker_tmp_cib }} constraint location {{ maas_pacemaker_fence_name }}_{{ host }} avoids {{ host }}=INFINITY\
+    {% endfor %}
     && pcs -f {{ maas_pacemaker_tmp_cib }} resource create pgsql-pri-ip ocf:heartbeat:IPaddr2\
         ip="{{ maas_postgres_floating_ip }}"\
         cidr_netmask="{{ maas_postgres_floating_ip_prefix_len }}"\
