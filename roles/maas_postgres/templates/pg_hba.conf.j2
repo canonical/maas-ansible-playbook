@@ -30,6 +30,8 @@ local all postgres peer
 {% endfor -%}
 {% endif %}
 
+
+{% if maas_ha_postgres_enabled|bool %}
 {% if maas_postgres_floating_ip is defined %}
 host replication replicator {{ maas_postgres_floating_ip }}/{{ 32 if maas_postgres_floating_ip|ansible.utils.ipv4 else 128 }} reject
 {% endif %}
@@ -53,4 +55,11 @@ host replication replicator {{ hostvars[inventory_hostname]['ansible_default_ipv
 {% endif %}
 
 host replication replicator {{ ansible_hostname }} reject
+{% if inventory_hostname | ansible.utils.ipv4 %}
+host replication replicator {{ inventory_hostname }}/32 reject
+{% elif inventory_hostname | ansible.utils.ipv6 %}
+host replication replicator {{ inventory_hostname }}/128 reject
+{% else %}
 host replication replicator {{ inventory_hostname }} reject
+{% endif %}
+{% endif %}
