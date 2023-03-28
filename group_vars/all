@@ -55,9 +55,9 @@ maas_ha_postgres_enabled: "{{ groups['maas_postgres']|length > 1 }}"
 
 maas_postgres_uri_login: "{{ maas_postgres_user }}:{{ maas_postgres_password }}"
 
-maas_postgres_proxy_host_v4: "{{ hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv4']['address'] if (groups['maas_postgres_proxy']) and hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv4'] is defined and hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv4']['address'] is defined else ''}}"
+maas_postgres_proxy_host_v4: "{{ hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv4']['address'] if ('maas_postgres_proxy' in groups and groups['maas_postgres_proxy']) and hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv4'] is defined and hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv4']['address'] is defined else ''}}"
 
-maas_postgres_proxy_host_v6: "{{ hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv6']['address'] if (groups['maas_postgres_proxy']) and hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv6'] is defined and hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv6']['address'] is defined else ''}}"
+maas_postgres_proxy_host_v6: "{{ hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv6']['address'] if ('maas_postgres_proxy' in groups and groups['maas_postgres_proxy']) and hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv6'] is defined and hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv6']['address'] is defined else ''}}"
 
 maas_postgres_proxy_uri: "postgres://{{ maas_postgres_uri_login }}@{{ maas_postgres_proxy_host_v4 if maas_postgres_proxy_host_v4 else maas_postgres_proxy_host_v6 }}:5432/{{ maas_postgres_database }}"
 
@@ -66,7 +66,7 @@ maas_postgres_primary_host_v6: "{{ hostvars[groups['maas_postgres'][0]]['ansible
 maas_postgres_primary_uri: "postgres://{{ maas_postgres_uri_login }}@{{ maas_postgres_primary_host_v4 if maas_postgres_primary_host_v4 else maas_postgres_primary_host_v6 }}:5432/{{ maas_postgres_database }}"
 
 
-maas_postgres_uri: "{{ maas_postgres_proxy_uri if (groups['maas_postgres_proxy']) else maas_postgres_primary_uri }}"
+maas_postgres_uri: "{{ maas_postgres_proxy_uri if ('maas_postgres_proxy' in groups and groups['maas_postgres_proxy']) else maas_postgres_primary_uri }}"
 
 # postgres version number
 maas_postgres_version_number: "{{ 14 if ansible_distribution_major_version | float >= 22 and maas_use_version is version('3.2', '>=') else 12 }}"
