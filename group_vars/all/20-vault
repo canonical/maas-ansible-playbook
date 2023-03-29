@@ -1,0 +1,9 @@
+---
+vault_integration: false    # Use MAAS vault for secret storage
+
+# MAAS Vault configuration
+vault_url: ""                 # The URL of the MAAS Vault
+vault_approle_id: ""          # The approle ID used for MAAS Vault
+vault_wrapped_token: ""
+vault_secrets_path: ""
+vault_secret_mount: ""

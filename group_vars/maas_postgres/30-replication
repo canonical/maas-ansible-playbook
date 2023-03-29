@@ -1,0 +1,4 @@
+---
+maas_postgres_primary_address: ""
+maas_postgres_primary_conninfo: "user={{ maas_postgres_replication_user }} password=''{{ maas_postgres_replication_password|default(maas_postgres_password) }}'' host={{ maas_postgres_floating_ip|default('127.0.0.1') }} port=5432 application_name={{ inventory_hostname }}"
+maas_postgres_replication_slot: "maas_replication"

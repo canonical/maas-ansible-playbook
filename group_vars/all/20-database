@@ -1,76 +1,21 @@
-# Global variable file for Ansible playbooks
-
-# Standard MAAS Variables
-maas_port: 5240             # The port MAAS uses to communicate on
-maas_https_port: 5443       # The https port MAAS uses to communicate on
-enable_tls: false           # Use TLS for MAAS communication
-vault_integration: false    # Use MAAS vault for secret storage
-
-# MAAS Vault configuration
-vault_url: ""                 # The URL of the MAAS Vault
-vault_approle_id: ""          # The approle ID used for MAAS Vault
-vault_wrapped_token: ""
-vault_secrets_path: ""
-vault_secret_mount: ""
-
-# Installation variables
-maas_install_deb: "{{ maas_installation_type == 'deb' }}"
-maas_snap_channel: "stable"     # if using snap, then the channel. ie: stable, beta, edge
-maas_deb_state: "present"       # if using deb, the state for install
-maas_state: "install"           # whether to install, or upgrade maas
-
-# O11y variables
-o11y_enable: false
-
-o11y_prometheus_url: ""
-o11y_loki_url: ""
-o11y_prometheus_alert_repos: "https://github.com/canonical/maas-prometheus-alert-rules.git"
-o11y_loki_alert_repos: "https://github.com/canonical/maas-loki-alert-rules.git"
-o11y_enabled_roles:
-  - maas_postgres_primary
-  - maas_postgres_secondary
-  - maas_region_controller
-  - maas_rack_controller
-
-o11y_grafana_agent_dir: "/opt/grafana-agent"
-o11y_grafana_agent_wal_dir: "/var/lib/grafana-agent/wal"
-o11y_grafana_agent_pos_dir: "/var/lib/grafana-agent/positions"
-
-o11y_grafana_agent_dirs:
-  - "{{ o11y_grafana_agent_dir }}"
-  - "{{ o11y_grafana_agent_wal_dir }}"
-  - "{{ o11y_grafana_agent_pos_dir }}"
-
-grafana_agent_pkg: https://github.com/grafana/agent/releases/download/v0.22.0/agent-linux-amd64.zip
-
-o11y_postgres_exporter_dir: "/opt/postgres-exporter"
-
-pg_exp_pkg: "https://github.com/prometheus-community/postgres_exporter/releases/download/v0.11.1/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}.tar.gz"
-
+---
 maas_proxy_postgres_proxy_enabled: false
 
 maas_postgres_user: "maas"
 maas_postgres_database: "maasdb"
+
 maas_ha_postgres_enabled: "{{ groups['maas_postgres']|length > 1 }}"
-
 maas_postgres_uri_login: "{{ maas_postgres_user }}:{{ maas_postgres_password }}"
-
 maas_postgres_proxy_host_v4: "{{ hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv4']['address'] if ('maas_postgres_proxy' in groups and groups['maas_postgres_proxy']) and hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv4'] is defined and hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv4']['address'] is defined else ''}}"
-
 maas_postgres_proxy_host_v6: "{{ hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv6']['address'] if ('maas_postgres_proxy' in groups and groups['maas_postgres_proxy']) and hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv6'] is defined and hostvars[groups['maas_postgres_proxy'][0]]['ansible_default_ipv6']['address'] is defined else ''}}"
-
 maas_postgres_proxy_uri: "postgres://{{ maas_postgres_uri_login }}@{{ maas_postgres_proxy_host_v4 if maas_postgres_proxy_host_v4 else maas_postgres_proxy_host_v6 }}:5432/{{ maas_postgres_database }}"
-
 maas_postgres_primary_host_v4: "{{ hostvars[groups['maas_postgres'][0]]['ansible_default_ipv4']['address'] if hostvars[groups['maas_postgres'][0]]['ansible_default_ipv4'] is defined and hostvars[groups['maas_postgres'][0]]['ansible_default_ipv4']['address'] is defined else ''}}"
 maas_postgres_primary_host_v6: "{{ hostvars[groups['maas_postgres'][0]]['ansible_default_ipv6']['address'] if hostvars[groups['maas_postgres'][0]]['ansible_default_ipv6'] is defined and hostvars[groups['maas_postgres'][0]]['ansible_default_ipv6']['address'] is defined else ''}}"
 maas_postgres_primary_uri: "postgres://{{ maas_postgres_uri_login }}@{{ maas_postgres_primary_host_v4 if maas_postgres_primary_host_v4 else maas_postgres_primary_host_v6 }}:5432/{{ maas_postgres_database }}"
-
-
 maas_postgres_uri: "{{ maas_postgres_proxy_uri if ('maas_postgres_proxy' in groups and groups['maas_postgres_proxy']) else maas_postgres_primary_uri }}"
 
 # postgres version number
 maas_postgres_version_number: "{{ 14 if ansible_distribution_major_version | float >= 22 and maas_use_version is version('3.2', '>=') else 12 }}"
-
 maas_postgres_replication_user: "replicator"
 maas_postgres_backup_dir: "/tmp/maas_backup/" 
 maas_postgres_backup_path: "{{ maas_postgres_backup_dir }}dump.sql.gz"
@@ -80,21 +25,3 @@ maas_exclude_backup_path: "{{ '/var/lib/maas/boot-resources/' if maas_install_de
 maas_backup_dest_path: "/tmp/{{ inventory_hostname }}_maas_backup_{{ ansible_date_time.iso8601 }}.tgz"
 maas_restore_config_path: "{{ '/etc/maas' if maas_install_deb | bool else '' }}"
 maas_restore_runtime_path: "{{ '/var/lib/maas' if maas_install_deb | bool else '' }}"
-
-maas_installmetric_file: "{{ '/var/snap/maas/common' if maas_installation_type | lower == 'snap' else '/var/lib/maas' }}/.ansible"
-maas_secret_file: "{{ '/var/snap/maas/common' if  maas_installation_type | lower == 'snap' else '/var/lib' }}/maas/secret"
-
-proxy_env:
-
-# Operating system releases and the minimum version of MAAS they can run
-supported_distributions:
-  Ubuntu:
-    "22.04":  # Jammy supports MAAS >= 3.3
-      max: "any"
-      min: "3.3"
-    "20.04":  # Focal supports MAAS >= 2.9 and < 3.3
-      max: "3.3"
-      min: "2.9"
-    "0.0":    # Versions below Focal are used for MAAS < 2.9
-      max: "2.9"
-      min: "any"

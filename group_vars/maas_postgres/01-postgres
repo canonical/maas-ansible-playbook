@@ -9,21 +9,10 @@ maas_postgres_action: "install"
 maas_postgres_bin_dir: "/usr/lib/postgresql/{{ maas_postgres_version_number }}/bin/"
 maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
 
-maas_postgres_primary_address: ""
-
-maas_postgres_primary_conninfo: "user={{ maas_postgres_replication_user }} password=''{{ maas_postgres_replication_password|default(maas_postgres_password) }}'' host={{ maas_postgres_floating_ip|default('127.0.0.1') }} port=5432 application_name={{ inventory_hostname }}"
-
 maas_postgres_data_dir: "/var/lib/postgresql/{{ maas_postgres_version_number }}/main/"
 maas_postgres_log_dir: "/var/log/postgresql/postgresql-{{ maas_postgres_version_number }}-main.log"
 
-maas_postgres_replication_slot: "maas_replication"
 maas_postgres_ssl_enabled: true
-
-maas_open_tcp_ports: 
-- 5432
-- "{{ 9187 if o11y_enable else (false) }}"
-
-maas_open_udp_ports: []
 
 maas_postgres_hash: "{{ 'md5' if maas_postgres_version_number|int <= 12 else 'scram-sha-256' }}"
 
@@ -37,32 +26,3 @@ maas_postgres_v4_subnet: "{{ maas_postgres_v4_cidr | ansible.utils.ipaddr('netwo
 maas_postgres_v6_subnet: "{{ maas_postgres_v6_cidr | ansible.utils.ipaddr('network') }}/{{ maas_postgres_v6_cidr | ansible.utils.ipaddr('prefix') }}"
 maas_postgres_floating_ip_iface: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['interface'] if 'ansible_default_ipv4' in hostvars[inventory_hostname]\
         else hostvars[inventory_hostname]['ansible_default_ipv6']['interface'] }}"
-maas_postgres_hba_entries:
-  local:
-    - type: 'local'
-      database: 'all'
-      user: 'all'
-      address: ''
-      method: 'peer'
-    - type: 'host'
-      database: 'all'
-      user: 'all'
-      address: '127.0.0.1/32'
-      method: '{{ maas_postgres_hash }}'
-    - type: 'host'
-      database: 'all'
-      user: 'all'
-      address: '::1/128'
-      method: '{{ maas_postgres_hash }}'
-  ipv4:
-    - type: 'host'
-      database: '{{ maas_postgres_database }}'
-      user: 'maas'
-      address: "{{ maas_postgres_v4_subnet }}" 
-      method: '{{ maas_postgres_hash }}'
-  ipv6:
-    - type: 'host'
-      database: '{{ maas_postgres_database }}'
-      user: 'maas'
-      address: "{{ maas_postgres_v6_subnet }}"
-      method: '{{ maas_postgres_hash }}'

@@ -1,0 +1,30 @@
+---
+maas_postgres_hba_entries:
+  local:
+    - type: 'local'
+      database: 'all'
+      user: 'all'
+      address: ''
+      method: 'peer'
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: '127.0.0.1/32'
+      method: '{{ maas_postgres_hash }}'
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: '::1/128'
+      method: '{{ maas_postgres_hash }}'
+  ipv4:
+    - type: 'host'
+      database: '{{ maas_postgres_database }}'
+      user: 'maas'
+      address: "{{ maas_postgres_v4_subnet }}" 
+      method: '{{ maas_postgres_hash }}'
+  ipv6:
+    - type: 'host'
+      database: '{{ maas_postgres_database }}'
+      user: 'maas'
+      address: "{{ maas_postgres_v6_subnet }}"
+      method: '{{ maas_postgres_hash }}'
