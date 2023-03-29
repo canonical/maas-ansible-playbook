@@ -1,0 +1,42 @@
+system {
+    allow_knet_handle_fallback: no
+}
+
+totem {
+    version: 2
+    secauth: off
+    cluster_name: postgres_pacemaker
+    transport: knet
+}
+
+logging {
+    fileline: off
+    to_stderr: yes
+    to_logfile: yes
+    logfile: /var/log/corosync/corosync.log
+    to_syslog: yes
+    debug: off
+    logger_subsys {
+        subsys: QUORUM
+        debug: off
+    }
+}
+
+
+nodelist {
+{% for pacemaker_host in groups['maas_corosync'] %}
+    node {
+        name: {{ pacemaker_host }}
+        ring0_addr: {{ hostvars[pacemaker_host]['ansible_default_ipv4']['address'] if 'ansible_default_ipv4' in hostvars[pacemaker_host] else hostvars[pacemaker_host]['ansible_default_ipv6']['address'] }}
+        nodeid: {{ loop.index }}
+    }
+{% endfor %}
+}
+
+quorum {
+    provider: corosync_votequorum
+    two_node: 1
+    wait_for_all: 1
+    last_man_standing: 1
+    auto_tie_breker: 0
+}

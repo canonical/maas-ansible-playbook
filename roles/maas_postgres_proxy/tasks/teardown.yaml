@@ -1,0 +1,13 @@
+---
+- name: "Uninstall HAProxy"
+  ansible.builtin.apt:
+    name: haproxy
+    state: absent
+    purge: true
+
+- name: "Remove HAProxy artifacts"
+  ansible.builtin.file:
+    state: absent
+    name: "{{ item }}"
+  with_items:
+    - /etc/haproxy/haproxy.cfg

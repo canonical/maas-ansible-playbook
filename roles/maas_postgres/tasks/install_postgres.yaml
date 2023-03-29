@@ -1,0 +1,92 @@
+---
+- name: "Install PostgreSQL and configuration dependencies"
+  ansible.builtin.apt:
+    name:
+      - "python3-psycopg2"
+      - "acl"
+      - "{{ maas_postgres_deb_name }}"
+    update_cache: true
+    cache_valid_time: 3600
+    state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
+  register: postgres_installed
+
+- name: "Install xinetd"
+  ansible.builtin.apt:
+    name: "xinetd"
+    state: present
+  when: maas_ha_postgres_enabled|bool
+
+- name: "Generate Replication Password"
+  ansible.builtin.command: openssl rand -base64 14
+  register: maas_postgres_replication_password_output
+  when: (maas_postgres_replication_password is undefined) and (maas_ha_postgres_enabled|bool) and (postgres_installed.changed)
+
+- name: "Save Replication Password"
+  ansible.builtin.set_fact:
+    maas_postgres_replication_password: "{{ maas_postgres_replication_password_output.stdout }}"
+    cacheable: true
+  run_once: true
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  loop: "{{ groups['maas_postgres'] }}"
+  when: (maas_ha_postgres_enabled|bool) and (postgres_installed.changed)
+
+- name: "Write pg_hba.conf"
+  ansible.builtin.template:
+    src: "pg_hba.conf.j2"
+    dest: "{{ maas_postgres_config_dir }}pg_hba.conf"
+    mode: 0640
+    owner: postgres
+    group: postgres
+
+- name: "Write postgresql.conf"
+  ansible.builtin.include_tasks:
+    file: write_postgres_config.yaml
+
+- name: "Create MAAS Postgres User"
+  community.postgresql.postgresql_user:
+    name: "{{ maas_postgres_user }}"
+    password: "{{ maas_postgres_password }}"
+    login_user: "postgres"
+    state: present
+  become: true
+  become_user: postgres
+
+- name: "Create MAAS Postgres Database"
+  community.postgresql.postgresql_db:
+    name: "{{ maas_postgres_database }}"
+    state: "{{ 'present' if maas_postgres_action | lower == 'install' else maas_postgres_action }}"
+    owner: "{{ maas_postgres_user }}"
+  become: true
+  become_user: postgres
+
+- name: "Write pgsql_check script"
+  ansible.builtin.template:
+    src: pgsql_check.j2
+    dest: /opt/pgsql_check
+    mode: 0755
+    owner: root
+    group: root
+  when: maas_ha_postgres_enabled|bool
+
+- name: "Add pgsql_check_v4 service entry"
+  ansible.builtin.lineinfile:
+    dest: /etc/services
+    line: "pgsql_check_v4  {{ maas_pgsql_check_port|default(23267) }}/tcp                       # postgres healthcheck"
+  when: maas_postgres_ipv4 is defined
+
+- name: "Add pgsql_check_v6 service entry"
+  ansible.builtin.lineinfile:
+    dest: /etc/services
+    line: "pgsql_check_v6  {{ maas_pgsql_check_port|default(23267) }}/tcp                       # postgres healthcheck"
+  when: maas_postgres_ipv6 is defined
+
+- name: "Write pgsql_check xinetd config file"
+  ansible.builtin.template:
+    src: pgsql_check_conf.j2
+    dest: /etc/xinetd.d/pgsql_check
+    mode: 0644
+    owner: root
+    group: root
+  when: maas_ha_postgres_enabled|bool
+  notify: "Restart xinetd"

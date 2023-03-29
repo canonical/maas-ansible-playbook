@@ -1,0 +1,98 @@
+---
+- name: "Install Pacemaker packages"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update-cache: true
+  with_items:
+    - pacemaker
+    - pcs
+    - fence-agents
+    - resource-agents-paf
+  register: install_pacemaker
+  notify: "Ensure Pacemaker is started"
+
+- name: "Add temp file config for pacemaker-managed postgres"
+  ansible.builtin.template:
+    src: "postgresql-part.conf.j2"
+    dest: "/etc/tmpfiles.d/postgresql-part.conf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+
+- name: "Generate Pacemaker user Password"
+  ansible.builtin.command: openssl rand -base64 14
+  register: maas_pacemaker_user_password_output
+  when: maas_pacemaker_user_password is undefined
+
+- name: "Save Pacemaker user Password"
+  ansible.builtin.set_fact:
+    maas_pacemaker_user_password: "{{ maas_pacemaker_user_password_output.stdout }}"
+    cacheable: true
+  run_once: true
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  loop: "{{ groups['maas_pacemaker'] }}"
+
+- name: "Set pacemaker user password"
+  ansible.builtin.user:
+    name: "hacluster"
+    password: "{{ maas_pacemaker_user_password | password_hash }}"
+
+- name: "Configure ssh for pacemaker"
+  ansible.builtin.template:
+    src: pacemaker_sshd_config.j2
+    dest: /etc/ssh/sshd_config.d/pacemaker_sshd.conf
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify: "Restart sshd"
+
+- name: "Flush handlers"
+  ansible.builtin.meta: flush_handlers
+
+- name: "Override /etc/hosts for External Address"
+  ansible.builtin.lineinfile:
+    dest: /etc/hosts
+    line: "{{ maas_pacemaker_self_address }} {{ inventory_hostname }}"
+
+- name: "Auth cluster"
+  ansible.builtin.shell:
+    cmd: "pcs host auth {{ groups['maas_pacemaker'] | join(' ') }} -u hacluster -p '{{ maas_pacemaker_user_password }}' && touch /tmp/pacemaker_auth"
+    creates: "/tmp/pacemaker_auth"
+    executable: /bin/bash
+  register: pacemaker_auth
+  until: pacemaker_auth is not failed
+  retries: 3
+  delay: 2
+
+- name: "Add Pacemaker Configuration Script"
+  ansible.builtin.template:
+    src: configure_pacemaker.sh.j2
+    dest: /tmp/configure_pacemaker.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Dump CIB file"
+  ansible.builtin.command:
+    cmd: "pcs cluster cib {{ maas_pacemaker_tmp_cib }}"
+    creates: "{{ maas_pacemaker_tmp_cib }}"
+
+- name: "Configure Pacemaker Resources"
+  ansible.builtin.command:
+    cmd: "/tmp/configure_pacemaker.sh"
+    removes: "{{ maas_pacemaker_tmp_cib }}"
+  run_once: true
+
+- name: "Setup firewall"
+  ansible.builtin.include_role:
+    name: maas_firewall
+    tasks_from: setup_firewall_rules
+  vars:
+    maas_open_tcp_ports:
+      - 5432
+      - 2224
+      - "{{ maas_pgsql_check_port|default(23267) }}"
+    maas_open_udp_ports:
+      - 5405

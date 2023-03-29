@@ -1,16 +1,17 @@
 # postgres version number
 maas_postgres_version_number: "{{ 14 if ansible_distribution_major_version | float >= 22 and maas_version is version('3.2', '>=') else 12 }}"
-
 # latest compatible deb version of postgres
 maas_postgres_deb_name: "postgresql-{{ maas_postgres_version_number }}"
 
 # action to perform on Postgres db, overriden by backup and restore
 maas_postgres_action: "install"
 
+maas_postgres_bin_dir: "/usr/lib/postgresql/{{ maas_postgres_version_number }}/bin/"
 maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
 
 maas_postgres_primary_address: ""
-maas_postgres_replication_user: "replicator"
+
+maas_postgres_primary_conninfo: "user={{ maas_postgres_replication_user }} password=''{{ maas_postgres_replication_password|default(maas_postgres_password) }}'' host={{ maas_postgres_floating_ip|default('127.0.0.1') }} port=5432 application_name={{ inventory_hostname }}"
 
 maas_postgres_data_dir: "/var/lib/postgresql/{{ maas_postgres_version_number }}/main/"
 maas_postgres_log_dir: "/var/log/postgresql/postgresql-{{ maas_postgres_version_number }}-main.log"
@@ -22,4 +23,46 @@ maas_open_tcp_ports:
 - 5432
 - "{{ 9187 if o11y_enable else (false) }}"
 
-maas_open_udp_ports:
+maas_open_udp_ports: []
+
+maas_postgres_hash: "{{ 'md5' if maas_postgres_version_number|int <= 12 else 'scram-sha-256' }}"
+
+maas_postgres_ipv4: "{{ ansible_default_ipv4['address'] if 'address' in ansible_default_ipv4 else '127.0.0.1' }}"
+maas_postgres_ipv6: "{{ ansible_default_ipv6['address'] if 'address' in ansible_default_ipv6 else '::1' }}"
+maas_postgres_ipv4_netmask: "{{ ansible_default_ipv4['netmask'] if 'netmask' in ansible_default_ipv4 else '255.255.255.255' }}"
+maas_postgres_ipv6_prefixlen: "{{ ansible_default_ipv6['prefixlen'] if 'prefixlen' in ansible_default_ipv6 else '128' }}"
+maas_postgres_v4_cidr: "{{ maas_postgres_ipv4 }}/{{ maas_postgres_ipv4_netmask }}"
+maas_postgres_v6_cidr: "{{ maas_postgres_ipv6 }}/{{ maas_postgres_ipv6_prefixlen }}"
+maas_postgres_v4_subnet: "{{ maas_postgres_v4_cidr | ansible.utils.ipaddr('network') }}/{{ maas_postgres_v4_cidr | ansible.utils.ipaddr('prefix') }}"
+maas_postgres_v6_subnet: "{{ maas_postgres_v6_cidr | ansible.utils.ipaddr('network') }}/{{ maas_postgres_v6_cidr | ansible.utils.ipaddr('prefix') }}"
+maas_postgres_floating_ip_iface: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['interface'] if 'ansible_default_ipv4' in hostvars[inventory_hostname]\
+        else hostvars[inventory_hostname]['ansible_default_ipv6']['interface'] }}"
+maas_postgres_hba_entries:
+  local:
+    - type: 'local'
+      database: 'all'
+      user: 'all'
+      address: ''
+      method: 'peer'
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: '127.0.0.1/32'
+      method: '{{ maas_postgres_hash }}'
+    - type: 'host'
+      database: 'all'
+      user: 'all'
+      address: '::1/128'
+      method: '{{ maas_postgres_hash }}'
+  ipv4:
+    - type: 'host'
+      database: '{{ maas_postgres_database }}'
+      user: 'maas'
+      address: "{{ maas_postgres_v4_subnet }}" 
+      method: '{{ maas_postgres_hash }}'
+  ipv6:
+    - type: 'host'
+      database: '{{ maas_postgres_database }}'
+      user: 'maas'
+      address: "{{ maas_postgres_v6_subnet }}"
+      method: '{{ maas_postgres_hash }}'

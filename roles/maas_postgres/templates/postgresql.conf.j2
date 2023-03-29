@@ -57,7 +57,7 @@ external_pid_file = '/var/run/postgresql/{{ maas_postgres_version_number }}-main
 {% if maas_postgres_primary_listen_all_ifaces|default(false) %}
 listen_addresses = '*'
 {% else %}
-listen_addresses = '{%- if maas_postgres_ipv4 is defined -%}{{ maas_postgres_ipv4 }}, {% endif -%}{%- if maas_postgres_ipv6 is defined -%}{{ maas_postgres_ipv6 }}, {% endif -%}localhost'         # what IP address(es) to listen on;
+listen_addresses = '{%- if extra_ip is defined -%}{{ extra_ip }}, {% endif -%}{%- if maas_postgres_ipv4 is defined -%}{{ maas_postgres_ipv4 }}, {% endif -%}{%- if maas_postgres_ipv6 is defined -%}{{ maas_postgres_ipv6 }}, {% endif -%}localhost'         # what IP address(es) to listen on;
 {% endif %}
                                         # comma-separated list of addresses;
                                         # defaults to 'localhost'; use '*' for all
@@ -202,7 +202,9 @@ dynamic_shared_memory_type = posix      # the default is the first option
 
 # - Settings -
 
-#wal_level = replica                    # minimal, replica, or logical
+{% if maas_ha_postgres_enabled|bool %}
+wal_level = replica                    # minimal, replica, or logical
+{% endif %}
                                         # (change requires restart)
 #fsync = on                             # flush data to disk for crash safety
                                         # (turning this off can cause
@@ -217,7 +219,6 @@ dynamic_shared_memory_type = posix      # the default is the first option
                                         #   fsync_writethrough
                                         #   open_sync
 #full_page_writes = on                  # recover from partial page writes
-#wal_log_hints = off                    # also do full page writes of non-critical updates
                                         # (change requires restart)
 #wal_compression = off                  # enable compression of full-page writes
 #wal_init_zero = on                     # zero-fill new WAL files
@@ -237,7 +238,7 @@ dynamic_shared_memory_type = posix      # the default is the first option
 #checkpoint_completion_target = 0.9     # checkpoint target duration, 0.0 - 1.0
 #checkpoint_flush_after = 256kB         # measured in pages, 0 disables
 #checkpoint_warning = 30s               # 0 disables
-max_wal_size = 1GB
+max_wal_size = 2GB
 min_wal_size = 80MB
 
 # - Archiving -
@@ -266,7 +267,9 @@ min_wal_size = 80MB
 
 # Set these only when performing a targeted recovery.
 
-#recovery_target = ''           # 'immediate' to end recovery as soon as a
+{% if maas_ha_postgres_enabled|bool %}
+wal_log_hints = on                    # also do full page writes of non-critical updates
+#recovery_target = 'immediate'           # 'immediate' to end recovery as soon as a
                                 # consistent state is reached
                                 # (change requires restart)
 #recovery_target_name = ''      # the named restore point to which recovery will proceed
@@ -281,11 +284,11 @@ min_wal_size = 80MB
                                 # just after the specified recovery target (on)
                                 # just before the recovery target (off)
                                 # (change requires restart)
-#recovery_target_timeline = 'latest'    # 'current', 'latest', or timeline ID
+recovery_target_timeline = 'latest'    # 'current', 'latest', or timeline ID
                                 # (change requires restart)
 #recovery_target_action = 'pause'       # 'pause', 'promote', 'shutdown'
                                 # (change requires restart)
-
+{% endif %}
 
 #------------------------------------------------------------------------------
 # REPLICATION
@@ -295,9 +298,11 @@ min_wal_size = 80MB
 
 # Set these on the primary and on any standby that will send replication data.
 
-#max_wal_senders = 10           # max number of walsender processes
+{% if maas_ha_postgres_enabled|bool %}
+max_wal_senders = {{ groups['maas_postgres']|length + 10 }}           # max number of walsender processes
+max_replication_slots = {{ groups['maas_postgres']|length + 10 }}     # max number of replication slots
+{% endif %}
                                 # (change requires restart)
-#max_replication_slots = 10     # max number of replication slots
                                 # (change requires restart)
 #wal_keep_size = 0              # in megabytes; 0 disables
 #max_slot_wal_keep_size = -1    # in megabytes; -1 disables
@@ -305,27 +310,15 @@ min_wal_size = 80MB
 #track_commit_timestamp = off   # collect timestamp of transaction commit
                                 # (change requires restart)
 
-# - Primary Server -
-
-# These settings are ignored on a standby server.
-
-{% if 'maas_postgres_primary' in group_names and maas_postgres_enable_sync is defined and groups['maas_postgres_secondary'] %}
-synchronous_standby_names = '*'
-{% endif %}
-                                # method to choose sync standbys, number of sync standbys,
-                                # and comma-separated list of application_name
-                                # from standby(s); '*' = all
-#vacuum_defer_cleanup_age = 0   # number of xacts by which cleanup is delayed
-
 # - Standby Servers -
 
 # These settings are ignored on a primary server.
 
-{% if 'maas_postgres_secondary' in group_names %}
-primary_conninfo = 'postgresql://{{ maas_postgres_replication_user }}:{{ maas_postgres_replication_password }}@{{ maas_postgres_primary_address }}:5432'                  # connection string to sending server
-primary_slot_name = '{{ maas_postgres_replication_slot }}'                 # replication slot on sending server
-promote_trigger_file = '{{ maas_postgres_trigger_file }}'              # file name whose presence ends recovery
+{% if maas_ha_postgres_enabled|bool %}
+primary_conninfo = '{{ maas_postgres_primary_conninfo }}'                  # connection string to sending server
+primary_slot_name = '{{ maas_postgres_replication_slot ~ "_" ~ inventory_hostname|regex_replace('[^A-Za-z0-9_]', '_') }}'                 # replication slot on sending server
 hot_standby = 'on'                       # "off" disallows queries during recovery
+hot_standby_feedback = 'on'
 {% else %}
 hot_standby = 'off'                       # "off" disallows queries during recovery
 {% endif %}
@@ -442,7 +435,9 @@ hot_standby = 'off'                       # "off" disallows queries during recov
                                         # requires logging_collector to be on.
 
 # This is used when logging to stderr:
-#logging_collector = off                # Enable capturing of stderr and csvlog
+{% if maas_ha_postgres_enabled|bool %}
+logging_collector = 'on'       # Enable capturing of stderr and csvlog
+{% endif %}
                                         # into log files. Required to be on for
                                         # csvlogs.
                                         # (change requires restart)
@@ -450,7 +445,7 @@ hot_standby = 'off'                       # "off" disallows queries during recov
 # These are only used if logging_collector is on:
 #log_directory = 'log'                  # directory where log files are written,
                                         # can be absolute or relative to PGDATA
-#log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'        # log file name pattern,
+log_filename = 'postgresql.log'        # log file name pattern,
                                         # can include strftime() escapes
 #log_file_mode = 0600                   # creation mode for log files,
                                         # begin with 0 to use octal notation

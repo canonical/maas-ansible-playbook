@@ -1,0 +1,19 @@
+#!/bin/bash
+
+PG_HOST="{{ postgres_host|default('localhost') }}"
+PG_PORT="{{ postgres_port|default('5432') }}"
+PG_DATABASE="{{ postgres_database|default('maasdb') }}"
+PG_USER="{{ postgres_user|default('maas') }}"
+export PGPASSWORD="{{ maas_postgres_password }}"
+
+CHECK="$(psql -t -h ${PG_HOST} -U ${PG_USER} -w -p ${PG_PORT} -d ${PG_DATABASE} -c 'SELECT pg_is_in_recovery()' 2> /dev/null | xargs)"
+
+if [ "$CHECK" == "t" ]; then
+    echo -e 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 9\r\n\r\nSecondary'
+elif [ "$CHECK" == "f" ]; then
+    echo -e 'HTTP/1.1 204 NO CONTENT\r\nContent-Length: 0\r\n\r\n'
+else
+    echo -e 'HTTP/1.1 503 Service Unavailable\r\nContent-Type: text/plain\r\n\r\nDB Down'
+fi
+
+sleep 1

@@ -1,0 +1,7 @@
+Match User hacluster
+{% for host in groups['maas_pacemaker'] %}
+Match Address {{ hostvars[host]["ansible_default_ipv4"]["address"] if "ansible_default_ipv4" in hostvars[host] else hostvars[host]["ansible_default_ipv6"]["address"] }}
+PasswordAuthentication yes
+{% endfor %}
+Match All
+

@@ -1,0 +1,11 @@
+maas_pacemaker_fencing_driver: "fence_ipmilan" # should be overriden depending on the type of host pacemaker is running on
+maas_pacemaker_tmp_cib: "/tmp/stonith_cfg"
+maas_pacemaker_fence_name: "maas_postgres_fence"
+maas_pacemaker_stonith_params: {} # To be filled out by user based on what fencing driver is used
+
+maas_paf_version: "2.3.0"
+maas_paf_revision: "1"
+maas_paf_deb_url: "https://github.com/ClusterLabs/PAF/releases/download/v{{ maas_paf_version }}/resource-agents-paf_{{ maas_paf_version }}-{{ maas_paf_revision }}_all.deb"
+maas_paf_deb_dest: "/tmp/resource-agents-paf_{{maas_paf_version }}-{{ maas_paf_revision }}_all.deb"
+
+maas_pacemaker_self_address: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] if 'ansible_default_ipv4' in hostvars[inventory_hostname] else hostvars['invenory_hostname']['ansible_default_ipv6']['address'] }}"

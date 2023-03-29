@@ -1,0 +1,56 @@
+global
+    maxconn 100
+
+defaults
+    log global
+    mode tcp
+    retries 2
+    timeout client 30m
+    timeout connect 4s
+    timeout server 30m
+    timeout check 5s
+
+listen stats
+    bind    :9090
+    balance
+    mode    http
+    stats   enable
+    stats uri /stats
+    stats refresh 10s
+
+{% if (maas_proxy_postgres_bind_addr_v4 is defined) and (maas_proxy_postgres_bind_addr_v4) %}
+
+frontend maas-postgres-v4
+    mode tcp
+    bind {{ maas_proxy_postgres_bind_addr_v4 }}:{{ maas_proxy_postgres_port }}
+    use_backend maas-postgres
+
+{% endif %}
+
+{% if (maas_proxy_postgres_bind_addr_v6 is defined) and (maas_proxy_postgres_bind_addr_v6) %}
+
+frontend maas-postgres-v6
+    mode tcp
+    bind {{ maas_proxy_postgres_bind_addr_v6 }}:{{ maas_proxy_postgres_port }}
+    use_backend maas-postgres
+
+{% endif %}
+
+backend maas-postgres
+    option httpchk
+    http-check send meth HEAD uri /
+    http-check expect status 204
+{% if maas_proxy_postgres_upstreams %}
+    {% for upstream in maas_proxy_postgres_upstreams %}
+    server {{ upstream['hostname'] }} {{ upstream['ip'] }}:{{ upstream['port'] }} maxconn 100 check port {{ maas_pgsql_check_port|default(23267) }}
+    {% endfor %}
+{% else %}
+    {%- for pg in groups['maas_postgres'] %}
+        {%- if ('ansible_default_ipv4' in hostvars[pg]) and ('address' in hostvars[pg]['ansible_default_ipv4']) %}
+    server {{ hostvars[pg]['ansible_hostname'] }} {{ hostvars[pg]['ansible_default_ipv4']['address'] }}:5432 maxconn 100 check port {{ maas_pgsql_check_port|default(23267) }} inter 1s rise 2 fall 3
+        {% endif -%}
+        {%- if ('ansible_default_ipv6' in hostvars[pg]) and ('address' in hostvars[pg]['ansible_default_ipv6']) %}
+    server {{ hostvars[pg]['ansible_hostname'] }} {{ hostvars[pg]['ansible_default_ipv6']['address'] }}:5432 maxconn 100 check port {{ maas_pgsql_check_port|default(23267) }} inter 1s rise 2 fall 3
+        {% endif -%}
+    {% endfor %}
+{% endif %}

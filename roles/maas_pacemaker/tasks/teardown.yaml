@@ -1,0 +1,23 @@
+---
+- name: "Uninstall Pacemaker Packages"
+  ansible.builtin.apt:
+    name:
+      - pacemaker
+      - pacemaker-common
+      - pcs
+      - fence-agents
+      - resource-agents-paf
+    state: absent
+    purge: true
+    autoremove: true
+
+- name: "Remove Pacemaker artifacts"
+  ansible.builtin.file:
+    state: absent
+    name: "{{ item }}"
+  with_items:
+    - /tmp/configure_pacemaker.sh
+    - /tmp/pacemaker_auth
+    - /etc/tmpfiles.d/postgresql-part.conf
+    - /etc/ssh/sshd_config.d/pacemaker_sshd.conf
+    - "{{ maas_pacemaker_tmp_cib }}"

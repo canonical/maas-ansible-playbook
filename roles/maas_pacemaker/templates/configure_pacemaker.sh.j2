@@ -1,0 +1,38 @@
+#!/bin/bash
+
+pcs cluster cib {{ maas_pacemaker_tmp_cib }}\
+    && stat {{ maas_pacemaker_tmp_cib }}\
+    && pcs -f {{ maas_pacemaker_tmp_cib }} resource defaults update migration-threshold=5\
+    && pcs -f {{ maas_pacemaker_tmp_cib }} resource defaults update resource-stickiness=10\
+    {% for host in groups['maas_pacemaker'] %}
+    && pcs -f {{ maas_pacemaker_tmp_cib }}\
+        stonith create {{ maas_pacemaker_fence_name }}_{{ host }}\
+        {{ hostvars[host]['maas_pacemaker_fencing_driver'] }}
+        {%- for key, value in hostvars[host]['maas_pacemaker_stonith_params'].items() %} {{ key }}={{ value }}{%- endfor -%}\
+    && pcs -f {{ maas_pacemaker_tmp_cib }} constraint location {{ maas_pacemaker_fence_name }}_{{ host }} avoids {{ host }}=INFINITY\
+    {% endfor %}
+    && pcs -f {{ maas_pacemaker_tmp_cib }} resource create pgsql-pri-ip ocf:heartbeat:IPaddr2\
+        ip="{{ maas_postgres_floating_ip }}"\
+        cidr_netmask="{{ maas_postgres_floating_ip_prefix_len }}"\
+        op monitor interval=10s\
+    && pcs -f {{ maas_pacemaker_tmp_cib }} resource create pgsqld ocf:heartbeat:pgsqlms\
+        bindir="{{ maas_postgres_bin_dir }}"\
+        pgdata="{{ maas_postgres_config_dir }}"\
+        datadir="{{ maas_postgres_data_dir }}"\
+        op start timeout=60s\
+        op stop timeout=60s\
+        op promote timeout=30s\
+        op demote timeout=120s\
+        op monitor interval=15s timeout=10s role="Master"\
+        op monitor interval=16s timeout=10s role="Slave"\
+        op notify timeout=60s\
+        promotable notify=true\
+    && pcs cluster cib-push scope=configuration {{ maas_pacemaker_tmp_cib }}\
+    && pcs resource status pgsqld\
+    && pcs resource meta pgsqld master-max=1\
+    && pcs constraint colocation add pgsql-pri-ip with Master pgsqld-clone INFINITY\
+    && pcs constraint order promote pgsqld-clone then start pgsql-pri-ip symmetrical=false kind=Mandatory\
+    && pcs constraint order demote pgsqld-clone then stop pgsql-pri-ip symmetrical=false kind=Mandatory\
+    && pcs resource enable pgsql-pri-ip\
+    && pcs resource enable pgsqld\
+    && rm {{ maas_pacemaker_tmp_cib }}
