@@ -1,0 +1,5 @@
+---
+maas_pacemaker_fencing_driver: "fence_ipmilan" # should be overriden depending on the type of host pacemaker is running on
+maas_pacemaker_tmp_cib: "/tmp/stonith_cfg"
+maas_pacemaker_fence_name: "maas_postgres_fence"
+maas_pacemaker_stonith_params: {} # To be filled out by user based on what fencing driver is used

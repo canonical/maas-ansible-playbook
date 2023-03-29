@@ -1,0 +1,30 @@
+---
+# O11y variables
+o11y_enable: false
+
+o11y_prometheus_url: ""
+o11y_loki_url: ""
+
+o11y_prometheus_alert_repos: "https://github.com/canonical/maas-prometheus-alert-rules.git"
+o11y_loki_alert_repos: "https://github.com/canonical/maas-loki-alert-rules.git"
+o11y_enabled_roles:
+  - maas_postgres
+  - maas_corosync
+  - maas_pacemaker
+  - maas_region_controller
+  - maas_rack_controller
+
+o11y_grafana_agent_dir: "/opt/grafana-agent"
+o11y_grafana_agent_wal_dir: "/var/lib/grafana-agent/wal"
+o11y_grafana_agent_pos_dir: "/var/lib/grafana-agent/positions"
+
+o11y_grafana_agent_dirs:
+  - "{{ o11y_grafana_agent_dir }}"
+  - "{{ o11y_grafana_agent_wal_dir }}"
+  - "{{ o11y_grafana_agent_pos_dir }}"
+
+grafana_agent_pkg: https://github.com/grafana/agent/releases/download/v0.22.0/agent-linux-amd64.zip
+
+o11y_postgres_exporter_dir: "/opt/postgres-exporter"
+
+pg_exp_pkg: "https://github.com/prometheus-community/postgres_exporter/releases/download/v0.11.1/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}.tar.gz"

@@ -4,9 +4,3 @@ maas_proxy_bind_addr_v4: "0.0.0.0"
 maas_proxy_bind_addr_v6: "::"
 maas_proxy_upstreams: [] # empty or undefined will use the default ips of each maas_region_controller
 maas_proxy_state: "install"
-
-maas_open_tcp_ports:
-- "{{ 5432 if 'maas_postgres' in group_names else (false) }}" 
-- "{{ maas_proxy_port }}"
-
-maas_open_udp_ports:

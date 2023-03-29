@@ -1,0 +1,15 @@
+---
+maas_open_tcp_ports:
+- 53		# dns
+- 514 		# rsyslog
+- 5248		# rack http port
+- 3218
+- 8000
+- "{{ maas_promtail_port if o11y_enable else (false) }}"
+
+maas_open_udp_ports:
+- 53 		# dns
+- 67:69 	# tftp, dhcp 
+- 123		# ntp
+- 514 		# rsyslog
+- 5248		# rack http port
