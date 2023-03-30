@@ -39,19 +39,35 @@ host replication replicator {{ maas_postgres_floating_ip }}/{{ 32 if maas_postgr
 {% for host in groups['maas_postgres'] %}
 {% if host != inventory_hostname %}
 {%- if ('ansible_default_ipv4' in hostvars[host]) and ('address' in hostvars[host]['ansible_default_ipv4']) -%}
+{% if "/" in hostvars[host]['ansible_default_ipv4']['address'] %}
+host replication replicator {{ hostvars[host]['ansible_default_ipv4']['address'] }} {{ maas_postgres_hash }}
+{% else %}
 host replication replicator {{ hostvars[host]['ansible_default_ipv4']['address'] }}/32 {{ maas_postgres_hash }}
 {% endif %}
+{% endif %}
 {%- if ('ansible_default_ipv6' in hostvars[host]) and ('address' in hostvars[host]['ansible_default_ipv6']) -%}
+{% if "/" in hostvars[host]['ansible_default_ipv6']['address'] %}
+host replication replicator {{ hostvars[host]['ansible_default_ipv6']['address'] }} {{ maas_postgres_hash }}
+{% else %}
 host replication replicator {{ hostvars[host]['ansible_default_ipv6']['address'] }}/128 {{ maas_postgres_hash }}
+{% endif %}
 {% endif %}
 {% endif %}
 {% endfor %}
 # don't allow replication of self
-{% if ('ansible_default_ipv4' in hostvars[inventory_hostname]) and ('address' in hostvars[inventory_hostname]['ansible_default_ipv4']) %}
-host replication replicator {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}/32 reject
+{% if ansible_default_ipv4 and ('address' in ansible_default_ipv4) %}
+{% if "/" in ansible_default_ipv4['address'] %}
+host replication replicator {{ ansible_default_ipv4['address'] }} reject
+{% else %}
+host replication replicator {{ ansible_default_ipv4['address'] }}/32 reject
 {% endif %}
-{% if ('ansible_default_ipv6' in hostvars[inventory_hostname]) and ('address' in hostvars[inventory_hostname]['ansible_default_ipv6']) %}
-host replication replicator {{ hostvars[inventory_hostname]['ansible_default_ipv6']['address'] }}/128 reject
+{% endif %}
+{% if ansible_default_ipv6 and ('address' in ansible_default_ipv6) %}
+{% if "/" in ansible_default_ipv6['address'] %}
+host replication replicator {{ ansible_default_ipv6['address'] }} reject
+{% else %}
+host replication replicator {{ ansible_default_ipv6['address'] }}/128 reject
+{% endif %}
 {% endif %}
 
 host replication replicator {{ ansible_hostname }} reject
