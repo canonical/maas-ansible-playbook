@@ -17,4 +17,10 @@
     name: "xinetd.service"
     state: restarted
     enabled: true
-  when: maas_ha_postgres_enabled|bool
+
+- name: "Start Postgres metrics agent"
+  ansible.builtin.systemd:
+    name: postgres_exporter
+    enabled: true
+    state: "restarted"
+    daemon-reload: true

@@ -6,23 +6,8 @@
     state: stopped
   when: ansible_facts.services['telemetry.service'] is defined
 
-- name: Remove grafana agent service
+- name: "Remove o11y agent artifacts"
   ansible.builtin.file:
-    path: /etc/systemd/system/telemetry.service
     state: absent
-
-- name: Reload the SystemD to re-read configurations
-  ansible.builtin.systemd:
-    daemon-reload: true
-
-- name: Remove agent directories
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-    mode: 0755
-  loop: "{{ o11y_grafana_agent_dirs }}"
-
-- name: Remove grafana agent pkg
-  ansible.builtin.file:
-    path: "{{ o11y_grafana_agent_dir }}"
-    state: absent
+    name: "{{ item }}"
+  with_items: "{{ o11y_grafana_agent_dirs|union([o11y_grafana_agent_unit]) }}"

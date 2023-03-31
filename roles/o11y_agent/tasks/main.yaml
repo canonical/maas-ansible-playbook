@@ -19,7 +19,6 @@
   ansible.builtin.apt:
     name: unzip
     state: "present"
-    update_cache: true
 
 - name: Download and unzip grafana agent
   ansible.builtin.unarchive:
@@ -28,28 +27,15 @@
     remote_src: true
   when: o11y_enable
 
-- name: Remove grafana agent pkg
-  ansible.builtin.file:
-    path: "{{ o11y_grafana_agent_dir }}"
-    state: "absent"
-  when: not o11y_enable
-
 - name: Make agent executable
   ansible.builtin.file:
     path: "{{ o11y_grafana_agent_dir }}/agent-linux-amd64"
     mode: "a+x"
   when: o11y_enable
 
-- name: Agent configuration
-  ansible.builtin.template:
-    src: "grafana-agent.yaml.j2"
-    dest: "{{ o11y_grafana_agent_dir }}/agent.yaml"
-    mode: 0644
-  when: o11y_enable
-
 - name: Creating a service file
   ansible.builtin.copy:
-    dest: /etc/systemd/system/telemetry.service
+    dest: "{{ o11y_grafana_agent_unit }}"
     mode: 0644
     content: |
       [Unit]
@@ -64,22 +50,11 @@
       WantedBy=multi-user.target
   when: o11y_enable
 
-- name: Reload the SystemD to re-read configurations
-  ansible.builtin.systemd:
-    daemon-reload: true
-
-- name: "Collect facts about system services"
-  ansible.builtin.service_facts:
-
-- name: Set the grafana agent service status
-  ansible.builtin.service:
-    name: telemetry
-    enabled: "{{ o11y_enable }}"
-    state: "{{ 'started' if o11y_enable else 'stopped' }}"
-  when: ansible_facts.services['telemetry.service'] is defined
-
-- name: Remove grafana agent service
-  ansible.builtin.file:
-    path: /etc/systemd/system/telemetry.service
-    state: "absent"
-  when: not o11y_enable
+- name: Agent configuration
+  ansible.builtin.template:
+    src: "grafana-agent.yaml.j2"
+    dest: "{{ o11y_grafana_agent_dir }}/agent.yaml"
+    mode: 0644
+  when: o11y_enable
+  notify:
+    - "Start grafana agent"
