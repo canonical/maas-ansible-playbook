@@ -3,8 +3,12 @@
   ansible.builtin.apt:
     name: "haproxy"
     state: absent
+    purge: true
 
-- name: "Remove HAProxy Config"
+- name: "Remove HAProxy artifacts"
   ansible.builtin.file:
-    path: /etc/haproxy/haproxy.cfg
-    state: 'absent'
+    state: absent
+    name: "{{ item }}"
+  with_items:
+    - /etc/haproxy/haproxy.cfg
+    - /var/lib/haproxy
