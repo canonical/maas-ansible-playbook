@@ -11,3 +11,4 @@
     name: "{{ item }}"
   with_items:
     - /etc/haproxy/haproxy.cfg
+    - /var/lib/haproxy
