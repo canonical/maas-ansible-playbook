@@ -2,9 +2,12 @@
 - name: "Install HAProxy"
   ansible.builtin.apt:
     name: "haproxy"
-    update_cache: true
-    cache_valid_time: 3600
     state: "{{ 'present' if maas_proxy_state | lower == 'install' else maas_proxy_state }}"
+
+- name: "Stop HAProxy"
+  ansible.builtin.systemd:
+    name: "haproxy.service"
+    state: 'stopped'
 
 - name: "Write HAProxy Config"
   ansible.builtin.template:
@@ -13,12 +16,8 @@
     mode: '0644'
     owner: haproxy
     group: haproxy
-
-- name: "Restart HAProxy"
-  ansible.builtin.systemd:
-    name: "haproxy.service"
-    state: 'restarted'
-    enabled: true
+  notify:
+    - "Restart HAProxy"
 
 - name: "Setup firewall"
   ansible.builtin.include_role:
