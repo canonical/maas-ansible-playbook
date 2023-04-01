@@ -40,7 +40,8 @@
       Group=postgres
       Type=simple
       EnvironmentFile={{ o11y_postgres_exporter_dir }}/postgres_exporter.env
-      ExecStart={{ o11y_postgres_exporter_dir }}/postgres_exporter
+      ExecStart={{ o11y_postgres_exporter_dir }}/postgres_exporter $ARGS
+      ExecReload=/bin/kill -HUP $MAINPID
       Restart=always
       [Install]
       WantedBy=multi-user.target
