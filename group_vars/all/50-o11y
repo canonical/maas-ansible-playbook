@@ -27,8 +27,9 @@ o11y_grafana_agent_dirs:
 grafana_agent_pkg: https://github.com/grafana/agent/releases/download/v0.22.0/agent-linux-amd64.zip
 
 o11y_postgres_exporter_dir: "/opt/postgres-exporter"
-
 pg_exp_pkg: "https://github.com/prometheus-community/postgres_exporter/releases/download/v0.11.1/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}.tar.gz"
-
 pg_exp_conn: "DATA_SOURCE_NAME='postgresql://{{ maas_postgres_user }}:{{ maas_postgres_password }}@\
               {{ inventory_hostname }}:5432/{{ maas_postgres_database }}?sslmode=disable'"
+
+ha_exp_pkg: "https://github.com/ClusterLabs/ha_cluster_exporter/releases/download/1.3.1/ha_cluster_exporter-{{ ubuntu_arch }}.gz"
+ha_exp_dir: "/opt/ha_cluster_exporter"

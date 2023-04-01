@@ -21,3 +21,5 @@
     - /etc/tmpfiles.d/postgresql-part.conf
     - /etc/ssh/sshd_config.d/pacemaker_sshd.conf
     - "{{ maas_pacemaker_tmp_cib }}"
+    - /etc/systemd/system/ha_cluster_exporter.service
+    - "{{ ha_exp_dir }}"
