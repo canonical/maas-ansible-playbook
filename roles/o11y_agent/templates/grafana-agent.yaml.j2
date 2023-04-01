@@ -37,6 +37,13 @@ metrics:
           static_configs:
             - targets: ['{{ ansible_hostname }}:9187']
 {% endif %}
+{% if 'maas_pacemaker' in group_names %}
+    - name: 'ha-cluster'
+      scrape_configs:
+        - job_name: 'cluster-metrics'
+          static_configs:
+            - targets: ['{{ ansible_hostname }}:9664']
+{% endif %}
 {% endif %}
 
 {% if o11y_loki_url|length > 0 %}
@@ -172,9 +179,26 @@ logs:
         - job_name: database-logs
           static_configs:
             - labels:
-                __path__: {{ maas_postgres_log_dir }}
+                __path__: {{ maas_postgres_data_dir ~ 'log/postgresql.log' }}
                 host: {{ ansible_hostname }}
                 job: "database-logs"
 {% endif %}
+{% if 'maas_pacemaker' in group_names %}
+    - name: 'ha-cluster'
+      clients:
+        - url: {{ o11y_loki_url }}
+      scrape_configs:
+        - job_name: pacemaker-logs
+          static_configs:
+            - labels:
+                __path__: /var/log/pacemaker/pacemaker.log
+                host: {{ ansible_hostname }}
+                job: "pacemaker-logs"
+        - job_name: corosync-logs
+          static_configs:
+            - labels:
+                __path__: /var/log/corosync/corosync.log
+                host: {{ ansible_hostname }}
+                job: "corosync-logs"
 {% endif %}
-
+{% endif %}
