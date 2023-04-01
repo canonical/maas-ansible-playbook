@@ -29,7 +29,7 @@
 
 - name: Make agent executable
   ansible.builtin.file:
-    path: "{{ o11y_grafana_agent_dir }}/agent-linux-amd64"
+    path: "{{ o11y_grafana_agent_dir }}/grafana-agent-linux-{{ ubuntu_arch }}"
     mode: "a+x"
   when: o11y_enable
 
@@ -44,7 +44,7 @@
       After=network.target
       [Service]
       Type=simple
-      ExecStart={{ o11y_grafana_agent_dir }}/agent-linux-amd64 -config.file={{ o11y_grafana_agent_dir }}/agent.yaml
+      ExecStart={{ o11y_grafana_agent_dir }}/grafana-agent-linux-{{ ubuntu_arch }} -config.file={{ o11y_grafana_agent_dir }}/agent.yaml
       Restart=on-abnormal
       [Install]
       WantedBy=multi-user.target
