@@ -13,6 +13,11 @@
     file: configure_postgres_secondary.yaml
   when: maas_ha_postgres_enabled|bool
 
+- name: "Configure Postgres metrics agent"
+  ansible.builtin.include_tasks:
+    file: o11y_pg.yaml
+  when: o11y_enable
+
 - name: "Setup firewall"
   ansible.builtin.include_role:
     name: maas_firewall
