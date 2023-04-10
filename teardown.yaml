@@ -32,7 +32,6 @@
       ansible.builtin.include_role:
         name: maas_proxy
         tasks_from: teardown
-      # when: "'haproxy' in ansible_facts.packages"
 
     - name: "Uninstall Pacemaker"
       ansible.builtin.include_role:
@@ -48,7 +47,6 @@
       ansible.builtin.include_role:
         name: maas_postgres
         tasks_from: teardown
-      # when: "'postgres' in ansible_facts.packages"
 
     - name: "Uninstall o11y"
       ansible.builtin.include_role:
