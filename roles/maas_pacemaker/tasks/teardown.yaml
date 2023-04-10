@@ -1,4 +1,9 @@
 ---
+- name: "Stop Cluster services"
+  ansible.builtin.command: pcs cluster stop --all
+  changed_when: false
+  when: "'pacemaker' in ansible_facts.packages"
+
 - name: "Uninstall Pacemaker Packages"
   ansible.builtin.apt:
     name:
@@ -20,4 +25,6 @@
     - /tmp/pacemaker_auth
     - /etc/tmpfiles.d/postgresql-part.conf
     - /etc/ssh/sshd_config.d/pacemaker_sshd.conf
-    - "{{ maas_pacemaker_tmp_cib }}"
+    - "{{ maas_pacemaker_tmp_cib|d(false) }}"
+    - /etc/systemd/system/ha_cluster_exporter.service
+    - "{{ ha_exp_dir }}"

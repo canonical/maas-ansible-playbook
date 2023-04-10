@@ -11,3 +11,10 @@
     name: "sshd.service"
     state: restarted
     no_block: false
+
+- name: "Start HA clusters metrics agent"
+  ansible.builtin.systemd:
+    name: ha_cluster_exporter
+    enabled: true
+    state: "restarted"
+    daemon-reload: true
