@@ -1,5 +1,5 @@
 # MAAS-ansible-playbook
-An Ansible playbook for installing and configuring MAAS, further documentation is found [here](https://maas.io/docs/ansible-playbooks-reference).
+An Ansible playbook for installing, configuring, and uninstalling MAAS. Further documentation is found [here](https://maas.io/docs/ansible-playbooks-reference).
 
 ## Supported versions
 This playbook has been tested with Ansible version 5.10.0 and above. We recommend using the latest available stable version of Ansible (currently 7.x). The `netaddr` Python library needs to be installed on the machine on which Ansible is used; note that this is not required on remote hosts.
