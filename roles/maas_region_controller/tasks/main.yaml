@@ -68,11 +68,11 @@
   vars:
     maas_open_tcp_ports:
       - 514       # rsyslog
-      - 3128
-      - 5240      # MAAS port
-      - 5241:5247
-      - 5250:5270 # region workers (RPC)
-      - 5432      # postgres
+      - 3128      # MAAS proxy
+      - 5240      # MAAS http port
+      - 5241:5247 # Intenal MAAS service communication
+      - 5250:5270 # Region workers (RPC)
+      - 5432      # Postgres
       - 5443      # MAAS https port
       - 8000
       - "{{ maas_proxy_port if 'maas_proxy' in group_names else (false) }}"
