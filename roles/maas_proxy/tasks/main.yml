@@ -25,6 +25,6 @@
     tasks_from: setup_firewall_rules
   vars:
     maas_open_tcp_ports:
-      - "{{ 5432 if 'maas_postgres' in group_names else (false) }}" 
+      - "{{ 5432 if 'maas_postgres' in group_names else (false) }}"
       - "{{ maas_proxy_port }}"
   when: ('maas_region_controller' not in group_names and 'maas_rack_controller' not in group_names)
