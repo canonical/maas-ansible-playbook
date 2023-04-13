@@ -67,7 +67,6 @@
     tasks_from: setup_firewall_rules
   vars:
     maas_open_tcp_ports:
-      - 53        # dns
       - 514       # rsyslog
       - 3128
       - 5240      # MAAS port
@@ -80,7 +79,6 @@
       - "{{ maas_proxy_postgres_port if 'maas_proxy' in group_names else (false) }}"
       - "{{ maas_promtail_port if o11y_enable else (false) }}"
     maas_open_udp_ports:
-      - 53        # dns
       - 123       # ntp
       - 514       # rsyslog
       - 5240      # MAAS port
