@@ -57,6 +57,7 @@
 - hosts: maas_postgres
   roles:
     - role: maas_postgres
+    - role: o11y_agent
   become: true
   gather_facts: true
   tags:

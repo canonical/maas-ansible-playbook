@@ -1,0 +1,7 @@
+---
+- name: "Start grafana agent"
+  ansible.builtin.systemd:
+    name: telemetry
+    enabled: true
+    state: "restarted"
+    daemon-reload: true

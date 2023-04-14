@@ -28,23 +28,10 @@
         name: maas_rack_controller
         tasks_from: teardown
 
-    - name: "Uninstall postgres"
-      ansible.builtin.include_role:
-        name: maas_postgres
-        tasks_from: teardown
-      # when: "'postgres' in ansible_facts.packages"
-
-    - name: "Uninstall postgres secondary"
-      ansible.builtin.include_role:
-        name: maas_postgres_secondary
-        tasks_from: teardown
-      # when: "'postgres' in ansible_facts.packages"
-
     - name: "Uninstall HAProxy"
       ansible.builtin.include_role:
         name: maas_proxy
         tasks_from: teardown
-      # when: "'haproxy' in ansible_facts.packages"
 
     - name: "Uninstall Pacemaker"
       ansible.builtin.include_role:
@@ -54,6 +41,11 @@
     - name: "Uninstall Corosync"
       ansible.builtin.include_role:
         name: maas_corosync
+        tasks_from: teardown
+
+    - name: "Uninstall postgres"
+      ansible.builtin.include_role:
+        name: maas_postgres
         tasks_from: teardown
 
     - name: "Uninstall o11y"

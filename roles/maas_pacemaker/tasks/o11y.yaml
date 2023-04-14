@@ -1,0 +1,38 @@
+---
+- name: "Create ha_cluster_exporter directory"
+  ansible.builtin.file:
+    path: "{{ ha_exp_dir }}"
+    state: "directory"
+    mode: 0755
+
+- name: "Download latest ha_cluster_exporter release"
+  ansible.builtin.get_url:
+    url: "{{ ha_exp_pkg }}"
+    dest: "{{ ha_exp_dir ~ '/ha_cluster_exporter.gz' }}"
+
+- name: "Extract ha_cluster_exporter"
+  ansible.builtin.command:
+    cmd: gunzip "{{ ha_exp_dir }}/ha_cluster_exporter.gz"
+    creates: "{{ ha_exp_dir ~ '/ha_cluster_exporter' }}"
+
+- name: "Make agent executable"
+  ansible.builtin.file:
+    path: "{{ ha_exp_dir ~ '/ha_cluster_exporter' }}"
+    mode: 0755
+
+- name: "Create a service file"
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/ha_cluster_exporter.service
+    mode: 0644
+    content: |
+      [Unit]
+      Description=Prometheus exporter for Pacemaker HA clusters metrics
+      After=network.target
+      [Service]
+      Type=simple
+      ExecStart={{ ha_exp_dir }}/ha_cluster_exporter $ARGS
+      ExecReload=/bin/kill -HUP $MAINPID
+      Restart=always
+      [Install]
+      WantedBy=multi-user.target
+  notify: "Start HA clusters metrics agent"

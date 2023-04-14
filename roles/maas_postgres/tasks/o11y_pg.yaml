@@ -2,22 +2,29 @@
 - name: "Create postgres-exporter directory"
   ansible.builtin.file:
     path: "{{ o11y_postgres_exporter_dir }}"
-    state: "{{ 'directory' if (o11y_enable and 'maas_postgres' in group_names) else 'absent' }}"
+    state: "directory"
     mode: 0755
-  changed_when: false
+
+- name: Install unzip
+  ansible.builtin.apt:
+    name: unzip
+    state: "present"
 
 - name: "Download and unzip latest postgres-exporter release"
   ansible.builtin.unarchive:
     src: "{{ pg_exp_pkg }}"
     dest: "{{ o11y_postgres_exporter_dir }}"
     remote_src: true
+    creates: "{{ o11y_postgres_exporter_dir ~ '/postgres_exporter' }}"
+    extra_opts:
+      - "--strip-components"
+      - "1"
 
 - name: "Set env variable for data source"
   ansible.builtin.copy:
+    dest: "{{ o11y_postgres_exporter_dir ~ '/postgres_exporter.env' }}"
     mode: 0644
-    dest: "{{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}/postgres_exporter.env"
-    content: |
-      DATA_SOURCE_NAME="postgresql://{{ maas_postgres_user }}:{{ maas_postgres_password }}@{{ inventory_hostname }}:5432/?sslmode=disable"
+    content: "{{ pg_exp_conn }}"
 
 - name: "Create a service file"
   ansible.builtin.copy:
@@ -32,23 +39,10 @@
       User=postgres
       Group=postgres
       Type=simple
-      EnvironmentFile={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}/postgres_exporter.env
-      ExecStart={{ o11y_postgres_exporter_dir }}/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}/postgres_exporter
+      EnvironmentFile={{ o11y_postgres_exporter_dir }}/postgres_exporter.env
+      ExecStart={{ o11y_postgres_exporter_dir }}/postgres_exporter $ARGS
+      ExecReload=/bin/kill -HUP $MAINPID
       Restart=always
       [Install]
       WantedBy=multi-user.target
-  when: o11y_enable
-
-- name: "Reload systemd to re-read configurations"
-  ansible.builtin.systemd:
-    daemon-reload: true
-
-- name: "Collect facts about system services"
-  ansible.builtin.service_facts:
-
-- name: "Set the pg-exporter agent service status"
-  ansible.builtin.service:
-    name: postgres_exporter
-    enabled: "{{ o11y_enable }}"
-    state: "{{ 'started' if o11y_enable else 'stopped' }}"
-  when: ansible_facts.services['postgres_exporter.service'] is defined
+  notify: "Start Postgres metrics agent"

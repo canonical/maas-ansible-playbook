@@ -85,6 +85,11 @@
     removes: "{{ maas_pacemaker_tmp_cib }}"
   run_once: true
 
+- name: "Configure HA metrics agent"
+  ansible.builtin.include_tasks:
+    file: o11y.yaml
+  when: o11y_enable
+
 - name: "Setup firewall"
   ansible.builtin.include_role:
     name: maas_firewall

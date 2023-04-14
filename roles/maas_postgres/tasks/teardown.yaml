@@ -7,6 +7,12 @@
   ansible.builtin.set_fact:
     maas_postgres_config_dir: "/etc/postgresql/{{ maas_postgres_version_number }}/main/"
 
+- name: Stop Postgres metrics agent
+  ansible.builtin.service:
+    name: postgres_exporter
+    state: stopped
+  when: ansible_facts.services['postgres_exporter.service'] is defined
+
 - name: "Remove PostgreSQL artifacts"
   ansible.builtin.file:
     state: absent
@@ -14,6 +20,8 @@
   with_items:
     - /opt/pgsql_check
     - /etc/xinetd.d/pgsql_check
+    - /etc/systemd/system/postgres_exporter.service
+    - "{{ o11y_postgres_exporter_dir }}"
 
 - name: "Uninstall PostgreSQL and configuration dependencies"
   ansible.builtin.apt:
