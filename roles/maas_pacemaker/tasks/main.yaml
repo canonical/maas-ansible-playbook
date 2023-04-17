@@ -20,6 +20,15 @@
     group: "root"
     mode: 0644
 
+- name: "Setup NOPROXY for cluster members"
+  ansible.builtin.lineinfile:
+    dest: "{{ item }}"
+    line: "NOPROXY={{ groups['maas_pacemaker'] | join(',') }},{{ maas_pacemaker_noproxy_list }},{{ maas_postgres_floating_ip }}"
+  with_items:
+    - "/etc/default/pacemaker"
+    - "/etc/default/pcsd"
+  when: proxy_env
+
 - name: "Generate Pacemaker user Password"
   ansible.builtin.command: openssl rand -base64 14
   register: maas_pacemaker_user_password_output
@@ -65,6 +74,9 @@
   until: pacemaker_auth is not failed
   retries: 3
   delay: 2
+  environment:
+    no_proxy: "{{ groups['maas_pacemaker'] | join(',') }},{{ maas_pacemaker_noproxy_list }},{{ maas_postgres_floating_ip }}"
+    NO_PROXY: "{{ groups['maas_pacemaker'] | join(',') }},{{ maas_pacemaker_noproxy_list }},{{ maas_postgres_floating_ip }}"
 
 - name: "Add Pacemaker Configuration Script"
   ansible.builtin.template:
