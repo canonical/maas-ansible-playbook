@@ -1,6 +1,6 @@
 ---
-maas_open_tcp_ports:
+maas_pgproxy_tcp_ports:
 - 5432
 - "{{ 5051 if 'maas_postgres' in group_names else (false) }}"
 
-maas_open_udp_ports:
+maas_pgproxy_udp_ports:
