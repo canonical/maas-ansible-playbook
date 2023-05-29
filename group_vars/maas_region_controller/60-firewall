@@ -1,5 +1,5 @@
 ---
-maas_rack_tcp_ports: 
+maas_region_tcp_ports:
 - 53 			# dns
 - 514 			# rsyslog
 - 3128
