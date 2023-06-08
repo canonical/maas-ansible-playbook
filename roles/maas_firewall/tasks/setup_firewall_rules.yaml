@@ -53,8 +53,12 @@
     protocol: tcp
     destination_port: "{{ item }}"
     jump: ACCEPT
-  with_items: '{{ maas_open_tcp_ports | select() }}'
-  when: maas_open_tcp_ports
+  with_items:
+    - '{{ maas_pg_tcp_ports | default([]) | select() }}'
+    - '{{ maas_pgproxy_tcp_ports | default([]) | select() }}'
+    - '{{ maas_proxy_tcp_ports | default([]) | select() }}'
+    - "{{ maas_rack_tcp_ports | default([]) | select() }}"
+    - "{{ maas_region_tcp_ports | default([]) | select() }}"
 
 - name: Open udp ports
   ansible.builtin.iptables:
@@ -62,8 +66,12 @@
     protocol: udp
     destination_port: "{{ item }}"
     jump: ACCEPT
-  with_items: "{{ maas_open_udp_ports }}"
-  when: maas_open_udp_ports
+  with_items:
+    - "{{ maas_pg_udp_ports | default([]) | select() }}"
+    - "{{ maas_pgproxy_udp_ports | default([]) | select() }}"
+    - "{{ maas_proxy_udp_ports | default([]) | select() }}"
+    - "{{ maas_rack_udp_ports | default([]) | select() }}"
+    - "{{ maas_region_udp_ports | default([]) | select() }}"
 
 - name: Set policy for INPUT chain to drop (otherwise)
   ansible.builtin.iptables:

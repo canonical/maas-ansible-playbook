@@ -4,3 +4,9 @@ maas_paf_deb_url: "https://github.com/ClusterLabs/PAF/releases/download/v{{ maas
 maas_paf_deb_dest: "/tmp/resource-agents-paf_{{maas_paf_version }}-{{ maas_paf_revision }}_all.deb"
 
 maas_pacemaker_self_address: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] if 'ansible_default_ipv4' in hostvars[inventory_hostname] else hostvars[inventory_hostname]['ansible_default_ipv6']['address'] }}"
+
+maas_pacemaker_noproxy_list_v4: "{{ groups['maas_pacemaker'] | map('extract', hostvars, 'ansible_default_ipv4') | map(attribute='address') | list }}"
+
+maas_pacemaker_noproxy_list_v6: "{{ groups['maas_pacemaker'] | map('extract', hostvars, 'ansible_default_ipv4') | map(attribute='address') | list }}"
+
+maas_pacemaker_noproxy_list: "{% if maas_pacemaker_noproxy_list_v4 %}{{ maas_pacemaker_noproxy_list_v4 | join(',') }}{% endif %}{% if maas_pacemaker_noproxy_list_v4 and maas_pacemaker_noproxy_list_v6 %},{% endif %}{% if maas_pacemaker_noproxy_list_v6 %}{{ maas_pacemaker_noproxy_list_v6 }}{% endif %}"
