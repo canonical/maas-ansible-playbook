@@ -54,6 +54,7 @@
     status_code:
       - 200
       - 204
+    use_proxy: false
   register: pg_healthcheck
   until: pg_healthcheck is not failed
   retries: 5
