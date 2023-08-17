@@ -9,6 +9,8 @@ admin_password: "admin"
 admin_email: "admin@email.com"
 admin_id: "admin"
 
+import_ssh_keys: true
+
 maas_proxy_port: "{{ 5240 if 'maas_region_controller' not in group_names else 5050 }}"
 maas_proxy_postgres_port: "{{ 5432 if 'maas_postgres' not in group_names else 5051 }}"
 
