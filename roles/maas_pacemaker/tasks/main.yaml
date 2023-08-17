@@ -113,3 +113,4 @@
       - "{{ maas_pgsql_check_port|default(23267) }}"
     maas_pg_udp_ports:
       - 5405
+  when: enable_firewall | bool
