@@ -1,0 +1,8 @@
+---
+- name: Restore database using the tar format
+  community.postgresql.postgresql_db:
+    name: "{{ maas_postgres_database }}"
+    state: restore
+    target: "{{ maas_postgres_backup_path }}"
+  become: true
+  become_user: postgres

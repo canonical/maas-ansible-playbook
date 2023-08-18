@@ -1,0 +1,14 @@
+---
+- name: "Create a backup directory"
+  file:
+    path: "{{ maas_postgres_backup_dir }}"
+    mode: 0777
+    state: directory
+
+- name: Dump database to a file
+  community.postgresql.postgresql_db:
+    name: "{{ maas_postgres_database }}"
+    state: dump
+    target: "{{ maas_postgres_backup_path }}"
+  become: true
+  become_user: postgres
