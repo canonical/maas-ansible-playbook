@@ -7,9 +7,7 @@ maas_https_port: 5443       # The https port MAAS uses to communicate on
 admin_username: "admin"
 admin_password: "admin"
 admin_email: "admin@email.com"
-admin_id: "admin"
-
-import_ssh_keys: true
+admin_id: ""
 
 maas_proxy_port: "{{ 5240 if 'maas_region_controller' not in group_names else 5050 }}"
 maas_proxy_postgres_port: "{{ 5432 if 'maas_postgres' not in group_names else 5051 }}"
