@@ -3,6 +3,8 @@
 # Standard MAAS Variables
 enable_tls: false           # Use TLS for MAAS communication
 
+enable_firewall: true       # Run the firewall setup tasks.
+
 # Installation variables
 maas_install_deb: "{{ maas_installation_type == 'deb' }}"
 maas_snap_channel: "stable"     # if using snap, then the channel. ie: stable, beta, edge

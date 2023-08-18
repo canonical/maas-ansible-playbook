@@ -149,6 +149,8 @@ There are additional optional variables that can be passed to the playbooks:
 - **enable_tls**: Whether MAAS should enable TLS\
   Default: `false` (only valid for MAAS >= 3.2)
 
+- **enable_firewall**: Whether MAAS should configure the firewall\
+  Default: `true`
 - ### MAAS Vault (only valid for MAAS >= 3.3)
 
   - **vault_integration**: Whether MAAS Should use Vault for secret storage\
