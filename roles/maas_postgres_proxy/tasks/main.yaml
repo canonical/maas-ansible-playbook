@@ -23,4 +23,4 @@
   ansible.builtin.include_role:
     name: maas_firewall
     tasks_from: setup_firewall_rules
-  when: ('maas_region_controller' not in group_names and 'maas_rack_controller' not in group_names) and ( enable_firewall | bool )
+  when: ('maas_region_controller' not in group_names and 'maas_rack_controller' not in group_names) and ( enable_firewall )
