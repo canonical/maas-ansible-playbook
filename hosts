@@ -12,5 +12,7 @@ maas_corosync
 [maas_proxy]
 
 [maas_region_controller]
+10.10.0.28
 
 [maas_rack_controller]
+
