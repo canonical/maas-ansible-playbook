@@ -140,8 +140,8 @@ There are additional optional variables that can be passed to the playbooks:
   - **admin_email**: The email address of the admin user\
     Default: `admin@email.com`
 
-  - **admin_id**: The launchpad id of the admin user\
-    Default: `admin`
+  - **admin_id**: the Launchpad or GitHub id of the admin user to import ssh keys.
+    (Optional)
 
 - **maas_proxy_postgres_proxy_enabled**: Use postgres proxy uri\
   Default: `false`

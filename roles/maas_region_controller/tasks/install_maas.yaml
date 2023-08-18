@@ -79,7 +79,7 @@
     command: >
       maas init --rbac-url={{ maas_rbac_url | default('') | quote }}
       --candid-agent-file={{ maas_candid_auth_file | default('') | quote }}
-      --admin-ssh-import={{ admin_id }}
+      --admin-ssh-import={{ admin_id if admin_id is defined else '' }}
     responses:
       "(?i)Username: ": "{{ admin_username }}"
       "(?i)Password: ": "{{ admin_password }}"
@@ -97,7 +97,7 @@
 - name: Add an administrator to MAAS
   ansible.builtin.command: maas createadmin \
    --username={{ admin_username }} --password={{ admin_password }} \
-   --email={{ admin_email }} --ssh-import={{ admin_id }}
+   --email={{ admin_email }} --ssh-import={{ admin_id if admin_id is defined else '' }}
   when: not maas_region_new_installation or maas_installation_type | lower == 'snap'
   run_once: true
 
