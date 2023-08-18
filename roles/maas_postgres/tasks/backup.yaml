@@ -1,6 +1,6 @@
 ---
 - name: "Create a backup directory"
-  file:
+  ansible.builtin.file:
     path: "{{ maas_postgres_backup_dir }}"
     mode: 0777
     state: directory

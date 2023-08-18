@@ -3,9 +3,9 @@
   ansible.builtin.set_fact:
     archive_list: "{{ archive_list | default([]) + [item] }}"
   loop:
-    - "{{ ('maas_postgres' in group_names) | ternary('{{ maas_postgres_backup_dir }}', None) }}"
-    - "{{ (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) | ternary('{{ maas_config_backup_path }}', None) }}"
-    - "{{ (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) | ternary('{{ maas_runtime_backup_path }}', None) }}"
+    - "{{ maas_postgres_backup_dir if 'maas_postgres' in group_names else None }}"
+    - "{{ maas_config_backup_path if (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) else None }}"
+    - "{{ maas_runtime_backup_path if (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) else None }}"
   when: item
 
 - name: Bundle Backup Assets
@@ -15,6 +15,7 @@
     exclude_path:
       - "{{ maas_exclude_backup_path }}"
     dest: "{{ maas_backup_dest_path }}"
+  when: archive_list is defined
 
 # ansible.builtin.fetch has the ability to be oom killed on large files, so we're using scp instead
 - name: Download Backup
@@ -22,8 +23,10 @@
   delegate_to: localhost
   become: false # don't need sudo locally
   changed_when: false
+  when: archive_list is defined
 
 - name: Remove Backup from Remote Host
   ansible.builtin.file:
     path: "{{ maas_backup_dest_path }}"
     state: absent
+  when: archive_list is defined
