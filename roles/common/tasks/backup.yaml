@@ -13,11 +13,11 @@
   when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
 
 - name: Verify snap backup valid
-  ansible.builtin.command: "snap check-snapshot {{ snap_id }}"
+  ansible.builtin.command: "snap check-snapshot {{ snap_id.stdout }}"
   when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
 
 - name: Export snap backup
-  ansible.builtin.command: "snap export-snapshot {{ snap_id }} {{ maas_snap_backup_path }}"
+  ansible.builtin.command: "snap export-snapshot {{ snap_id.stdout }} {{ maas_snap_backup_path }}"
   when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
 
 - name: Generate List of Archiveable Directories

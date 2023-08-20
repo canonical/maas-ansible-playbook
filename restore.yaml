@@ -1,7 +1,7 @@
 ---
 - hosts: all
   tasks:
-  - name: Check backup file exists for host.
+  - name: Check backup file exists for host
     stat:
       path: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
     delegate_to: localhost
