@@ -1,9 +1,27 @@
 ---
+- name: Stop MAAS snap
+  ansible.builtin.command: snap stop maas
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
+
+- name: Backup MAAS snap
+  ansible.builtin.command: snap save maas
+  register: snap_id
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
+
+- name: Verify snap backup valid
+  ansible.builtin.command: "snap check-snapshot {{ snap_id }}"
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
+
+- name: Export snap backup
+  ansible.builtin.command: "snap export-snapshot {{ snap_id }} {{ maas_snap_backup_path }}"
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
+
 - name: Generate List of Archiveable Directories
   ansible.builtin.set_fact:
     archive_list: "{{ archive_list | default([]) + [item] }}"
   loop:
     - "{{ maas_postgres_backup_dir if 'maas_postgres' in group_names else None }}"
+    - "{{ maas_snap_backup_path if (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) else None }}"
     - "{{ maas_config_backup_path if (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) else None }}"
     - "{{ maas_runtime_backup_path if (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) else None }}"
   when: item
@@ -30,3 +48,7 @@
     path: "{{ maas_backup_dest_path }}"
     state: absent
   when: archive_list is defined
+
+- name: Start MAAS snap
+  ansible.builtin.command: snap start maas
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)

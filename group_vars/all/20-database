@@ -25,6 +25,7 @@ maas_postgres_version_number: "{{ 14 if ansible_distribution_major_version | flo
 maas_postgres_replication_user: "replicator"
 maas_postgres_backup_dir: "/tmp/maas_backup/" 
 maas_postgres_backup_path: "{{ maas_postgres_backup_dir }}dump.sql.gz"
+maas_snap_backup_path: "{{ '' if maas_install_deb | bool else '/var/lib/maas/snap_backup' }}"
 maas_config_backup_path: "{{ '/etc/maas/' if maas_install_deb | bool else '' }}"
 maas_runtime_backup_path: "{{ '/var/lib/maas/' if maas_install_deb | bool else '' }}"
 maas_exclude_backup_path: "{{ '/var/lib/maas/boot-resources/' if maas_install_deb | bool else '' }}"

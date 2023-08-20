@@ -31,6 +31,15 @@
   become: true
   gather_facts: true
 
+- hosts: maas_region_controller
+  tasks:
+    - name: Reset database triggers
+      ansible.builtin.command: maas-region dbupgrade
+      when: ('maas_region_controller' in group_names) and (not maas_install_deb | bool)
+      run_once: true
+  become: true
+  gather_facts: true
+
 - hosts:
     - maas_postgres
     - maas_region_controller

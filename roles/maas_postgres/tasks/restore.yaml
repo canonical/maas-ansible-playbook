@@ -1,5 +1,5 @@
 ---
-- name: Restore database using the tar format
+- name: Restore database from file
   community.postgresql.postgresql_db:
     name: "{{ maas_postgres_database }}"
     state: restore
