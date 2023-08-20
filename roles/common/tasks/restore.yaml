@@ -9,7 +9,7 @@
 
 - name: Unpack Backup Archive
   ansible.builtin.unarchive:
-    src: "{{ maas_backup_file }}"
+    src: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
     dest: /tmp/maas_backup/
 
 - name: Stop Region Controller

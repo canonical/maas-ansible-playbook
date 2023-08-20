@@ -1,4 +1,13 @@
 ---
+- hosts: all
+  tasks:
+  - name: Check backup file exists for host.
+    stat:
+      path: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
+    delegate_to: localhost
+    become: false
+    register: backup_file
+    
 - hosts:
     - maas_postgres
     - maas_region_controller
@@ -8,6 +17,7 @@
       ansible.builtin.include_role:
         name: common
         tasks_from: restore
+      when: backup_file.stat.exists
   become: true
   gather_facts: true
 
@@ -17,6 +27,7 @@
       ansible.builtin.include_role:
         name: maas_postgres
         tasks_from: restore
+      when: backup_file.stat.exists
   become: true
   gather_facts: true
 
@@ -29,5 +40,6 @@
       ansible.builtin.file:
         path: /tmp/maas_backup
         state: absent
+      when: backup_file.stat.exists
   become: true
   gather_facts: true
