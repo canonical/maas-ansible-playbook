@@ -28,8 +28,12 @@
   ansible.builtin.command: snap stop maas
   when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
 
-- name: Import snap data
-  ansible.builtin.command: "snap import-snapshot /tmp/maas_backup/{{ maas_snap_backup_path }}"
+- name: Backup MAAS snap
+  ansible.builtin.shell: "\
+    set -o pipefail && \
+    snap import-snapshot /tmp/maas_backup/{{ maas_snap_backup_path } | awk 'NR==3' | awk '{print $1}'"
+  args:
+    executable: /bin/bash
   register: snap_id
   when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
 

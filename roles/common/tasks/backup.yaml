@@ -4,7 +4,11 @@
   when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
 
 - name: Backup MAAS snap
-  ansible.builtin.command: snap save maas
+  ansible.builtin.shell: "\
+    set -o pipefail && \
+    snap save maas | awk 'NR==2' | awk '{print $1}'"
+  args:
+    executable: /bin/bash
   register: snap_id
   when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
 

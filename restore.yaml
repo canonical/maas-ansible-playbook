@@ -7,7 +7,7 @@
     delegate_to: localhost
     become: false
     register: backup_file
-    
+
 - hosts:
     - maas_postgres
     - maas_region_controller
