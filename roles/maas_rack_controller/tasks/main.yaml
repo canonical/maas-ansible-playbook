@@ -14,7 +14,6 @@
   ansible.builtin.package_facts:
     manager: "auto"
 
-
 - name: Check installed snaps
   ansible.builtin.shell: "\
     set -o pipefail && \

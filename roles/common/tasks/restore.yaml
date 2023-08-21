@@ -7,12 +7,9 @@
     mode: '0755'
     state: directory
 
-- name: Download Backup to hosts
-  ansible.builtin.command: scp {{ maas_backup_download_path }}{{ maas_backup_file }} {{ ansible_user }}@{{ inventory_hostname }}:/tmp/maas_backup/backup_file.tgz
-
 - name: Unpack Backup Archive
   ansible.builtin.unarchive:
-    src: /tmp/maas_backup/backup_file.tgz
+    src: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
     dest: /tmp/maas_backup/
 
 - name: Stop Region Controller
@@ -31,26 +28,38 @@
   ansible.builtin.command: snap stop maas
   when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
 
+- name: Locate snap backup file
+  ansible.builtin.find:
+    paths: /tmp/maas_backup/
+    recurse: false
+    file_type: file
+    patterns: '*.zip'
+  register: snap_zip
+
 - name: Import MAAS snap backup
   ansible.builtin.shell: "\
     set -o pipefail && \
-    snap import-snapshot /tmp/maas_backup{{ maas_snap_backup_path }} | awk 'NR==3' | awk '{print $1}'"
+    snap import-snapshot {{ snap_zip.files[0].path }} | awk 'NR==3' | awk '{print $1}'"
   args:
     executable: /bin/bash
   register: snap_id
-  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
+  when: >
+    (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and
+    ( not maas_install_deb | bool ) and ( snap_zip.files | length > 0 )
 
 - name: Restore Snap data
   ansible.builtin.command: "snap restore {{ snap_id.stdout }}"
-  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
+  when: >
+    (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and
+    (not maas_install_deb | bool) and ( snap_zip.files | length > 0 )
 
 - name: Restore Config
   ansible.builtin.command: "mv /tmp/maas_backup{{ maas_restore_config_path }} {{ maas_restore_config_path }}"
-  when: ('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (maas_install_deb | bool)
 
 - name: Restore Runtime Data
   ansible.builtin.command: "mv /tmp/maas_backup{{ maas_restore_runtime_path }} {{ maas_restore_runtime_path }}"
-  when: ('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (maas_install_deb | bool)
 
 - name: Start Region Controller
   ansible.builtin.systemd:
