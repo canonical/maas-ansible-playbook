@@ -11,7 +11,7 @@ maas_snap_channel: "stable"     # if using snap, then the channel. ie: stable, b
 maas_deb_state: "present"       # if using deb, the state for install
 maas_state: "install"           # whether to install, or upgrade maas
 
-maas_installmetric_file: "{{ '/var/snap/maas/common' if maas_installation_type | lower == 'snap' else '/var/lib/maas' }}/.ansible"
+maas_installmetric_file: "{{ '/var/snap/maas/common/maas' if maas_installation_type | lower == 'snap' else '/var/lib/maas' }}/.ansible"
 maas_secret_file: "{{ '/var/snap/maas/common' if  maas_installation_type | lower == 'snap' else '/var/lib' }}/maas/secret"
 
 proxy_env:
