@@ -68,6 +68,7 @@
   ansible.builtin.copy:
     src: "{{ maas_backup_dest_path }}"
     dest: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
+    remote_src: true
   when: archive_list is defined
 
 - name: Remove Backup from Remote Host
