@@ -55,14 +55,19 @@
   when: archive_list is defined
 
 # ansible.builtin.fetch has the ability to be oom killed on large files, so we're using scp instead
+# - name: Download Backup
+#   ansible.builtin.command: >
+#     scp -o StrictHostKeyChecking=no \
+#     {{ ansible_user }}@{{ inventory_hostname }}:{{ maas_backup_dest_path }} \
+#     {{ maas_backup_download_path }}{{ maas_backup_file }} -vvv
+#   delegate_to: localhost
+#   become: false # don't need sudo locally
+#   changed_when: false
+#   when: archive_list is defined
 - name: Download Backup
-  ansible.builtin.command: >
-    scp -o StrictHostKeyChecking=no \
-    {{ ansible_user }}@{{ inventory_hostname }}:{{ maas_backup_dest_path }} \
-    {{ maas_backup_download_path }}{{ maas_backup_file }} -vvv
-  delegate_to: localhost
-  become: false # don't need sudo locally
-  changed_when: false
+  ansible.builtin.copy:
+    src: "{{ maas_backup_dest_path }}"
+    dest: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
   when: archive_list is defined
 
 - name: Remove Backup from Remote Host
