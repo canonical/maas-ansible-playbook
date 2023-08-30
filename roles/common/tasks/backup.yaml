@@ -59,7 +59,7 @@
   ansible.builtin.command: >
     scp -o StrictHostKeyChecking=no \
     {{ ansible_user }}@{{ inventory_hostname }}:{{ maas_backup_dest_path }} \
-    {{ maas_backup_download_path }}{{ maas_backup_file }}
+    {{ maas_backup_download_path }}{{ maas_backup_file }} -vvv
   delegate_to: localhost
   become: false # don't need sudo locally
   changed_when: false
