@@ -11,6 +11,7 @@
   ansible.builtin.unarchive:
     src: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
     dest: /tmp/maas_backup/
+  timeout: 3600
 
 - name: Stop Region Controller
   ansible.builtin.systemd:

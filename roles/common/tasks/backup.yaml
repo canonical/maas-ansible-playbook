@@ -53,12 +53,14 @@
       - "{{ maas_exclude_backup_path }}"
     dest: "{{ maas_backup_dest_path }}"
   when: archive_list is defined
+  timeout: 3600
 
 - name: Download Backup
   ansible.builtin.fetch:
     src: "{{ maas_backup_dest_path }}"
     dest: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
   when: archive_list is defined
+  timeout: 3600
 
 - name: Remove Backup from Remote Host
   ansible.builtin.file:
