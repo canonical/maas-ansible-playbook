@@ -6,7 +6,7 @@
     group: root
     mode: '0755'
     state: directory
-  
+
 - name: Copy backup Archive
   ansible.builtin.copy:
     src: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
