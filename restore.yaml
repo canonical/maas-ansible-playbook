@@ -7,6 +7,7 @@
     delegate_to: localhost
     become: false
     register: backup_file
+    timeout: 3600
 
 - hosts:
     - maas_postgres

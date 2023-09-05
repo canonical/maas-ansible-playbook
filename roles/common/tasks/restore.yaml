@@ -17,6 +17,7 @@
     src: "/tmp/{{ maas_backup_file }}"
     dest: /tmp/maas_backup/
     remote_src: true
+  timeout: 3600
 
 - name: Stop Region Controller
   ansible.builtin.systemd:
