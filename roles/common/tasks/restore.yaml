@@ -6,11 +6,17 @@
     group: root
     mode: '0755'
     state: directory
+  
+- name: Copy backup Archive
+  ansible.builtin.copy:
+    src: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
+    dest: "/tmp/{{ maas_backup_file }}"
 
 - name: Unpack Backup Archive
   ansible.builtin.unarchive:
-    src: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
+    src: "/tmp/{{ maas_backup_file }}"
     dest: /tmp/maas_backup/
+    remote_src: true
 
 - name: Stop Region Controller
   ansible.builtin.systemd:
