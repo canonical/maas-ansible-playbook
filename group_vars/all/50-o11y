@@ -24,7 +24,7 @@ o11y_grafana_agent_dirs:
   - "{{ o11y_grafana_agent_wal_dir }}"
   - "{{ o11y_grafana_agent_pos_dir }}"
 
-grafana_agent_pkg: "https://github.com/grafana/agent/releases/download/v0.32.1/grafana-agent-linux-{{ ubuntu_arch }}.zip"
+grafana_agent_pkg: "https://github.com/grafana/agent/releases/download/v{{'0.37.4' if maas_version=3.5 else '0.32.1'}}/grafana-agent-linux-{{ ubuntu_arch }}.zip"
 
 o11y_postgres_exporter_dir: "/opt/postgres-exporter"
 pg_exp_pkg: "https://github.com/prometheus-community/postgres_exporter/releases/download/v0.11.1/postgres_exporter-0.11.1.linux-{{ ubuntu_arch }}.tar.gz"
