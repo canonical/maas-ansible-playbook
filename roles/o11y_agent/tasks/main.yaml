@@ -20,10 +20,6 @@
     name: unzip
     state: "present"
 
-- name: Print version of Grafana agent
-  ansible.builtin.debug:
-    msg: "{{ grafana_agent_pkg }}"
-
 - name: Download and unzip grafana agent
   ansible.builtin.unarchive:
     src: "{{ grafana_agent_pkg }}"
