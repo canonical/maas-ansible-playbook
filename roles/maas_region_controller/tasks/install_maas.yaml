@@ -79,12 +79,12 @@
     command: >
       maas init --rbac-url={{ maas_rbac_url | default('') | quote }}
       --candid-agent-file={{ maas_candid_auth_file | default('') | quote }}
-      --admin-ssh-import={{ admin_id if admin_id is defined else '' }}
     responses:
       "(?i)Username: ": "{{ admin_username }}"
       "(?i)Password: ": "{{ admin_password }}"
       "(?i)Again: ": "{{ admin_password }}"
       "(?i)Email: ": "{{ admin_email }}"
+      "(?i)Import SSH keys ": "{{ admin_id if admin_id is defined else '' }}"
   when: maas_installation_type | lower == 'deb' and maas_region_new_installation is defined
 
 - name: Starting MAAS region service
