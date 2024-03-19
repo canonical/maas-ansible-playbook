@@ -55,6 +55,15 @@
     src: "grafana-agent.yaml.j2"
     dest: "{{ o11y_grafana_agent_dir }}/agent.yaml"
     mode: 0644
-  when: o11y_enable
+  when: o11y_enable and maas_version is version("3.5",'<')
+  notify:
+    - "Start grafana agent"
+
+- name: Agent configuration for MAAS 3.5
+  ansible.builtin.template:
+    src: "agent-{{ maas_installation_type }}.yaml.j2"
+    dest: "{{ o11y_grafana_agent_dir }}/agent.yaml"
+    mode: 0644
+  when: o11y_enable and maas_version is version("3.5",'>=')
   notify:
     - "Start grafana agent"

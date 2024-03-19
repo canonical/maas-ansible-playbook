@@ -1,0 +1,203 @@
+server:
+  log_level: info
+
+{% if o11y_prometheus_url|length > 0 %}
+metrics:
+  wal_directory: {{ o11y_grafana_agent_wal_dir }}
+  global:
+    scrape_interval: 30s
+    external_labels:
+      host: {{ ansible_hostname }}
+{% if group_names|intersect(['maas_region_controller', 'maas_rack_controller']) %}
+      maas_az: {{ maas_availability_zone | default('default') }}
+      maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+      maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+{% endif %}
+    remote_write:
+      - url: {{o11y_prometheus_url}}
+        name: prom-export
+  configs:
+{% if group_names|intersect(['maas_region_controller', 'maas_rack_controller']) %}
+    - name: 'maas'
+      scrape_configs:
+        - job_name: 'maas-metrics'
+          static_configs:
+            - targets: ['{{ ansible_hostname }}:5239']
+{% if 'maas_region_controller' in group_names %}
+        - job_name: 'maas-cluster-metrics'
+          static_configs:
+            - targets: ['{{ ansible_hostname }}:5240']
+          metrics_path: '/MAAS/metrics'
+{% endif %}
+{% endif %}
+{% if 'maas_postgres' in group_names %}
+    - name: 'postgres'
+      scrape_configs:
+        - job_name: 'database-metrics'
+          static_configs:
+            - targets: ['{{ ansible_hostname }}:9187']
+{% endif %}
+{% if 'maas_pacemaker' in group_names %}
+    - name: 'ha-cluster'
+      scrape_configs:
+        - job_name: 'cluster-metrics'
+          static_configs:
+            - targets: ['{{ ansible_hostname }}:9664']
+{% endif %}
+{% endif %}
+
+{% if o11y_loki_url|length > 0 %}
+logs:
+  positions_directory: {{ o11y_grafana_agent_pos_dir }}
+  configs:
+{% if group_names|intersect(['maas_region_controller', 'maas_rack_controller']) %}
+    - name: 'maas'
+      clients:
+        - url: {{ o11y_loki_url }}
+      scrape_configs:
+        - job_name: maas-audit
+          syslog:
+            listen_address: localhost:{{ maas_promtail_port }}
+            labels:
+              job: "maas-audit"
+              maas_az: {{ maas_availability_zone | default('default') }}
+              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              maas_module: "audit"
+          relabel_configs:
+            - source_labels: ['__syslog_message_hostname']
+              target_label: 'host'
+            - source_labels: ['__syslog_message_app_name']
+              target_label: 'maas_module'
+          pipeline_stages:
+            - regex:
+                expression: "^(?s) \\[(?P<severity>\\S+?)\\] ((?P<machine>\\S+): )?(?P<content>.*)$"
+            - output:
+                source: content
+            - labels:
+                severity:
+                machine:
+
+        - job_name: maas-console
+          journal:
+            matches: _SYSTEMD_UNIT=maas-regiond.service, _SYSTEMD_UNIT=maas-rackd.service
+            labels:
+              host: {{ ansible_hostname }}
+              maas_az: {{ maas_availability_zone | default('default') }}
+              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              job: "maas-console"
+
+{% if 'maas_rack_controller' in group_names %}
+        - job_name: maas-dhcpd
+          journal:
+            matches: _SYSTEMD_UNIT=dhcpd.service, _SYSTEMD_UNIT=dhcpd6.service
+            labels:
+              host: {{ ansible_hostname }}
+              maas_az: {{ maas_availability_zone | default('default') }}
+              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              job: "maas-dhcpd"
+{% endif %}
+
+        - job_name: maas-metadata
+          journal:
+            matches: _SYSTEMD_UNIT=maas-http.service
+            labels:
+              host: {{ ansible_hostname }}
+              maas_az: {{ maas_availability_zone | default('default') }}
+              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              job: "maas-metadata"
+
+        - job_name: maas-named
+          journal:
+            matches: _SYSTEMD_UNIT=named.service
+            labels:
+              host: {{ ansible_hostname }}
+              maas_az: {{ maas_availability_zone | default('default') }}
+              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              job: "maas-named"
+
+        - job_name: maas-ntpd
+          journal:
+            matches: _SYSTEMD_UNIT=chrony.service
+            labels:
+              host: {{ ansible_hostname }}
+              maas_az: {{ maas_availability_zone | default('default') }}
+              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              job: "maas-ntpd"
+
+        - job_name: maas-proxy
+          journal:
+            matches: _SYSTEMD_UNIT=maas-proxy.service
+            labels:
+              host: {{ ansible_hostname }}
+              maas_az: {{ maas_availability_zone | default('default') }}
+              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              job: "maas-proxy"
+
+        - job_name: maas-temporal
+          journal:
+            matches: _SYSTEMD_UNIT=maas-temporal.service
+            labels:
+              host: {{ ansible_hostname }}
+              maas_az: {{ maas_availability_zone | default('default') }}
+              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              job: "maas-temporal"
+
+        - job_name: maas-apiserver
+          journal:
+            matches: _SYSTEMD_UNIT=maas-apiserver.service
+            labels:
+              host: {{ ansible_hostname }}
+              maas_az: {{ maas_availability_zone | default('default') }}
+              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              job: "maas-apiserver"
+
+        - job_name: maas-agent
+          journal:
+            matches: _SYSTEMD_UNIT=maas-agent.service
+            labels:
+              host: {{ ansible_hostname }}
+              maas_az: {{ maas_availability_zone | default('default') }}
+              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
+              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              job: "maas-agent"
+{% endif %}
+{% if 'maas_postgres' in group_names %}
+    - name: 'postgres'
+      clients:
+        - url: {{ o11y_loki_url }}
+      scrape_configs:
+        - job_name: database-logs
+          static_configs:
+            - labels:
+                __path__: {{ maas_postgres_data_dir ~ 'log/postgresql.log' }}
+                host: {{ ansible_hostname }}
+                job: "database-logs"
+{% endif %}
+{% if 'maas_pacemaker' in group_names %}
+    - name: 'ha-cluster'
+      clients:
+        - url: {{ o11y_loki_url }}
+      scrape_configs:
+        - job_name: pacemaker-logs
+          static_configs:
+            - labels:
+                __path__: /var/log/pacemaker/pacemaker.log
+                host: {{ ansible_hostname }}
+                job: "pacemaker-logs"
+        - job_name: corosync-logs
+          static_configs:
+            - labels:
+                __path__: /var/log/corosync/corosync.log
+                host: {{ ansible_hostname }}
+                job: "corosync-logs"
+{% endif %}
+{% endif %}
