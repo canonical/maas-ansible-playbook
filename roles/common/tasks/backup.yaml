@@ -61,6 +61,7 @@
     dest: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
   when: archive_list is defined
   timeout: 3600
+  become: false
 
 - name: Remove Backup from Remote Host
   ansible.builtin.file:
