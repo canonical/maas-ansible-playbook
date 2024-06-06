@@ -1,0 +1,20 @@
+---
+all:
+  children:
+    maas_pacemaker:
+      children:
+        maas_corosync:
+          hosts:
+    maas_postgres:
+      hosts:
+        18886-sjc11-head-node1:
+    maas_region_controller:
+      hosts:
+        18886-sjc11-firewall-node1:
+    maas_rack_controller:
+      hosts:
+        18886-sjc11-head-node1:
+    maas_proxy:
+      hosts:
+    maas_postgres_proxy:
+      hosts:

@@ -14,6 +14,32 @@
           - maas_installation_type is defined
           - maas_postgres_password is defined
 
+    - debug:
+        msg: |-
+          {% for k in _my_vars %}
+          {{ k }}: {{ lookup('vars', k) }}
+          {% endfor %}
+      vars:
+        _special_vars:
+          - ansible_dependent_role_names
+          - ansible_play_batch
+          - ansible_play_hosts
+          - ansible_play_hosts_all
+          - ansible_play_name
+          - ansible_play_role_names
+          - ansible_role_names
+          - environment
+          - hostvars
+          - play_hosts
+          - role_names
+        _hostvars: "{{ hostvars[inventory_hostname].keys() }}"
+        _my_vars: "{{ vars.keys()|
+                      difference(_hostvars)|
+                      difference(_special_vars)|
+                      reject('match', '^_.*$')|
+                      list|
+                      sort }}"
+
     - name: "Ensure maas_version is a version string"
       ansible.builtin.assert:
         fail_msg: "'{{ maas_version }}' is not a valid version number"

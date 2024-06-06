@@ -64,14 +64,14 @@
     index_var: idx
   when: maas_ha_postgres_enabled|bool
 
-- name: Migrate MAAS database
-  ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
-  changed_when: false
-  register: pg_migrate
-  until: pg_migrate is not failed
-  retries: 1
-  delay: 2
-  run_once: true
+#- name: Migrate MAAS database
+#  ansible.builtin.command: "{{ 'maas' if maas_installation_type | lower == 'snap' else 'maas-region' }} migrate"
+#  changed_when: false
+#  register: pg_migrate
+#  until: pg_migrate is not failed
+#  retries: 1
+#  delay: 2
+#  run_once: true
 
 # MAAS region controller only needs to be initialized in this case if rbac or candid are in use, otherwise the regiond.conf write handles init
 - name: Initialise MAAS Controller - Deb

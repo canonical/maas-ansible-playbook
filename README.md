@@ -1,5 +1,6 @@
 # MAAS-ansible-playbook
 An Ansible playbook for installing and configuring MAAS, further documentation is found [here](https://maas.io/docs/ansible-playbooks-reference).
+This was forked from: git clone git@github.com:maas/maas-ansible-playbook as the upstream playbook is no longer supported by ansible
 
 ## Versions
 This playbook has been tested with Ansible version 5.10.0 and above. We recommend using the latest available stable version of Ansible (currently 7.x). The `netaddr` Python library needs to be installed on the machine on which Ansible is used; note that this is not required on remote hosts.
@@ -7,7 +8,7 @@ This playbook has been tested with Ansible version 5.10.0 and above. We recommen
 ## Install
 
 ```
-git clone git@github.com:maas/maas-ansible-playbook
+git clone git@github.com:singlestore/maas-ansible-playbook
 ```
 
 ## Setup
@@ -192,19 +193,33 @@ The following variables are only required when using HA Postgres:
 ### Deploy the MAAS stack
 
 ```
-ansible-playbook -i ./hosts\
-    --extra-vars="maas_version=3.2 maas_postgres_password=example maas_installation_type=deb maas_url=http://example.com:5240/MAAS"\
+cd maas-ansible-playbook
+ansible-playbook -i ./<hosts_filename>.yaml \
+    --extra-vars="maas_version=3.4 \
+        maas_postgres_action=install \
+        maas_postgres_user=maas \
+        maas_postgres_database=anvil \
+        maas_postgres_v4_subnet=<ipv4_address of primary postgres host> \
+        maas_postgres_v6_subnet=<ipv6_address of primary postgres host> \
+        maas_postgres_password=<postgres_passwd> \
+        maas_installation_type=snap \
+        maas_url=http://<ip_addr_of_regiond_controller>/MAAS" \
     ./site.yaml
 ```
 
 ### Deploy the MAAS stack with Observability enabled
 
 ```
-ansible-playbook -i ./hosts \
-    --extra-vars="maas_version=3.3 \
-        maas_postgres_password=example \
+ansible-playbook -i ./<hosts_filename> \
+    --extra-vars="maas_version=3.4 \
+        maas_postgres_action=install \
+        maas_postgres_user=maas \
+        maas_postgres_database=anvil \
+        maas_postgres_v4_subnet=<ipv4_address of primary postgres host> \
+        maas_postgres_v6_subnet=<ipv6_address of primary postgres host> \
+        maas_postgres_password=<postgres_passwd> \
         maas_installation_type=snap \
-        maas_url=http://example.com:5240/MAAS \
+        maas_url=http://<ip_addr_of_regiond_controller>/MAAS" \
         o11y_enable=true \
         o11y_prometheus_url=http://prometheus-server:9090/api/v1/write \
         o11y_loki_url=http://loki-server:3100/loki/api/v1/push" \
@@ -250,3 +265,7 @@ MAAS has a curated collection of alert rules for Prometheus and Loki. You can ex
 ```
 ansible-playbook --extra-vars="o11y_alertrules_dest=/tmp" ./alertrules.yaml
 ```
+
+### Playbook Known Issues
+
+* group vars in     ./group_vars/all/20-database assume current postgres user is called 'maas'
