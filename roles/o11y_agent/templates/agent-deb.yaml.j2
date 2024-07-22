@@ -10,8 +10,8 @@ metrics:
       host: {{ ansible_hostname }}
 {% if group_names|intersect(['maas_region_controller', 'maas_rack_controller']) %}
       maas_az: {{ maas_availability_zone | default('default') }}
-      maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
-      maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+      maas_region: {{ 'maas_region_controller' in group_names }}
+      maas_rack: {{ 'maas_rack_controller' in group_names }}
 {% endif %}
     remote_write:
       - url: {{o11y_prometheus_url}}
@@ -61,8 +61,8 @@ logs:
             labels:
               job: "maas-audit"
               maas_az: {{ maas_availability_zone | default('default') }}
-              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
-              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              maas_region: {{ 'maas_region_controller' in group_names }}
+              maas_rack: {{ 'maas_rack_controller' in group_names }}
               maas_module: "audit"
           relabel_configs:
             - source_labels: ['__syslog_message_hostname']
@@ -84,8 +84,8 @@ logs:
             labels:
               host: {{ ansible_hostname }}
               maas_az: {{ maas_availability_zone | default('default') }}
-              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
-              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              maas_region: {{ 'maas_region_controller' in group_names }}
+              maas_rack: {{ 'maas_rack_controller' in group_names }}
               job: "maas-console"
 
 {% if 'maas_rack_controller' in group_names %}
@@ -95,8 +95,8 @@ logs:
             labels:
               host: {{ ansible_hostname }}
               maas_az: {{ maas_availability_zone | default('default') }}
-              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
-              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              maas_region: {{ 'maas_region_controller' in group_names }}
+              maas_rack: {{ 'maas_rack_controller' in group_names }}
               job: "maas-dhcpd"
 {% endif %}
 
@@ -106,8 +106,8 @@ logs:
             labels:
               host: {{ ansible_hostname }}
               maas_az: {{ maas_availability_zone | default('default') }}
-              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
-              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              maas_region: {{ 'maas_region_controller' in group_names }}
+              maas_rack: {{ 'maas_rack_controller' in group_names }}
               job: "maas-metadata"
 
         - job_name: maas-named
@@ -116,8 +116,8 @@ logs:
             labels:
               host: {{ ansible_hostname }}
               maas_az: {{ maas_availability_zone | default('default') }}
-              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
-              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              maas_region: {{ 'maas_region_controller' in group_names }}
+              maas_rack: {{ 'maas_rack_controller' in group_names }}
               job: "maas-named"
 
         - job_name: maas-ntpd
@@ -126,8 +126,8 @@ logs:
             labels:
               host: {{ ansible_hostname }}
               maas_az: {{ maas_availability_zone | default('default') }}
-              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
-              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              maas_region: {{ 'maas_region_controller' in group_names }}
+              maas_rack: {{ 'maas_rack_controller' in group_names }}
               job: "maas-ntpd"
 
         - job_name: maas-proxy
@@ -136,8 +136,8 @@ logs:
             labels:
               host: {{ ansible_hostname }}
               maas_az: {{ maas_availability_zone | default('default') }}
-              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
-              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              maas_region: {{ 'maas_region_controller' in group_names }}
+              maas_rack: {{ 'maas_rack_controller' in group_names }}
               job: "maas-proxy"
 
         - job_name: maas-temporal
@@ -146,8 +146,8 @@ logs:
             labels:
               host: {{ ansible_hostname }}
               maas_az: {{ maas_availability_zone | default('default') }}
-              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
-              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              maas_region: {{ 'maas_region_controller' in group_names }}
+              maas_rack: {{ 'maas_rack_controller' in group_names }}
               job: "maas-temporal"
 
         - job_name: maas-apiserver
@@ -156,8 +156,8 @@ logs:
             labels:
               host: {{ ansible_hostname }}
               maas_az: {{ maas_availability_zone | default('default') }}
-              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
-              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              maas_region: {{ 'maas_region_controller' in group_names }}
+              maas_rack: {{ 'maas_rack_controller' in group_names }}
               job: "maas-apiserver"
 
         - job_name: maas-agent
@@ -166,8 +166,8 @@ logs:
             labels:
               host: {{ ansible_hostname }}
               maas_az: {{ maas_availability_zone | default('default') }}
-              maas_region: {{ 'True' if 'maas_region_controller' in group_names else 'False' }}
-              maas_rack: {{ 'True' if 'maas_rack_controller' in group_names else 'False' }}
+              maas_region: {{ 'maas_region_controller' in group_names }}
+              maas_rack: {{ 'maas_rack_controller' in group_names }}
               job: "maas-agent"
 {% endif %}
 {% if 'maas_postgres' in group_names %}
