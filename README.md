@@ -7,7 +7,7 @@ This playbook has been tested with Ansible version 5.10.0 and above. We recommen
 ## Install
 
 ```
-git clone git@github.com:maas/maas-ansible-playbook
+git clone git@github.com:canonical/maas-ansible-playbook
 ```
 
 ## Setup
