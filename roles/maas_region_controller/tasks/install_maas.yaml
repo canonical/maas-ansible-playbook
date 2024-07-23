@@ -133,3 +133,4 @@
     path: "{{ maas_installmetric_file }}"
     state: touch
     mode: 0644
+
