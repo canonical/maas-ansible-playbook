@@ -1,6 +1,16 @@
 ---
+- hosts: all
+  tasks:
+  - name: Check backup file exists for host
+    stat:
+      path: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
+    delegate_to: localhost
+    become: false
+    register: backup_file
+    timeout: 3600
+
 - hosts:
-    - maas_postgres_primary
+    - maas_postgres
     - maas_region_controller
     - maas_rack_controller
   tasks:
@@ -8,20 +18,31 @@
       ansible.builtin.include_role:
         name: common
         tasks_from: restore
+      when: backup_file.stat.exists
   become: true
   gather_facts: true
 
-- hosts: maas_postgres_primary
+- hosts: maas_postgres
   tasks:
     - name: Restore from database dump
       ansible.builtin.include_role:
         name: maas_postgres
         tasks_from: restore
+      when: backup_file.stat.exists
+  become: true
+  gather_facts: true
+
+- hosts: maas_region_controller
+  tasks:
+    - name: Reset database triggers
+      ansible.builtin.command: maas-region dbupgrade
+      when: ('maas_region_controller' in group_names) and (maas_install_deb | bool)
+      run_once: true
   become: true
   gather_facts: true
 
 - hosts:
-    - maas_postgres_primary
+    - maas_postgres
     - maas_region_controller
     - maas_rack_controller
   tasks:
@@ -29,5 +50,6 @@
       ansible.builtin.file:
         path: /tmp/maas_backup
         state: absent
+      when: backup_file.stat.exists
   become: true
   gather_facts: true

@@ -1,11 +1,48 @@
 ---
+- name: Stop MAAS snap
+  ansible.builtin.command: snap stop maas
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
+
+- name: Backup MAAS snap
+  ansible.builtin.shell: "\
+    set -o pipefail && \
+    snap save maas | awk 'NR==2' | awk '{print $1}'"
+  args:
+    executable: /bin/bash
+  register: snap_id
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
+
+- name: Verify snap backup valid
+  ansible.builtin.command: "snap check-snapshot {{ snap_id.stdout }}"
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
+
+- name: Create Temporary Unpack Directory
+  ansible.builtin.file:
+    path: /tmp/
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+
+- name: Make snap backup directory
+  ansible.builtin.file:
+    path: "{{ maas_snap_backup_path }}"
+    mode: 0777
+    state: directory
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
+
+- name: Export snap backup
+  ansible.builtin.command: "snap export-snapshot {{ snap_id.stdout }} {{ maas_snap_backup_path }}backup.zip"
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
+
 - name: Generate List of Archiveable Directories
   ansible.builtin.set_fact:
     archive_list: "{{ archive_list | default([]) + [item] }}"
   loop:
-    - "{{ ('maas_postgres_primary' in group_names) | ternary('{{ maas_postgres_backup_dir }}', None) }}"
-    - "{{ (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) | ternary('{{ maas_config_backup_path }}', None) }}"
-    - "{{ (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) | ternary('{{ maas_runtime_backup_path }}', None) }}"
+    - "{{ maas_postgres_backup_dir if 'maas_postgres' in group_names else None }}"
+    - "{{ maas_snap_backup_path if (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) else None }}"
+    - "{{ maas_config_backup_path if (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) else None }}"
+    - "{{ maas_runtime_backup_path if (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) else None }}"
   when: item
 
 - name: Bundle Backup Assets
@@ -15,15 +52,29 @@
     exclude_path:
       - "{{ maas_exclude_backup_path }}"
     dest: "{{ maas_backup_dest_path }}"
+  when: archive_list is defined
+  timeout: 3600
 
-# ansible.builtin.fetch has the ability to be oom killed on large files, so we're using scp instead
 - name: Download Backup
-  ansible.builtin.command: scp {{ ansible_user }}@{{ inventory_hostname }}:{{ maas_backup_dest_path }} {{ maas_backup_download_path }}
-  delegate_to: localhost
-  become: false # don't need sudo locally
-  changed_when: false
+  ansible.builtin.fetch:
+    src: "{{ maas_backup_dest_path }}"
+    dest: "{{ maas_backup_download_path }}{{ maas_backup_file }}"
+  when: archive_list is defined
+  timeout: 3600
+  become: false
 
 - name: Remove Backup from Remote Host
   ansible.builtin.file:
     path: "{{ maas_backup_dest_path }}"
     state: absent
+  when: archive_list is defined
+
+- name: Remove Snap Backup Directory
+  ansible.builtin.file:
+    path: "{{ maas_snap_backup_path }}"
+    state: absent
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
+
+- name: Start MAAS snap
+  ansible.builtin.command: snap start maas
+  when: (('maas_region_controller' in group_names) or ('maas_rack_controller' in group_names)) and (not maas_install_deb | bool)
