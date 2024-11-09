@@ -38,12 +38,18 @@
   register: maas_admin_api_key
   changed_when: false
 
+- name: "Check MAAS login status"
+  ansible.builtin.command: maas list
+  register: maas_login_status
+  changed_when: false
+
 - name: "Login in MAAS"
   ansible.builtin.command: maas login {{ admin_username }} {{ maas_url }} {{ maas_admin_api_key.stdout }}
   environment:
     http_proxy: ""
     https_proxy: ""
     no_proxy: "localhost,hostvars[inventory_hostname]['ansible_env'].SSH_CONNECTION.split(' ')[2]"
+  when: (admin_username + " " + maas_url) not in maas_login_status.stdout
   changed_when: true
   register: login
   until: login is not failed
